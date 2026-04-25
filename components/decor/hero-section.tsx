@@ -20,43 +20,43 @@ export function DecorHeroSection() {
       src: "/momos.png",
       range: [0.1, 0.20],
       rotate: -5,
-      className: "bottom-[45%] right-[17%] w-[16%] h-[26%]",
+      className: "bottom-[46%] right-[20%] w-[16%] h-[26%]",
     },
     {
       src: "/momos2.png",
       range: [0.20, 0.25],
       rotate: -2,
-      className: "bottom-[42%] right-[18%] w-[22%] h-[26%]",
+      className: "bottom-[40%] right-[22%] w-[22%] h-[26%]",
     },
     {
       src: "/sushi.png",
       range: [0.25, 0.30],
-      rotate: 10,
-      className: "top-[30%] left-[15%] w-[26%] h-[30%]",
+      rotate: 16,
+      className: "top-[30%] left-[18%] w-[26%] h-[30%]",
     },
     {
       src: "/rolls.png",
       range: [0.30, 0.35],
       rotate: 6,
-      className: "top-[10%] left-[36%] w-[38%] h-[32%]",
+      className: "top-[16%] left-[36%] w-[38%] h-[32%]",
     },
     {
       src: "/mit.png",
       range: [0.35, 0.40],
       rotate: -10,
-      className: "top-[15%] left-[25%] w-[24%] h-[38%]",
+      className: "top-[16%] left-[28%] w-[24%] h-[38%]",
     },
     {
       src: "/mit1.png",
       range: [0.40, 0.45],
       rotate: -10,
-      className: "top-[20%] left-[30%] w-[21%] h-[38%]",
+      className: "top-[21%] left-[33%] w-[21%] h-[38%]",
     },
     {
       src: "/noodles.png",
       range: [0.45, 0.50], 
       rotate: -10,
-      className: "bottom-[24%] left-[32%] w-[38%] h-[30%]",
+      className: "bottom-[28%] left-[32%] w-[38%] h-[30%]",
     },
       {
       src: "/lamon.png",
@@ -96,12 +96,20 @@ export function DecorHeroSection() {
               experiences.
             </p>
             
-            <Link href="/shop?category=Decor">
-              <button className="group flex items-center gap-3 px-6 py-3.5 bg-charcoal text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
-                Explore Artistry
-                <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
-              </button>
-            </Link>
+            <div className="flex flex-col gap-3">
+              <Link href="/shop?category=Decor">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-3.5 bg-charcoal text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
+                  Shop Collection
+                  <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
+                </button>
+              </Link>
+              <Link href="/collections?type=Decor">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-3.5 border border-charcoal/10 text-charcoal text-[8px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-charcoal hover:text-white transition-all duration-700">
+                  View Lookbook
+                  <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
+                </button>
+              </Link>
+            </div>
           </motion.div>
         </div>
 

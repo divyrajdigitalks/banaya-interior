@@ -46,19 +46,19 @@ function ShopContent() {
               <Sparkles className="h-2 w-2 text-gold" />
               <div className="h-px w-3 bg-gold/40" />
             </div>
-            <p className="text-[7px] uppercase tracking-[0.4em] text-gold font-bold mb-3">The Royal Marketplace</p>
-            <h1 className="text-3xl md:text-4xl font-serif font-black text-charcoal mb-4 tracking-tighter leading-tight">
+            <p className="text-[9px] uppercase tracking-[0.4em] text-gold font-black mb-3">The Royal Marketplace</p>
+            <h1 className="text-4xl md:text-5xl font-serif font-black text-charcoal mb-4 tracking-tighter leading-tight">
               Curated <span className="italic font-light text-gold">Masterpieces</span>
             </h1>
-            <p className="text-charcoal/50 max-w-md mx-auto text-sm font-light leading-relaxed">
+            <p className="text-charcoal/70 max-w-md mx-auto text-base font-light leading-relaxed">
               Explore our complete collection of heritage-inspired furniture and decor.
             </p>
           </motion.div>
         </div>
         
         {/* Decorative background element */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.01] pointer-events-none select-none">
-          <span className="text-[12vw] font-serif italic font-black">SHOP</span>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none select-none">
+          <span className="text-[15vw] font-serif italic font-black text-charcoal">SHOP</span>
         </div>
       </section>
 
