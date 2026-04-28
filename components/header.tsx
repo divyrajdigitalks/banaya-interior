@@ -32,11 +32,47 @@ export function Header({ variant = "dark" }: HeaderProps) {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${bgClass}`}>
       <div className="container mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-center h-20">
-          {/* Logo Only Header */}
-          <Link href="/">
+        <div className="flex items-center justify-center h-24">
+          {/* Desktop Navigation - Hidden as per request */}
+          {/* <nav className="hidden lg:flex items-center gap-10">
+            {navLinks.slice(0, 2).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-300 relative group ${
+                  pathname === link.href ? "text-gold" : `${textColor}/60 hover:text-gold`
+                }`}
+              >
+                {link.name}
+                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-500 ${pathname === link.href ? "w-full" : "w-0 group-hover:w-full"}`} />
+              </Link>
+            ))}
+          </nav> */}
+
+          {/* Center Logo */}
+          <Link href="/" className="relative">
             <Logo variant={logoVariant} />
           </Link>
+
+          {/* Desktop Navigation - Hidden as per request */}
+          {/* <nav className="hidden lg:flex items-center gap-10">
+            {navLinks.slice(2).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-300 relative group ${
+                  pathname === link.href ? "text-gold" : `${textColor}/60 hover:text-gold`
+                }`}
+              >
+                {link.name}
+                <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-500 ${pathname === link.href ? "w-full" : "w-0 group-hover:w-full"}`} />
+              </Link>
+            ))}
+          </nav> */}
+
+          {/* Mobile Menu Placeholder - Hidden */}
+          {/* <div className="lg:hidden">
+          </div> */}
         </div>
       </div>
     </header>

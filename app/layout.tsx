@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { StoreProvider } from '@/context/StoreContext'
+import { DoorTransition } from '@/components/door-transition'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({ 
@@ -45,8 +47,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${cormorant.variable} ${inter.variable} font-sans antialiased`}>
-        {children}
-        <Analytics />
+        <StoreProvider>
+          <DoorTransition />
+          {children}
+          <Analytics />
+        </StoreProvider>
       </body>
     </html>
   )
