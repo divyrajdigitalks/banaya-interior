@@ -17,10 +17,10 @@ function ShopContent() {
 
   useEffect(() => {
     const category = searchParams.get("category");
-    if (category) setSelectedCategory(category);
+    setSelectedCategory(category || "All");
     
     const query = searchParams.get("q");
-    if (query) setSearchQuery(query);
+    setSearchQuery(query || "");
   }, [searchParams]);
 
   const filteredProducts = FEATURED_PRODUCTS.filter((p) => {

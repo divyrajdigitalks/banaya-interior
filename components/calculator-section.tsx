@@ -60,6 +60,85 @@ const ToggleSwitch = ({ on, onClick }: { on: boolean; onClick: () => void }) => 
 );
 
 /* ─── Card Component ─── */
+const BrandSelection = ({ selBrand, setSelBrand }: { selBrand: string; setSelBrand: (id: string) => void }) => (
+  <div className="space-y-8">
+    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
+      Brand Level <div className="h-px bg-slate-100 flex-1" />
+    </label>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {BRAND_OPTIONS.map((opt) => {
+        const active = selBrand === opt.id;
+        return (
+          <button
+            key={opt.id}
+            onClick={() => setSelBrand(opt.id)}
+            className={`p-6 rounded-3xl border transition-all space-y-6 text-left ${
+              active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-lg" : "border-slate-100 bg-white hover:border-slate-200"
+            }`}
+          >
+            <div className="aspect-video rounded-2xl overflow-hidden relative bg-slate-50">
+              <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
+              {active && (
+                <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
+                  <CheckCircle2 className="text-slate-900" size={32} />
+                </div>
+              )}
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest block text-slate-900">{opt.name}</span>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                {opt.multiplier === 1 ? "Standard Pricing" : `${Math.round((opt.multiplier - 1) * 100)}% Premium`}
+              </p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+const FinalEstimateForm = ({ register, handleSubmit, onSubmit, errors, back, estimate }: any) => (
+  <div className="space-y-10">
+    <div className="space-y-2 text-center">
+      <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto border-2 border-slate-900 mb-8">
+        <Calculator size={32} className="text-slate-900" />
+      </div>
+      <h3 className="text-3xl font-bold text-slate-900">Your Estimate is Ready</h3>
+      <p className="text-slate-500">Fill in your details to receive the detailed proposal and lock in this pricing.</p>
+    </div>
+
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-2xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-10 rounded-3xl border border-slate-100 bg-white shadow-xl">
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Full Name</label>
+          <Input {...register("name")} placeholder="Your name" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.name ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          {errors.name && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.name.message}</p>}
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Email Address</label>
+          <Input {...register("email")} placeholder="you@email.com" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.email ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          {errors.email && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.email.message}</p>}
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Phone Number</label>
+          <Input {...register("phone")} placeholder="+91 00000 00000" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.phone ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          {errors.phone && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.phone.message}</p>}
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">City</label>
+          <Input {...register("city")} placeholder="Your city" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.city ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          {errors.city && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.city.message}</p>}
+        </div>
+      </div>
+
+      <div className="flex gap-4 pt-12 pb-8">
+        <Button type="button" variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
+        <Button type="submit" className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">Submit & Get Detailed Quote</Button>
+      </div>
+    </form>
+  </div>
+);
+
 const ItemCard = ({ 
   item, 
   isSelected, 
@@ -200,6 +279,8 @@ export function CalculatorSection() {
   const handleOpen = (type: "services" | "interior" | "homes") => {
     setServiceType(type);
     resetAll();
+    // If services, we can skip BHK if we want, but let's keep it consistent
+    // or better, let's make it smarter.
     setIsOpen(true);
   };
 
@@ -231,7 +312,10 @@ export function CalculatorSection() {
   const toggleBasic = (id: string) => setSelBasic(p => p.find(x => x.id === id) ? p.filter(x => x.id !== id) : [...p, { id, qty: 1 }]);
   const updateBasicQty = (id: string, d: number | string) => setSelBasic(p => p.map(x => x.id === id ? { ...x, qty: Math.max(1, typeof d === "string" ? (parseInt(d) || 0) : d) } : x));
 
-  const next = () => setStep(p => Math.min(p + 1, 4));
+  const next = () => {
+    const max = serviceType === "homes" ? 5 : (serviceType === "services" ? 3 : 4);
+    setStep(p => Math.min(p + 1, max));
+  };
   const back = () => setStep(p => Math.max(p - 1, 1));
   const onSubmit = () => setSubmitted(true);
 
@@ -246,12 +330,28 @@ export function CalculatorSection() {
     document.body.removeChild(a);
   };
 
-  const progSteps = [
-    { s: 1, n: "Requirements" },
-    { s: 2, n: "Selection" },
-    { s: 3, n: "Brand" },
-    { s: 4, n: "Estimate" }
-  ];
+  const getSteps = () => {
+    if (serviceType === "services") return [
+      { s: 1, n: "Services" },
+      { s: 2, n: "Quality" },
+      { s: 3, n: "Estimate" }
+    ];
+    if (serviceType === "homes") return [
+      { s: 1, n: "Scope" },
+      { s: 2, n: "Refine" },
+      { s: 3, n: "Detailed" },
+      { s: 4, n: "Quality" },
+      { s: 5, n: "Estimate" }
+    ];
+    return [
+      { s: 1, n: "Scope" },
+      { s: 2, n: "Detailed" },
+      { s: 3, n: "Quality" },
+      { s: 4, n: "Estimate" }
+    ];
+  };
+
+  const progSteps = getSteps();
 
   return (
     <section className="py-24 bg-white">
@@ -335,7 +435,7 @@ export function CalculatorSection() {
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${step >= item.s ? "text-slate-900" : "text-slate-300"}`}>
                       {item.n}
                     </span>
-                    {idx < 3 && <div className={`w-12 h-px ${step > item.s ? "bg-slate-900" : "bg-slate-100"}`} />}
+                    {idx < progSteps.length - 1 && <div className={`w-12 h-px ${step > item.s ? "bg-slate-900" : "bg-slate-100"}`} />}
                   </div>
                 ))}
               </div>
@@ -356,9 +456,11 @@ export function CalculatorSection() {
                       >
                         <div className="space-y-2">
                           <h3 className="text-2xl font-bold text-slate-900">
-                            {serviceType === "homes" ? "Select basic items" : "Project scope"}
+                            {serviceType === "homes" ? "Select project scope" : (serviceType === "services" ? "Select services" : "Project scope")}
                           </h3>
-                          <p className="text-slate-500">Let's start with the basics of your project.</p>
+                          <p className="text-slate-500">
+                            {serviceType === "services" ? "Select the services you need for your project." : "Let's start with the basics of your project."}
+                          </p>
                         </div>
 
                         {serviceType === "homes" ? (
@@ -373,7 +475,7 @@ export function CalculatorSection() {
                                     active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900" : "border-slate-100 bg-white"
                                   }`}
                                 >
-                                  <div className="aspect-square rounded-xl overflow-hidden relative">
+                                  <div className="aspect-square rounded-xl overflow-hidden relative bg-slate-50">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                     {active && (
                                       <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
@@ -383,6 +485,22 @@ export function CalculatorSection() {
                                   </div>
                                   <span className="text-[10px] font-bold uppercase tracking-widest block text-slate-600">{item.name}</span>
                                 </button>
+                              );
+                            })}
+                          </div>
+                        ) : serviceType === "services" ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {GENERAL_SERVICES.map((opt) => {
+                              const sel = selServices.find(s => s.id === opt.id);
+                              return (
+                                <ItemCard 
+                                  key={opt.id}
+                                  item={opt}
+                                  isSelected={!!sel}
+                                  onToggle={() => toggleSvc(opt.id)}
+                                  onUpdateQty={(d) => updateSvcQty(opt.id, d)}
+                                  qty={sel?.qty || 1}
+                                />
                               );
                             })}
                           </div>
@@ -411,10 +529,10 @@ export function CalculatorSection() {
                                       key={opt.id}
                                       onClick={() => setSelBHK(opt.id)}
                                       className={`p-4 rounded-2xl border transition-all text-center space-y-4 ${
-                                        active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900" : "border-slate-100 bg-white"
+                                        active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-lg" : "border-slate-100 bg-white"
                                       }`}
                                     >
-                                      <div className="aspect-[4/3] rounded-xl overflow-hidden relative">
+                                      <div className="aspect-[4/3] rounded-xl overflow-hidden relative bg-slate-50">
                                         <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
                                         {active && (
                                           <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
@@ -462,93 +580,81 @@ export function CalculatorSection() {
                       >
                         <div className="space-y-2">
                           <h3 className="text-2xl font-bold text-slate-900">
-                            {serviceType === "services" ? "Select services" : "Customize items"}
+                            {serviceType === "services" ? "Quality Level" : (serviceType === "homes" ? "Refine items" : "Detailed Selection")}
                           </h3>
-                          <p className="text-slate-500">Refine your selection and adjust quantities.</p>
+                          <p className="text-slate-500">
+                            {serviceType === "services" ? "Select the material quality level for your project." : "Refine your selection and adjust quantities."}
+                          </p>
                         </div>
 
-                        <div className="space-y-16">
-                          {serviceType === "homes" && selFurniture.map((furnId) => {
-                            const furn = FURNITURE_ITEMS.find(f => f.id === furnId);
-                            if (!furn) return null;
-                            return (
-                              <div key={furnId} className="space-y-8">
+                        {serviceType === "services" ? (
+                          <BrandSelection selBrand={selBrand} setSelBrand={setSelBrand} />
+                        ) : (
+                          <div className="space-y-16">
+                            {serviceType === "homes" && selFurniture.map((furnId) => {
+                              const furn = FURNITURE_ITEMS.find(f => f.id === furnId);
+                              if (!furn) return null;
+                              return (
+                                <div key={furnId} className="space-y-8">
+                                  <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
+                                    {furn.name} <div className="h-px bg-slate-100 flex-1" />
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {furn.options ? furn.options.map((opt) => {
+                                      const sel = selFurnOpts.find(o => o.id === opt.id);
+                                      return (
+                                        <ItemCard 
+                                          key={opt.id}
+                                          item={opt}
+                                          isSelected={!!sel}
+                                          onToggle={() => toggleFurnOpt(opt.id)}
+                                          onUpdateQty={(d) => updateFurnQty(opt.id, d)}
+                                          qty={sel?.qty || 1}
+                                        />
+                                      );
+                                    }) : (
+                                      <ItemCard 
+                                        item={furn}
+                                        isSelected={true}
+                                        onToggle={() => {}}
+                                        onUpdateQty={(d) => updateFurnQty(furn.id, d)}
+                                        qty={selFurnOpts.find(o => o.id === furn.id)?.qty || 1}
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+
+                            {serviceType === "interior" && Object.entries(DETAILED_FURNITURE).map(([area, items]) => (
+                              <div key={area} className="space-y-8">
                                 <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
-                                  {furn.name} <div className="h-px bg-slate-100 flex-1" />
+                                  {area} <div className="h-px bg-slate-100 flex-1" />
                                 </h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                  {furn.options ? furn.options.map((opt) => {
-                                    const sel = selFurnOpts.find(o => o.id === opt.id);
+                                  {(items as any[]).map((item) => {
+                                    const sel = selDetailed.find(f => f.id === item.id);
                                     return (
                                       <ItemCard 
-                                        key={opt.id}
-                                        item={opt}
+                                        key={item.id}
+                                        item={item}
                                         isSelected={!!sel}
-                                        onToggle={() => toggleFurnOpt(opt.id)}
-                                        onUpdateQty={(d) => updateFurnQty(opt.id, d)}
+                                        onToggle={() => toggleDet(item.id)}
+                                        onUpdateQty={(d) => updateDetQty(item.id, d)}
                                         qty={sel?.qty || 1}
                                       />
                                     );
-                                  }) : (
-                                    <ItemCard 
-                                      item={furn}
-                                      isSelected={true}
-                                      onToggle={() => {}}
-                                      onUpdateQty={(d) => updateFurnQty(furn.id, d)}
-                                      qty={selFurnOpts.find(o => o.id === furn.id)?.qty || 1}
-                                    />
-                                  )}
+                                  })}
                                 </div>
                               </div>
-                            );
-                          })}
-
-                          {serviceType === "interior" && Object.entries(DETAILED_FURNITURE).map(([area, items]) => (
-                            <div key={area} className="space-y-8">
-                              <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
-                                {area} <div className="h-px bg-slate-100 flex-1" />
-                              </h4>
-                              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {(items as any[]).map((item) => {
-                                  const sel = selDetailed.find(f => f.id === item.id);
-                                  return (
-                                    <ItemCard 
-                                      key={item.id}
-                                      item={item}
-                                      isSelected={!!sel}
-                                      onToggle={() => toggleDet(item.id)}
-                                      onUpdateQty={(d) => updateDetQty(item.id, d)}
-                                      qty={sel?.qty || 1}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-
-                          {serviceType === "services" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                              {GENERAL_SERVICES.map((opt) => {
-                                const sel = selServices.find(s => s.id === opt.id);
-                                return (
-                                  <ItemCard 
-                                    key={opt.id}
-                                    item={opt}
-                                    isSelected={!!sel}
-                                    onToggle={() => toggleSvc(opt.id)}
-                                    onUpdateQty={(d) => updateSvcQty(opt.id, d)}
-                                    qty={sel?.qty || 1}
-                                  />
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
+                            ))}
+                          </div>
+                        )}
 
                         <div className="flex gap-4 pt-12 pb-8">
                           <Button variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
                           <Button onClick={next} className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">
-                            Next Step <ChevronRight size={18} className="ml-2" />
+                            {serviceType === "services" ? "Final Estimate" : "Next Step"} <ChevronRight size={18} className="ml-2" />
                           </Button>
                         </div>
                       </motion.div>
@@ -562,122 +668,137 @@ export function CalculatorSection() {
                         exit={{ opacity: 0, x: -20 }}
                         className="space-y-12"
                       >
-                        <div className="space-y-2">
-                          <h3 className="text-2xl font-bold text-slate-900">Brand & Quality</h3>
-                          <p className="text-slate-500">Select the material quality level for your project.</p>
-                        </div>
-
-                        {serviceType === "interior" && (
-                          <div className="space-y-8">
-                            <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
-                              Additional Requirements <div className="h-px bg-slate-100 flex-1" />
-                            </label>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                              {BASIC_REQUIREMENTS.map((item) => {
-                                const sel = selBasic.find(b => b.id === item.id);
-                                return (
-                                  <ItemCard 
-                                    key={item.id}
-                                    item={item}
-                                    isSelected={!!sel}
-                                    onToggle={() => toggleBasic(item.id)}
-                                    onUpdateQty={(d) => updateBasicQty(item.id, d)}
-                                    qty={sel?.qty || 1}
-                                  />
-                                );
-                              })}
+                        {serviceType === "services" ? (
+                          <FinalEstimateForm 
+                            register={register} 
+                            handleSubmit={handleSubmit} 
+                            onSubmit={onSubmit} 
+                            errors={errors} 
+                            back={back} 
+                            estimate={estimate} 
+                          />
+                        ) : (
+                          <>
+                            <div className="space-y-2">
+                              <h3 className="text-2xl font-bold text-slate-900">
+                                {serviceType === "homes" ? "Detailed Selection" : "Quality Level"}
+                              </h3>
+                              <p className="text-slate-500">
+                                {serviceType === "homes" ? "Select additional detailed items for your home." : "Select the material quality level for your project."}
+                              </p>
                             </div>
-                          </div>
+
+                            {serviceType === "homes" ? (
+                              <div className="space-y-16">
+                                {Object.entries(DETAILED_FURNITURE).map(([area, items]) => (
+                                  <div key={area} className="space-y-8">
+                                    <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
+                                      {area} <div className="h-px bg-slate-100 flex-1" />
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                      {(items as any[]).map((item) => {
+                                        const sel = selDetailed.find(f => f.id === item.id);
+                                        return (
+                                          <ItemCard 
+                                            key={item.id}
+                                            item={item}
+                                            isSelected={!!sel}
+                                            onToggle={() => toggleDet(item.id)}
+                                            onUpdateQty={(d) => updateDetQty(item.id, d)}
+                                            qty={sel?.qty || 1}
+                                          />
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                ))}
+                                <div className="space-y-8">
+                                  <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
+                                    Additional Requirements <div className="h-px bg-slate-100 flex-1" />
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {BASIC_REQUIREMENTS.map((item) => {
+                                      const sel = selBasic.find(b => b.id === item.id);
+                                      return (
+                                        <ItemCard 
+                                          key={item.id}
+                                          item={item}
+                                          isSelected={!!sel}
+                                          onToggle={() => toggleBasic(item.id)}
+                                          onUpdateQty={(d) => updateBasicQty(item.id, d)}
+                                          qty={sel?.qty || 1}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <BrandSelection selBrand={selBrand} setSelBrand={setSelBrand} />
+                            )}
+
+                            <div className="flex gap-4 pt-12 pb-8">
+                              <Button variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
+                              <Button onClick={next} className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">
+                                {serviceType === "homes" ? "Next Step" : "Final Estimate"} <ChevronRight size={18} className="ml-2" />
+                              </Button>
+                            </div>
+                          </>
                         )}
-
-                        <div className="space-y-8">
-                          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
-                            Brand Level <div className="h-px bg-slate-100 flex-1" />
-                          </label>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            {BRAND_OPTIONS.map((opt) => {
-                              const active = selBrand === opt.id;
-                              return (
-                                <button
-                                  key={opt.id}
-                                  onClick={() => setSelBrand(opt.id)}
-                                  className={`p-6 rounded-3xl border transition-all space-y-6 text-left ${
-                                    active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-lg" : "border-slate-100 bg-white"
-                                  }`}
-                                >
-                                  <div className="aspect-video rounded-2xl overflow-hidden relative">
-                                    <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
-                                    {active && (
-                                      <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
-                                        <CheckCircle2 className="text-slate-900" size={32} />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="space-y-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest block text-slate-900">{opt.name}</span>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                      {opt.multiplier === 1 ? "Standard Pricing" : `${Math.round((opt.multiplier - 1) * 100)}% Premium`}
-                                    </p>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div className="flex gap-4 pt-12 pb-8">
-                          <Button variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
-                          <Button onClick={next} className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">
-                            Final Estimate <ChevronRight size={18} className="ml-2" />
-                          </Button>
-                        </div>
                       </motion.div>
                     )}
 
                     {step === 4 && (
                       <motion.div
                         key="step4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
                         className="space-y-10"
                       >
-                        <div className="space-y-2 text-center">
-                          <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto border-2 border-slate-900 mb-8">
-                            <Calculator size={32} className="text-slate-900" />
-                          </div>
-                          <h3 className="text-3xl font-bold text-slate-900">Your Estimate is Ready</h3>
-                          <p className="text-slate-500">Fill in your details to receive the detailed proposal and lock in this pricing.</p>
-                        </div>
+                        {serviceType === "interior" ? (
+                          <FinalEstimateForm 
+                            register={register} 
+                            handleSubmit={handleSubmit} 
+                            onSubmit={onSubmit} 
+                            errors={errors} 
+                            back={back} 
+                            estimate={estimate} 
+                          />
+                        ) : (
+                          <>
+                            <div className="space-y-2">
+                              <h3 className="text-2xl font-bold text-slate-900">Quality Level</h3>
+                              <p className="text-slate-500">Select the material quality level for your project.</p>
+                            </div>
+                            <BrandSelection selBrand={selBrand} setSelBrand={setSelBrand} />
+                            <div className="flex gap-4 pt-12 pb-8">
+                              <Button variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
+                              <Button onClick={next} className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">
+                                Final Estimate <ChevronRight size={18} className="ml-2" />
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                      </motion.div>
+                    )}
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-2xl mx-auto">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-10 rounded-3xl border border-slate-100 bg-white shadow-xl">
-                            <div className="space-y-3">
-                              <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Full Name</label>
-                              <Input {...register("name")} placeholder="Your name" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.name ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
-                              {errors.name && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.name.message}</p>}
-                            </div>
-                            <div className="space-y-3">
-                              <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Email Address</label>
-                              <Input {...register("email")} placeholder="you@email.com" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.email ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
-                              {errors.email && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.email.message}</p>}
-                            </div>
-                            <div className="space-y-3">
-                              <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Phone Number</label>
-                              <Input {...register("phone")} placeholder="+91 00000 00000" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.phone ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
-                              {errors.phone && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.phone.message}</p>}
-                            </div>
-                            <div className="space-y-3">
-                              <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">City</label>
-                              <Input {...register("city")} placeholder="Your city" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.city ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
-                              {errors.city && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.city.message}</p>}
-                            </div>
-                          </div>
-
-                          <div className="flex gap-4 pt-12 pb-8">
-                            <Button type="button" variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
-                            <Button type="submit" className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">Submit & Get Detailed Quote</Button>
-                          </div>
-                        </form>
+                    {step === 5 && serviceType === "homes" && (
+                      <motion.div
+                        key="step5"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-10"
+                      >
+                        <FinalEstimateForm 
+                          register={register} 
+                          handleSubmit={handleSubmit} 
+                          onSubmit={onSubmit} 
+                          errors={errors} 
+                          back={back} 
+                          estimate={estimate} 
+                        />
                       </motion.div>
                     )}
                   </AnimatePresence>
