@@ -13,7 +13,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative h-[100vh] overflow-hidden bg-charcoal">
+    <section className="relative h-screen overflow-hidden bg-charcoal">
       {/* Background Image with Ken Burns effect */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -28,8 +28,8 @@ export function HeroSection() {
       </div>
       
       {/* Premium Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-90" />
+      <div className="absolute inset-0 bg-linear-to-r from-charcoal via-charcoal/60 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-charcoal via-transparent to-transparent opacity-90" />
 
       {/* Content */}
       <div className="relative z-10 h-full container mx-auto px-6 md:px-12 flex flex-col justify-center">
@@ -81,16 +81,11 @@ export function HeroSection() {
             className="flex flex-wrap gap-5 mt-10"
           >
             <Link href="/collections">
-              <button className="px-8 py-4 bg-gold text-charcoal font-black uppercase tracking-[0.2em] text-[9px] rounded-full hover:bg-white transition-all duration-700 shadow-xl hover:scale-105 active:scale-95">
+              <button className="px-8 py-4 bg-gold text-charcoal font-semibold text-sm rounded-full hover:bg-white transition-all duration-700 shadow-xl hover:scale-105 active:scale-95">
                 Explore Collections
               </button>
             </Link>
-            <Link href="/shop?category=Interior">
-              <button className="px-8 py-4 border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[9px] rounded-full hover:bg-white hover:text-charcoal transition-all duration-700 shadow-xl hover:scale-105 active:scale-95">
-                Shop Interiors
-              </button>
-            </Link>
-            <button className="group flex items-center gap-3 text-white text-[9px] font-black uppercase tracking-[0.2em] hover:text-gold transition-all duration-500">
+            <button className="group flex items-center gap-3 text-white text-sm font-semibold hover:text-gold transition-all duration-500">
               View Portfolio
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-2 transition-transform text-gold" />
             </button>
@@ -106,7 +101,7 @@ export function HeroSection() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
       >
         <span className="text-[9px] uppercase tracking-[0.5em] text-white/30 font-bold">Scroll</span>
-        <div className="w-px h-16 bg-gradient-to-b from-gold to-transparent" />
+        <div className="w-px h-16 bg-linear-to-b from-gold to-transparent" />
       </motion.div>
     </section>
   );

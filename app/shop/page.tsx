@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { ChevronDown, SlidersHorizontal, Search, X, Grid, List, Sparkles } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, ChevronDown, SlidersHorizontal, Search, X, Grid, List, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FEATURED_PRODUCTS, CATEGORIES } from "@/lib/constants";
 import { ProductCard } from "@/components/product/product-card";
 import { Footer } from "@/components/footer";
 
 function ShopContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,6 +36,19 @@ function ShopContent() {
     <div className="min-h-screen bg-warm-cream">
       {/* ── Compact Page Header ── */}
       <section className="bg-white pt-20 pb-8 border-b border-charcoal/5 relative overflow-hidden">
+        <div className="absolute top-6 left-6 z-20">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== "undefined" && window.history.length > 1) router.back();
+              else router.push("/decor");
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-charcoal/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-semibold text-charcoal hover:border-gold/30 hover:text-gold transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+        </div>
         <div className="container mx-auto px-6 md:px-12 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -105,7 +119,7 @@ function ShopContent() {
               {/* Refine Button */}
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.1em] text-white bg-charcoal px-5 py-2.5 rounded-full hover:bg-gold transition-all duration-500 shadow-md group"
+                className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-white bg-charcoal px-5 py-2.5 rounded-full hover:bg-gold transition-all duration-500 shadow-md group"
               >
                 <SlidersHorizontal className="h-3 w-3 group-hover:rotate-180 transition-transform duration-500" /> 
                 <span className="hidden sm:inline">Refine</span>
@@ -142,7 +156,7 @@ function ShopContent() {
               </div>
               
               <div className="relative group">
-                <button className="flex items-center gap-2 text-[7px] font-black uppercase tracking-[0.1em] text-charcoal py-2 px-4 bg-white border border-charcoal/5 rounded-full hover:border-gold/30 transition-all">
+                <button className="flex items-center gap-2 text-[7px] font-black uppercase tracking-widest text-charcoal py-2 px-4 bg-white border border-charcoal/5 rounded-full hover:border-gold/30 transition-all">
                   Sort: {sortBy} <ChevronDown className="h-2.5 w-2.5 text-gold" />
                 </button>
               </div>
@@ -187,7 +201,7 @@ function ShopContent() {
                   <span className="text-[6px] uppercase tracking-widest font-black text-charcoal/20">Showing {filteredProducts.length}</span>
                   <span className="text-[6px] uppercase tracking-widest font-black text-charcoal/20">Of 120</span>
                 </div>
-                <div className="w-full h-[1px] bg-charcoal/5 relative rounded-full overflow-hidden">
+                <div className="w-full h-px bg-charcoal/5 relative rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     whileInView={{ width: "33%" }}

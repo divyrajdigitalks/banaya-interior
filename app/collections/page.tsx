@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Sparkles, ShieldCheck, Truck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, ShieldCheck, Truck } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { CATEGORIES } from "@/lib/constants";
 import { Footer } from "@/components/footer";
 
 export default function CollectionsPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-warm-cream">
       {/* ── Hero Section ── */}
@@ -27,9 +29,22 @@ export default function CollectionsPage() {
           />
         </motion.div>
         
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-charcoal via-charcoal/40 to-transparent" />
         
         <div className="relative z-10 container mx-auto px-6 md:px-12">
+          <div className="mb-5">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined" && window.history.length > 1) router.back();
+                else router.push("/");
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur px-4 py-2 text-sm font-semibold text-white hover:border-gold/40 hover:text-gold transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+          </div>
           <div className="max-w-4xl">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -84,7 +99,7 @@ export default function CollectionsPage() {
                 { icon: Truck, title: "White Glove", desc: "Complimentary premium delivery" }
               ].map((item, idx) => (
                 <div key={idx} className="flex gap-4 group">
-                  <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-warm-cream flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-500">
+                  <div className="shrink-0 w-9 h-9 rounded-lg bg-warm-cream flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-500">
                     <item.icon className="w-3.5 h-3.5" />
                   </div>
                   <div>
@@ -112,14 +127,14 @@ export default function CollectionsPage() {
                 className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center ${i % 2 !== 0 ? "lg:[&>*:first-child]:order-last" : ""}`}
               >
                 {/* Image Section */}
-                <div className="lg:col-span-7 relative aspect-[16/10] rounded-2xl overflow-hidden shadow-xl group">
+                <div className="lg:col-span-7 relative aspect-16/10 rounded-2xl overflow-hidden shadow-xl group">
                   <Image
                     src={cat.image}
                     alt={cat.name}
                     fill
                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-30 group-hover:opacity-10 transition-opacity duration-1000" />
+                  <div className="absolute inset-0 bg-linear-to-t from-charcoal/60 via-transparent to-transparent opacity-30 group-hover:opacity-10 transition-opacity duration-1000" />
                   
                   {/* Floating Year/Index */}
                   <div className="absolute bottom-6 left-6 text-white/20 font-serif italic text-6xl select-none group-hover:text-gold/20 transition-colors duration-1000">
@@ -156,7 +171,7 @@ export default function CollectionsPage() {
                   </div>
 
                   <Link
-                    href={`/shop?category=${cat.name}`}
+                    href="/contact"
                     className="inline-flex items-center gap-4 group"
                   >
                     <div className="relative">
@@ -164,8 +179,8 @@ export default function CollectionsPage() {
                         <ArrowRight className="h-3.5 w-3.5 text-gold group-hover:text-white group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-charcoal group-hover:text-gold transition-colors">
-                      Enter the {cat.name}
+                    <span className="text-sm font-semibold text-charcoal group-hover:text-gold transition-colors">
+                      Enquire for {cat.name}
                     </span>
                   </Link>
                 </div>
@@ -195,7 +210,7 @@ export default function CollectionsPage() {
               </p>
               
               <Link href="/contact">
-                <button className="group relative px-10 py-4 bg-gold text-charcoal font-black uppercase tracking-[0.2em] text-[9px] rounded-full hover:bg-white transition-all duration-700 overflow-hidden shadow-lg">
+                <button className="group relative px-10 py-4 bg-gold text-charcoal font-semibold text-sm rounded-full hover:bg-white transition-all duration-700 overflow-hidden shadow-lg">
                   <span className="relative z-10">Commission a Masterpiece</span>
                   <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
                 </button>

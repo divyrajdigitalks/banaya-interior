@@ -98,13 +98,13 @@ export function DecorHeroSection() {
             
             <div className="flex flex-col gap-3">
               <Link href="/shop?category=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-3.5 bg-charcoal text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 bg-charcoal text-white text-sm font-semibold rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
                   Shop Collection
                   <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
               <Link href="/collections?type=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-3.5 border border-charcoal/10 text-charcoal text-[8px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-charcoal hover:text-white transition-all duration-700">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 border border-charcoal/10 text-charcoal text-sm font-semibold rounded-full hover:bg-charcoal hover:text-white transition-all duration-700">
                   View Lookbook
                   <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
                 </button>
@@ -143,7 +143,7 @@ export function DecorHeroSection() {
 
         {/* 🪵 TRAY - ANIMATED */}
         <motion.div 
-          className="relative w-full max-w-[1000px] aspect-[4/3] z-20"
+          className="relative w-full max-w-[1000px] aspect-4/3 z-20"
           style={{
             scale: useTransform(scrollYProgress, [0, 0.1], [1, 1.1]),
             rotateX: useTransform(scrollYProgress, [0, 0.1], [0, 5]),
@@ -175,7 +175,7 @@ export function DecorHeroSection() {
       {/* SCROLL GUIDE */}
       <div className="absolute top-[90vh] left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
         <span className="text-[9px] uppercase tracking-[0.5em] text-charcoal/20 font-bold">Experience the Ritual</span>
-        <div className="w-px h-24 bg-gradient-to-b from-gold to-transparent" />
+        <div className="w-px h-24 bg-linear-to-b from-gold to-transparent" />
       </div>
     </section>
   );
