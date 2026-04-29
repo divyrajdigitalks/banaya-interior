@@ -284,6 +284,18 @@ export function CalculatorSection() {
     setIsOpen(true);
   };
 
+  useEffect(() => {
+    const onOpenCalculator = (event: Event) => {
+      const customEvent = event as CustomEvent<{ type?: "services" | "interior" | "homes" }>;
+      const type = customEvent.detail?.type;
+      if (!type) return;
+      handleOpen(type);
+    };
+
+    window.addEventListener("open-calculator", onOpenCalculator);
+    return () => window.removeEventListener("open-calculator", onOpenCalculator);
+  }, []);
+
   /* handlers */
   const toggleSvc = (id: string) => setSelServices(p => p.find(x => x.id === id) ? p.filter(x => x.id !== id) : [...p, { id, qty: 1 }]);
   const updateSvcQty = (id: string, d: number | string) => setSelServices(p => p.map(x => x.id === id ? { ...x, qty: Math.max(1, typeof d === "string" ? (parseInt(d) || 0) : d) } : x));
@@ -395,7 +407,7 @@ export function CalculatorSection() {
         </div>
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[90vw] lg:max-w-7xl h-[95vh] md:h-[90vh] flex flex-col p-0 overflow-hidden bg-white border-none shadow-2xl rounded-3xl">
+          <DialogContent className="w-[98vw] max-w-[98vw] sm:w-[95vw] sm:max-w-[95vw] lg:max-w-[1400px] h-[96vh] max-h-[96vh] flex flex-col p-0 overflow-hidden bg-white border-none shadow-2xl rounded-3xl">
             <DialogHeader className="p-6 md:p-8 border-b border-slate-50 shrink-0">
               <div className="flex items-center justify-between">
                 <div>
@@ -441,7 +453,7 @@ export function CalculatorSection() {
               </div>
             </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto p-8 md:p-12 no-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 no-scrollbar">
               <div className="flex flex-col lg:flex-row gap-12 items-start pb-20">
                 {/* Multi-step Form Content */}
                 <div className="flex-1 w-full min-w-0">

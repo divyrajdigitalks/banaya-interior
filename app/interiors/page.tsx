@@ -17,7 +17,9 @@ export default function InteriorsPage() {
       <AboutSection />
       <CategoriesSection />
       <ServicesSection />
-      <CalculatorSection />
+      <div className="hidden">
+        <CalculatorSection />
+      </div>
       <ProjectsSection />
       <GallerySection />
       <TrustSection />

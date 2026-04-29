@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Calculator, Lock, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const services = [
   {
     id: "full-home",
+    calculatorType: "homes",
     title: "Full Home Interior",
     description: "Complete estimation journey with a structured and accurate questionnaire for your entire sanctuary.",
     image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80",
@@ -15,22 +16,27 @@ const services = [
   },
   {
     id: "kitchen",
-    title: "Kitchen",
-    description: "Smart modular kitchen estimator designed for the heart of your home. Releasing soon.",
+    calculatorType: "interior",
+    title: "Interior",
+    description: "Smart modular kitchen estimator designed for the heart of your home.",
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
-    available: false,
+    available: true,
   },
   {
     id: "wardrobe",
-    title: "Wardrobe",
-    description: "Bespoke wardrobe estimation flow crafted for your personal collection. In progress.",
+    calculatorType: "interior",
+    title: "Service",
+    description: "Bespoke wardrobe estimation flow crafted for your personal collection.",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
-    available: false,
+    available: true,
   },
 ];
 
 export function ServicesSection() {
   const [activeWord, setActiveWord] = useState("Sanctuary");
+  const openCalculator = (type: "services" | "interior" | "homes") => {
+    window.dispatchEvent(new CustomEvent("open-calculator", { detail: { type } }));
+  };
 
   return (
     <section className="py-32 bg-warm-cream/20">
@@ -89,18 +95,6 @@ export function ServicesSection() {
                   className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                 />
                 
-                {/* Overlay for unavailable services */}
-                {!service.available && (
-                  <div className="absolute inset-0 bg-charcoal/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-8 text-center">
-                    <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4 border border-white/20">
-                      <Lock className="w-6 h-6 text-white" />
-                    </div>
-                    <span className="text-white text-[10px] font-black uppercase tracking-[0.2em]">
-                      Coming Soon to the Collection
-                    </span>
-                  </div>
-                )}
-
                 {/* Floating Index */}
                 <div className="absolute top-8 left-8 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-black">
                   0{index + 1}
@@ -120,7 +114,7 @@ export function ServicesSection() {
               {/* Action Button */}
               <div className="mt-8 px-2">
                 <button
-                  disabled={!service.available}
+                  onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
                   className={`group/btn relative w-full py-6 rounded-full text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all duration-700 shadow-xl ${
                     service.available
                       ? "bg-charcoal text-white hover:shadow-gold/20"

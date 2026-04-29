@@ -3,6 +3,7 @@ export const CATEGORIES = [
   { id: "2", name: "Dining Room", image: "https://images.unsplash.com/photo-1616486886892-ff366aa67ba4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZGluaW5nJTIwcm9vbXxlbnwwfHwwfHx8MA%3D%3D", count: 28 },
   { id: "3", name: "Bedroom", image: "https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVkcm9vbXxlbnwwfHwwfHx8MA%3D%3D", count: 35 },
   { id: "4", name: "Home Office", image: "https://images.unsplash.com/photo-1535957998253-26ae1ef29506?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8SG9tZSUyME9mZmljZXxlbnwwfHwwfHx8MA%3D%3D", count: 15 },
+  { id: "6", name: "Interior", image: "https://images.unsplash.com/photo-1616486029423-aaa4789e8c9a?auto=format&fit=crop&q=80&w=800", count: 22 },
   { id: "5", name: "Decor", image: "https://plus.unsplash.com/premium_photo-1682259448848-90967eec2edb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZGVjb3J8ZW58MHx8MHx8fDA%3D", count: 64 },
 ];
 
@@ -51,6 +52,42 @@ export const FEATURED_PRODUCTS = [
     image: "https://images.unsplash.com/photo-1550581190-9c1c48d98d71?auto=format&fit=crop&q=80&w=800",
     hoverImage: "https://images.unsplash.com/photo-1584762223575-061cdc64c599?auto=format&fit=crop&q=80&w=800",
     tag: "Trending",
+  },
+  {
+    id: "p6",
+    name: "Regal Interior Console Unit",
+    price: 21500,
+    category: "Interior",
+    image: "https://images.unsplash.com/photo-1616627456593-7f2852f0b1a5?auto=format&fit=crop&q=80&w=800",
+    hoverImage: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=800",
+    tag: "Interior Edit",
+  },
+  {
+    id: "p7",
+    name: "Signature Interior Accent Chair",
+    price: 17900,
+    category: "Interior",
+    image: "https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=800",
+    hoverImage: "https://images.unsplash.com/photo-1567016376408-0226e4d0f2f5?auto=format&fit=crop&q=80&w=800",
+    tag: "Studio Pick",
+  },
+  {
+    id: "p8",
+    name: "Handcrafted Brass Wall Decor",
+    price: 5900,
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+    hoverImage: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&q=80&w=800",
+    tag: "New Decor",
+  },
+  {
+    id: "p9",
+    name: "Ivory Ceramic Table Decor Set",
+    price: 4200,
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1517705008128-361805f42e86?auto=format&fit=crop&q=80&w=800",
+    hoverImage: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&q=80&w=800",
+    tag: "Best Value",
   }
 ];
 
