@@ -25,7 +25,7 @@ export default function HomePage() {
 
   return (
     <div 
-      className="relative h-screen w-full overflow-hidden bg-[#1a1a1a]"
+      className="relative h-screen w-full overflow-hidden bg-primary"
       onMouseMove={handleMouseMove}
     >
       {/* Animated Background Pattern */}
@@ -84,8 +84,8 @@ export default function HomePage() {
           {/* Overlay with animated gradient */}
           <div className={`absolute inset-0 transition-all duration-500 ${
             hoveredSide === "left" 
-              ? 'bg-gradient-to-r from-black/60 via-black/40 to-transparent' 
-              : 'bg-black/50'
+              ? 'bg-gradient-to-r from-primary/60 via-primary/40 to-transparent' 
+              : 'bg-primary/50'
           }`} />
 
           {/* Decorative corner accent */}
@@ -149,8 +149,8 @@ export default function HomePage() {
           {/* Overlay with animated gradient */}
           <div className={`absolute inset-0 transition-all duration-500 ${
             hoveredSide === "right" 
-              ? 'bg-gradient-to-l from-black/60 via-black/40 to-transparent' 
-              : 'bg-black/50'
+              ? 'bg-gradient-to-l from-primary/60 via-primary/40 to-transparent' 
+              : 'bg-primary/50'
           }`} />
 
           {/* Decorative corner accent */}
@@ -195,7 +195,7 @@ export default function HomePage() {
       </div>
 
       {/* Bottom Info Bar */}
-      <div className={`absolute bottom-0 left-0 right-0 z-40 flex justify-between items-center px-8 py-6 bg-gradient-to-t from-black/80 to-transparent transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '700ms' }}>
+      <div className={`absolute bottom-0 left-0 right-0 z-40 flex justify-between items-center px-8 py-6 bg-gradient-to-t from-primary/80 to-transparent transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '700ms' }}>
         <div className="text-white/50 text-xs tracking-wider">
           <span className="text-[#c9a962]">Est.</span> 2020
         </div>

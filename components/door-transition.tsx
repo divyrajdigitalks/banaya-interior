@@ -22,7 +22,7 @@ export function DoorTransition() {
             initial={{ x: 0 }}
             animate={{ x: "-100%" }}
             transition={{ duration: 0.8, ease: [0.77, 0, 0.175, 1], delay: 0.2 }}
-            className="w-1/2 h-full bg-slate-900 flex items-center justify-end"
+            className="w-1/2 h-full bg-primary flex items-center justify-end"
           >
             <div className="w-px h-1/4 bg-white/20 mr-4" />
           </motion.div>
@@ -32,7 +32,7 @@ export function DoorTransition() {
             initial={{ x: 0 }}
             animate={{ x: "100%" }}
             transition={{ duration: 0.8, ease: [0.77, 0, 0.175, 1], delay: 0.2 }}
-            className="w-1/2 h-full bg-slate-900 flex items-center justify-start"
+            className="w-1/2 h-full bg-primary flex items-center justify-start"
           >
             <div className="w-px h-1/4 bg-white/20 ml-4" />
           </motion.div>

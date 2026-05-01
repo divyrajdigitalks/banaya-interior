@@ -5,7 +5,7 @@ import { Instagram, Facebook, Linkedin, Phone, Mail, MapPin } from "lucide-react
 
 export function Footer() {
   return (
-    <footer className="bg-[#1a1a1a] text-white py-16 px-8 md:px-16">
+    <footer className="bg-primary text-white py-16 px-8 md:px-16">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Logo & Description */}
@@ -18,7 +18,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6">Quick Links</h4>
+            <h4 className="text-xs font-semibold mb-6">Quick links</h4>
             <ul className="space-y-3">
               {["Interiors", "Decor", "Projects", "About Us", "Contact"].map((link) => (
                 <li key={link}>
@@ -35,7 +35,7 @@ export function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6">Services</h4>
+            <h4 className="text-xs font-semibold mb-6">Our services</h4>
             <ul className="space-y-3">
               {[
                 "Full Home Interior",
@@ -58,7 +58,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase mb-6">Contact</h4>
+            <h4 className="text-xs font-semibold mb-6">Get in touch</h4>
             <ul className="space-y-4">
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-[#c9a962]" />

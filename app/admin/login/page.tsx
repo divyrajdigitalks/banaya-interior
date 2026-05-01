@@ -28,11 +28,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm-cream flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none select-none overflow-hidden">
-        <span className="absolute top-[-10%] left-[-5%] text-[30vw] font-serif italic font-black text-charcoal rotate-[-15deg]">ADMIN</span>
-        <span className="absolute bottom-[-10%] right-[-5%] text-[30vw] font-serif italic font-black text-charcoal rotate-[15deg]">PANEL</span>
+        <span className="absolute top-[-10%] left-[-5%] text-[30vw] font-serif italic font-black text-primary rotate-[-15deg]">ADMIN</span>
+        <span className="absolute bottom-[-10%] right-[-5%] text-[30vw] font-serif italic font-black text-primary rotate-[15deg]">PANEL</span>
       </div>
 
       <motion.div
@@ -41,8 +41,8 @@ export default function AdminLoginPage() {
         transition={{ duration: 0.8 }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="border-charcoal/5 shadow-2xl bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
-          <CardHeader className="pt-10 pb-6 text-center border-b border-charcoal/5">
+        <Card className="border-primary/5 shadow-2xl bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <CardHeader className="pt-10 pb-6 text-center border-b border-primary/5">
             <div className="flex justify-center mb-6">
               <Logo variant="dark" />
             </div>
@@ -51,18 +51,18 @@ export default function AdminLoginPage() {
               <Sparkles className="h-3 w-3 text-gold" />
               <div className="h-px w-3 bg-gold/40" />
             </div>
-            <CardTitle className="text-2xl font-serif font-black text-charcoal tracking-tight">Admin Sanctuary</CardTitle>
-            <CardDescription className="text-charcoal/50 text-xs uppercase tracking-[0.2em] font-bold mt-1">
-              Management & Control Center
+            <CardTitle className="text-2xl font-serif font-black text-primary tracking-tight">Admin Sanctuary</CardTitle>
+            <CardDescription className="text-primary/50 text-xs font-semibold mt-1">
+              Management & control center
             </CardDescription>
           </CardHeader>
           
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6 pt-8 px-8">
               <div className="space-y-2.5">
-                <Label htmlFor="email" className="text-[10px] uppercase tracking-widest font-black text-charcoal/60 ml-1">Identity</Label>
+                <Label htmlFor="email" className="text-xs font-semibold text-primary/60 ml-1">Identity</Label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20 group-focus-within:text-gold transition-colors" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/20 group-focus-within:text-gold transition-colors" />
                   <Input 
                     id="email" 
                     type="email" 
@@ -70,18 +70,18 @@ export default function AdminLoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-warm-cream/30 border-charcoal/5 rounded-2xl pl-11 py-6 text-sm font-medium focus:ring-2 focus:ring-gold/5 focus:border-gold/20 transition-all placeholder:text-charcoal/20 outline-none"
+                    className="bg-background/30 border-primary/5 rounded-2xl pl-11 py-6 text-sm font-medium focus:ring-2 focus:ring-gold/5 focus:border-gold/20 transition-all placeholder:text-primary/20 outline-none"
                   />
                 </div>
               </div>
               
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between ml-1">
-                  <Label htmlFor="password" className="text-[10px] uppercase tracking-widest font-black text-charcoal/60">Passcode</Label>
-                  <button type="button" className="text-[9px] uppercase tracking-widest font-black text-gold hover:text-charcoal transition-colors">Forgot?</button>
+                  <Label htmlFor="password" className="text-xs font-semibold text-primary/60">Passcode</Label>
+                  <button type="button" className="text-[9px] font-bold text-gold hover:text-primary transition-colors">Forgot?</button>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20 group-focus-within:text-gold transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/20 group-focus-within:text-gold transition-colors" />
                   <Input 
                     id="password" 
                     type="password" 
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-warm-cream/30 border-charcoal/5 rounded-2xl pl-11 py-6 text-sm font-medium focus:ring-2 focus:ring-gold/5 focus:border-gold/20 transition-all placeholder:text-charcoal/20 outline-none"
+                    className="bg-background/30 border-primary/5 rounded-2xl pl-11 py-6 text-sm font-medium focus:ring-2 focus:ring-gold/5 focus:border-gold/20 transition-all placeholder:text-primary/20 outline-none"
                   />
                 </div>
               </div>
@@ -98,13 +98,14 @@ export default function AdminLoginPage() {
             <CardFooter className="pb-10 pt-4 px-8">
               <Button 
                 disabled={isLoading}
-                className="w-full bg-charcoal hover:bg-gold text-white font-black uppercase tracking-[0.2em] text-[10px] py-7 rounded-2xl transition-all duration-500 shadow-xl shadow-charcoal/10 group overflow-hidden relative"
+                type="submit" 
+                className="w-full bg-primary hover:bg-gold text-white font-bold tracking-widest text-xs py-7 rounded-2xl transition-all duration-500 shadow-xl shadow-primary/10 flex items-center justify-center gap-3 group/btn relative overflow-hidden uppercase"
               >
-                <span className="relative z-10 flex items-center gap-2">
+                <span className="relative z-10 flex items-center gap-3">
                   {isLoading ? "Validating..." : "Enter Sanctuary"}
-                  {!isLoading && <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-2 transition-transform" />}
+                  {!isLoading && <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-2 transition-transform" />}
                 </span>
-                <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gold translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
               </Button>
             </CardFooter>
           </form>

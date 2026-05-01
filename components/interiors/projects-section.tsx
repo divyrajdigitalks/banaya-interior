@@ -53,7 +53,7 @@ export function ProjectsSection() {
   const currentProject = projects[currentIndex];
 
   return (
-    <section className="py-32 bg-white overflow-hidden">
+    <section className="py-32 bg-background overflow-hidden">
       <div className="container mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           
@@ -65,10 +65,10 @@ export function ProjectsSection() {
               viewport={{ once: true }}
               className="space-y-4"
             >
-              <span className="text-[10px] tracking-[0.4em] text-gold font-black uppercase block">
-                Portfolio of Distinction
+              <span className="text-lg uppercase  text-gold font-bold block">
+                Portfolio of distinction
               </span>
-              <h2 className="font-serif text-5xl md:text-6xl text-charcoal font-black leading-tight">
+              <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
                 Living <br />
                 <span className="italic font-light text-gold">Masterpieces.</span>
               </h2>
@@ -79,7 +79,7 @@ export function ProjectsSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-charcoal/50 text-lg font-light leading-relaxed max-w-sm"
+              className="text-primary/50 text-lg font-light leading-relaxed max-w-sm"
             >
               Each project is a unique dialogue between architecture and soul, meticulously crafted to reflect the essence of its inhabitants.
             </motion.p>
@@ -88,14 +88,14 @@ export function ProjectsSection() {
             <div className="flex items-center gap-6 pt-8">
               <button
                 onClick={prevSlide}
-                className="group w-14 h-14 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-charcoal hover:text-white transition-all duration-500 shadow-xl"
+                className="group w-14 h-14 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl"
               >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               </button>
-              <div className="h-[1px] w-12 bg-charcoal/10" />
+              <div className="h-[1px] w-12 bg-primary/10" />
               <button
                 onClick={nextSlide}
-                className="group w-14 h-14 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-charcoal hover:text-white transition-all duration-500 shadow-xl"
+                className="group w-14 h-14 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl"
               >
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -140,7 +140,7 @@ export function ProjectsSection() {
             </div>
 
             {/* Decorative background text */}
-            <div className="absolute -top-12 -right-12 text-[12vw] font-serif font-black text-charcoal/[0.03] pointer-events-none select-none -z-10 italic">
+            <div className="absolute -top-12 -right-12 text-[12vw] font-serif font-black text-primary/[0.03] pointer-events-none select-none -z-10 italic">
               Legacy
             </div>
           </div>
@@ -153,7 +153,7 @@ export function ProjectsSection() {
                   0{currentIndex + 1}
                 </span>
                 <div className="h-[1px] flex-grow bg-gold/30" />
-                <span className="text-xs font-black text-charcoal/20 uppercase tracking-widest">
+                <span className="text-xs font-semibold text-primary/20">
                   0{projects.length}
                 </span>
               </div>
@@ -167,16 +167,16 @@ export function ProjectsSection() {
                   transition={{ duration: 0.5 }}
                   className="space-y-4"
                 >
-                  <h3 className="font-serif text-3xl text-charcoal font-black leading-tight">
+                  <h3 className="font-serif text-3xl text-primary font-black leading-tight">
                     {currentProject.title}
                   </h3>
-                  <p className="text-charcoal/60 text-base font-light leading-relaxed">
+                  <p className="text-primary/60 text-base font-light leading-relaxed">
                     {currentProject.description}
                   </p>
                 </motion.div>
               </AnimatePresence>
 
-              <button className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-charcoal hover:text-gold transition-colors pt-4">
+              <button className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-primary hover:text-gold transition-colors pt-4">
                 View Full Case Study
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
               </button>

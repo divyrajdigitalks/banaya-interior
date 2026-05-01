@@ -67,12 +67,12 @@ export function DecorHeroSection() {
   ];
 
   return (
-    <section ref={containerRef} className="relative h-[400vh] bg-warm-cream overflow-visible">
+    <section ref={containerRef} className="relative h-[400vh] bg-background overflow-visible">
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         
         {/* BACKGROUND DECORATIVE TEXT */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] select-none">
-          <span className="font-serif italic text-[25vw] font-black text-charcoal tracking-tighter">HERITAGE</span>
+          <span className="font-serif italic text-[25vw] font-black text-primary tracking-tighter">HERITAGE</span>
         </div>
 
         {/* LEFT TEXT - ROYAL STYLE */}
@@ -82,14 +82,14 @@ export function DecorHeroSection() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-[8px] uppercase tracking-[0.4em] text-gold font-black mb-3 flex items-center gap-2">
-              <span className="w-5 h-px bg-gold" /> Since 2020
+            <p className="text-xs text-gold font-semibold mb-3 flex items-center gap-2">
+              <span className="w-5 h-px bg-gold" /> Est. Since 2020
             </p>
-            <h1 className="font-serif text-4xl md:text-6xl text-charcoal font-black leading-[0.9] tracking-tighter mb-5">
+            <h1 className="font-serif text-4xl md:text-6xl text-primary font-black leading-[0.9] tracking-tighter mb-5">
               Banaya <br />
-              <span className="italic font-light text-gold">Décor</span>
+              <span className="italic font-light text-gold">Decor</span>
             </h1>
-            <p className="text-charcoal/50 text-sm font-light leading-relaxed mb-6">
+            <p className="text-foreground/50 text-sm font-light leading-relaxed mb-6">
               Masterfully handcrafted wooden <br />
               serving treasures designed for <br />
               the most distinguished dining <br />
@@ -98,13 +98,13 @@ export function DecorHeroSection() {
             
             <div className="flex flex-col gap-3">
               <Link href="/shop?category=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 bg-charcoal text-white text-sm font-semibold rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 bg-primary text-white text-sm font-semibold rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
                   Shop Collection
                   <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
               <Link href="/collections?type=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 border border-charcoal/10 text-charcoal text-sm font-semibold rounded-full hover:bg-charcoal hover:text-white transition-all duration-700">
+                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 border border-primary/10 text-primary text-sm font-semibold rounded-full hover:bg-primary hover:text-white transition-all duration-700">
                   View Lookbook
                   <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
                 </button>
@@ -120,8 +120,8 @@ export function DecorHeroSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <p className="text-[8px] uppercase tracking-[0.4em] text-gold font-black mb-3">Uncompromising Quality</p>
-            <p className="text-charcoal/60 text-base font-light leading-relaxed mb-6 italic">
+            <p className="text-xs text-gold font-semibold mb-3">Uncompromising quality and detail</p>
+            <p className="text-foreground/60 text-base font-light leading-relaxed mb-6 italic">
               "Elevate every culinary ritual with our signature <br />
               heritage-fit tray collection."
             </p>
@@ -133,7 +133,7 @@ export function DecorHeroSection() {
                 "Food-Safe Royal Finish",
                 "Modular Interlock Design"
               ].map((text, i) => (
-                <p key={i} className="text-[8px] uppercase tracking-[0.2em] text-charcoal/40 font-bold">
+                <p key={i} className="text-xs text-foreground/50 font-medium">
                   {text}
                 </p>
               ))}
@@ -174,7 +174,7 @@ export function DecorHeroSection() {
 
       {/* SCROLL GUIDE */}
       <div className="absolute top-[90vh] left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
-        <span className="text-[9px] uppercase tracking-[0.5em] text-charcoal/20 font-bold">Experience the Ritual</span>
+        <span className="text-xs text-primary/40 font-semibold">Experience the Ritual</span>
         <div className="w-px h-24 bg-linear-to-b from-gold to-transparent" />
       </div>
     </section>

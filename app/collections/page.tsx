@@ -11,9 +11,9 @@ import { Footer } from "@/components/footer";
 export default function CollectionsPage() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-warm-cream">
+    <div className="min-h-screen bg-background">
       {/* ── Hero Section ── */}
-      <section className="relative h-[40vh] flex items-center overflow-hidden bg-charcoal">
+      <section className="relative h-[40vh] flex items-center overflow-hidden bg-primary">
         <motion.div 
           initial={{ scale: 1.05, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.5 }}
@@ -29,7 +29,7 @@ export default function CollectionsPage() {
           />
         </motion.div>
         
-        <div className="absolute inset-0 bg-linear-to-r from-charcoal via-charcoal/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary via-primary/40 to-transparent" />
         
         <div className="relative z-10 container mx-auto px-6 md:px-12">
           <div className="mb-5">
@@ -53,8 +53,8 @@ export default function CollectionsPage() {
               className="flex items-center gap-3 mb-3"
             >
               <div className="h-px w-5 bg-gold" />
-              <p className="text-[7px] uppercase tracking-[0.4em] text-gold font-bold">
-                The Royal Anthology
+              <p className="text-xs text-gold font-semibold">
+                The royal anthology
               </p>
             </motion.div>
             
@@ -81,14 +81,14 @@ export default function CollectionsPage() {
       </section>
 
       {/* ── Philosophy Section ── */}
-      <section className="bg-white py-16 border-b border-charcoal/5">
+      <section className="bg-white py-16 border-b border-primary/5">
         <div className="container mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <h2 className="text-2xl md:text-4xl font-serif font-black text-charcoal leading-tight mb-6">
+              <h2 className="text-2xl md:text-4xl font-serif font-black text-primary leading-tight mb-6">
                 Designed for the <span className="text-gold italic font-light">Discerning Eye</span>, built for generations.
               </h2>
-              <p className="text-charcoal/60 text-base font-light leading-relaxed max-w-2xl">
+              <p className="text-primary/60 text-base font-light leading-relaxed max-w-2xl">
                 Our collections are not merely furniture; they are curated experiences. We blend ancient woodworking techniques with contemporary silhouettes to create spaces that resonate with soul and sophistication.
               </p>
             </div>
@@ -98,13 +98,13 @@ export default function CollectionsPage() {
                 { icon: ShieldCheck, title: "Legacy Quality", desc: "25-year structural guarantee" },
                 { icon: Truck, title: "White Glove", desc: "Complimentary premium delivery" }
               ].map((item, idx) => (
-                <div key={idx} className="flex gap-4 group">
-                  <div className="shrink-0 w-9 h-9 rounded-lg bg-warm-cream flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-500">
-                    <item.icon className="w-3.5 h-3.5" />
+                <div key={idx} className="flex items-center gap-4 group">
+                  <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-500">
+                    <item.icon size={16} />
                   </div>
                   <div>
-                    <h4 className="text-[9px] font-black uppercase tracking-widest text-charcoal mb-0.5">{item.title}</h4>
-                    <p className="text-charcoal/40 text-[10px] leading-tight">{item.desc}</p>
+                    <h4 className="text-xs font-semibold text-primary">{item.title}</h4>
+                    <p className="text-[10px] text-primary/40">{item.desc}</p>
                   </div>
                 </div>
               ))}

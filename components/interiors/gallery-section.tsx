@@ -85,7 +85,7 @@ export function GallerySection() {
   };
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden">
+    <section className="py-20 bg-background relative overflow-hidden">
       {/* Decorative Background Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
         <span className="text-[12vw] font-black tracking-tighter uppercase whitespace-nowrap">
@@ -100,55 +100,39 @@ export function GallerySection() {
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-3"
+            className="space-y-4"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-[1px] bg-gold" />
-              <span className="text-gold text-[8px] font-black uppercase tracking-[0.4em]">
-                Exquisite Spaces
+            <span className="text-lg uppercase  text-gold font-bold block">
+              A curated sanctuary for you
+            </span>
+            <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
+              A Glimpse of <br />
+              <span className="italic font-light text-gold transition-all duration-700">
+                {galleryImages[currentIndex].category}.
               </span>
-            </div>
-            <h2 className="font-serif text-4xl md:text-6xl text-charcoal leading-tight font-black tracking-tighter">
-              Objects of <span className="italic font-light text-gold">Desire</span>
             </h2>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-4"
-          >
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePrev}
+              className="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl bg-background"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl bg-background"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
             <button
               onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="w-12 h-12 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-gold hover:text-charcoal transition-all duration-500 group mr-4"
-              title={isAutoPlaying ? "Pause" : "Play"}
+              className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center text-gold hover:bg-gold hover:text-white transition-all duration-500 shadow-lg"
             >
-              {isAutoPlaying ? (
-                <Pause className="w-4 h-4" />
-              ) : (
-                <Play className="w-4 h-4 ml-0.5" />
-              )}
+              {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
-            <button 
-              onClick={() => {
-                handlePrev();
-                setIsAutoPlaying(false);
-              }}
-              className="w-12 h-12 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-charcoal hover:text-white transition-all duration-500 group"
-            >
-              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            </button>
-            <button 
-              onClick={() => {
-                handleNext();
-                setIsAutoPlaying(false);
-              }}
-              className="w-12 h-12 rounded-full border border-charcoal/10 flex items-center justify-center hover:bg-charcoal hover:text-white transition-all duration-500 group"
-            >
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </motion.div>
+          </div>
         </div>
       </div>
 

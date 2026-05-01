@@ -23,10 +23,10 @@ export function Header({ variant = "dark" }: HeaderProps) {
   const bgClass = variant === "transparent" 
     ? "bg-transparent" 
     : variant === "light" 
-      ? "bg-white/80 backdrop-blur-md border-b border-charcoal/5" 
-      : "bg-charcoal/95 backdrop-blur-md border-b border-white/5";
+      ? "bg-white/80 backdrop-blur-md border-b border-primary/5" 
+      : "bg-primary/95 backdrop-blur-md border-b border-white/5";
   
-  const textColor = variant === "light" ? "text-charcoal" : "text-white";
+  const textColor = variant === "light" ? "text-primary" : "text-white";
   const logoVariant = variant === "light" ? "dark" : "light";
 
   return (
@@ -39,7 +39,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-300 relative group ${
+                className={`text-xs font-semibold transition-all duration-300 relative group ${
                   pathname === link.href ? "text-gold" : `${textColor}/60 hover:text-gold`
                 }`}
               >
@@ -60,7 +60,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-300 relative group ${
+                className={`text-xs font-semibold transition-all duration-300 relative group ${
                   pathname === link.href ? "text-gold" : `${textColor}/60 hover:text-gold`
                 }`}
               >

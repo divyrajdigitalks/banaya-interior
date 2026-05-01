@@ -6,14 +6,14 @@ import Image from "next/image";
 
 export function FeaturesSection() {
   return (
-    <section className="relative py-32 bg-[#fdfcfb] overflow-hidden">
+    <section className="relative py-32 bg-background overflow-hidden">
       {/* Large Background Text Decoration */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
         <motion.h2 
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 0.03, scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
-          className="font-serif text-[25vw] text-charcoal tracking-[0.1em] uppercase whitespace-nowrap"
+          className="font-serif text-[25vw] text-primary tracking-[0.1em] uppercase whitespace-nowrap"
         >
           CRAFTSMANSHIP
         </motion.h2>
@@ -37,7 +37,7 @@ export function FeaturesSection() {
                 fill
                 className="object-cover transition-transform duration-[2s] group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-charcoal/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
             </motion.div>
 
             {/* Floating Badges */}
@@ -46,14 +46,14 @@ export function FeaturesSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5 }}
-              className="absolute -top-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-charcoal/5 flex items-center gap-4"
+              className="absolute -top-6 -left-6 bg-background p-6 rounded-2xl shadow-xl border border-primary/5 flex items-center gap-4"
             >
               <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-charcoal">Artisanal</p>
-                <p className="text-xs text-charcoal/40 font-light">Hand-carved</p>
+                <p className="text-xs font-semibold text-primary">Artisanal Craft</p>
+                <p className="text-xs text-primary/40 font-light">Hand-carved items</p>
               </div>
             </motion.div>
 
@@ -62,14 +62,14 @@ export function FeaturesSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.7 }}
-              className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-charcoal/5 flex items-center gap-4"
+              className="absolute -bottom-6 -right-6 bg-background p-6 rounded-2xl shadow-xl border border-primary/5 flex items-center gap-4"
             >
               <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-charcoal">Food Safe</p>
-                <p className="text-xs text-charcoal/40 font-light">Natural Finish</p>
+                <p className="text-xs font-semibold text-primary">Food Safe</p>
+                <p className="text-xs text-primary/40 font-light">Natural Finish</p>
               </div>
             </motion.div>
           </div>
@@ -81,7 +81,7 @@ export function FeaturesSection() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="text-[10px] tracking-[0.5em] text-gold font-black uppercase block"
+                className="text-xs text-gold font-semibold block"
               >
                 The Art of Living
               </motion.span>
@@ -89,7 +89,7 @@ export function FeaturesSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="font-serif text-5xl md:text-7xl text-charcoal font-black leading-tight"
+                className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
               >
                 Handcrafted <br />
                 <span className="italic font-light text-gold">Soulful</span> Pieces.
@@ -99,7 +99,7 @@ export function FeaturesSection() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="text-charcoal/50 text-lg font-light leading-relaxed max-w-xl"
+                className="text-primary/50 text-lg font-light leading-relaxed max-w-xl"
               >
                 Discover objects that transcend utility, each carved by master artisans to bring warmth and heritage into your home. 100% natural, scratch-proof, and designed to last generations.
               </motion.p>
@@ -114,15 +114,15 @@ export function FeaturesSection() {
                 { label: "Safe", value: "100% Food Safe" },
               ].map((item, idx) => (
                 <div key={idx} className="space-y-1 border-l-2 border-gold/20 pl-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gold">{item.label}</p>
-                  <p className="text-charcoal text-sm font-medium">{item.value}</p>
+                  <p className="text-xs font-semibold text-gold">{item.label}</p>
+                  <p className="text-primary text-sm font-medium">{item.value}</p>
                 </div>
               ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-              <button className="group relative px-12 py-6 bg-charcoal text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4">
+              <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
+                <span className="relative z-10 flex items-center gap-4 tracking-widest uppercase">
                   Acquire Piece <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
@@ -133,8 +133,8 @@ export function FeaturesSection() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-charcoal/40">Bespoke Inquiry</p>
-                  <p className="text-charcoal font-black tracking-widest">+91 88558 17434</p>
+                  <p className="text-xs font-semibold text-primary/40">Bespoke Inquiry</p>
+                  <p className="text-primary font-bold tracking-widest">+91 88558 17434</p>
                 </div>
               </div>
             </div>

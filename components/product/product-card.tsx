@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingBag, Check, ArrowRight } from "lucide-react";
+import { Heart, ShoppingBag, Check, ArrowRight, Star } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/context/StoreContext";
@@ -11,24 +11,30 @@ interface ProductCardProps {
   id: string;
   name: string;
   price: number;
+  originalPrice?: number;
   image: string;
   hoverImage?: string;
   category: string;
   tag?: string;
+  rating?: number;
+  reviewsCount?: number;
 }
 
-export function ProductCard({ id, name, price, image, hoverImage, category, tag }: ProductCardProps) {
+export function ProductCard({ 
+  id, 
+  name, 
+  price, 
+  originalPrice,
+  image, 
+  hoverImage, 
+  category, 
+  tag,
+  rating = 4.5,
+  reviewsCount = 120
+}: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useStore();
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePos({ x, y });
-  };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,32 +52,20 @@ export function ProductCard({ id, name, price, image, hoverImage, category, tag 
     setTimeout(() => setIsAdding(false), 2000);
   };
 
+  const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : null;
+
   return (
-    <Link href={`/product/${id}`} className="block">
-      <motion.div
-        className="group relative flex flex-col bg-transparent perspective-1000 cursor-pointer"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setMousePos({ x: 0, y: 0 });
-        }}
-        onMouseMove={handleMouseMove}
-        animate={{
-          rotateY: mousePos.x * 5,
-          rotateX: -mousePos.y * 5,
-          scale: isHovered ? 1.01 : 1,
-        }}
+    <Link href={`/product/${id}`} className="group block">
+      <motion.div 
+        whileHover={{ y: -8 }}
+        className="flex flex-col gap-4 bg-white p-3 rounded-2xl border border-primary/5 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
       >
         {/* Image Container */}
-        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-warm-cream shadow-sm transition-all duration-700 group-hover:shadow-xl group-hover:shadow-charcoal/5">
-          {tag && (
-            <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-              <span className="bg-charcoal text-gold text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-gold/20 shadow-lg backdrop-blur-md">
-                {tag}
+        <div className="relative aspect-square overflow-hidden rounded-xl bg-[#fdf9f3]">
+          {discount && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="bg-[#e87d3e] text-white text-[9px] font-bold px-2.5 py-1 rounded-full shadow-lg uppercase tracking-wider">
+                {discount}% off
               </span>
             </div>
           )}
@@ -81,88 +75,66 @@ export function ProductCard({ id, name, price, image, hoverImage, category, tag 
               e.preventDefault();
               e.stopPropagation();
             }}
-            className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/90 backdrop-blur-md text-charcoal opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 hover:bg-gold hover:text-white border border-charcoal/5 shadow-md"
+            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm text-primary opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary hover:text-white shadow-md"
           >
-            <Heart className="h-3.5 w-3.5" />
+            <Heart className="h-4 w-4" />
           </button>
           
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full overflow-hidden">
             <Image
               src={isHovered && hoverImage ? hoverImage : image}
               alt={name}
               fill
-              className="object-cover transition-transform duration-[1.5s] ease-out scale-100 group-hover:scale-105"
+              className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 via-charcoal/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          </div>
-
-          {/* Quick Add Button Overlay */}
-          <div className="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 z-20">
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleQuickAdd(e);
-              }}
-              disabled={isAdding}
-              className="w-full bg-white text-charcoal py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-gold hover:text-white transition-all shadow-xl border border-gold/10 disabled:bg-gold disabled:text-white overflow-hidden relative"
-            >
-              <AnimatePresence mode="wait">
-                {isAdding ? (
-                  <motion.div
-                    key="check"
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    className="flex items-center gap-2"
-                  >
-                    <Check className="h-3.5 w-3.5 stroke-[3]" />
-                    Added
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="bag"
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    className="flex items-center gap-2"
-                  >
-                    <ShoppingBag className="h-3.5 w-3.5" />
-                    Add to Cart
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </button>
           </div>
         </div>
 
-        {/* Product Details */}
-        <div className="mt-4 space-y-1.5 px-1">
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[7px] text-gold uppercase tracking-[0.3em] font-black">{category}</span>
-              <div className="h-px w-5 bg-gold/20" />
-            </div>
-            <div className="group/title inline-flex items-center gap-2">
-              <h3 className="text-base font-serif font-black text-charcoal group-hover/title:text-gold transition-colors duration-500 leading-tight">
-                {name}
-              </h3>
-              <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover/title:opacity-100 group-hover/title:translate-x-0 transition-all duration-500 text-gold" />
-            </div>
+        {/* Product Info */}
+        <div className="flex flex-col gap-2 px-1 pb-2">
+          <div className="space-y-1">
+            <span className="text-[9px] font-bold text-gold uppercase tracking-[0.2em]">{category}</span>
+            <h3 className="text-sm font-bold text-primary line-clamp-1 group-hover:text-gold transition-colors duration-500">
+              {name}
+            </h3>
           </div>
           
           <div className="flex items-center justify-between">
-            <p className="text-charcoal font-black tracking-tighter text-lg">
-              ₹{price.toLocaleString()}
-            </p>
-            <div className="flex gap-1">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-1 h-1 rounded-full bg-gold/10" />
-              ))}
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-black text-primary">₹{price.toLocaleString()}</span>
+              {originalPrice && (
+                <span className="text-xs text-primary/20 line-through">₹{originalPrice.toLocaleString()}</span>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-1 bg-gold/5 px-2 py-1 rounded-lg border border-gold/10">
+              <Star className="h-2.5 w-2.5 fill-gold text-gold" />
+              <span className="text-[10px] font-bold text-gold">{rating}</span>
             </div>
           </div>
-          
-          <div className="h-[1.5px] w-0 group-hover:w-full bg-gradient-to-r from-gold via-gold/30 to-transparent transition-all duration-1000 ease-out" />
+
+          <div className="pt-2">
+            <button
+              onClick={handleQuickAdd}
+              disabled={isAdding}
+              className="w-full py-3.5 bg-primary text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-xl hover:bg-gold transition-all duration-500 disabled:opacity-50 shadow-xl shadow-primary/5 group/btn relative overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isAdding ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" /> Added to Sanctuary
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="h-3.5 w-3.5" /> Acquire Piece
+                  </>
+                )}
+              </span>
+              <div className="absolute inset-0 bg-gold translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500" />
+            </button>
+          </div>
         </div>
       </motion.div>
     </Link>

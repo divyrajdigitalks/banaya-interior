@@ -39,23 +39,16 @@ export function ServicesSection() {
   };
 
   return (
-    <section className="py-32 bg-warm-cream/20">
+    <section className=" bg-background">
       <div className="container mx-auto px-6 md:px-12">
         {/* Header */}
         <div className="text-center mb-24 space-y-6">
-          <motion.span 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-[10px] tracking-[0.5em] text-gold font-black uppercase block"
-          >
-            Estimation Suite
-          </motion.span>
+       
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-serif text-5xl md:text-7xl text-charcoal font-black leading-tight"
+            className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
           >
             Estimate your <br />
             <span className="italic font-light text-gold transition-all duration-700">
@@ -67,7 +60,7 @@ export function ServicesSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-charcoal/50 max-w-xl mx-auto text-lg font-light leading-relaxed"
+            className="text-primary/50 max-w-xl mx-auto text-lg font-light leading-relaxed"
           >
             Select a bespoke service to receive a meticulous estimate. Our smart logic ensures transparency and precision for your investment.
           </motion.p>
@@ -103,10 +96,10 @@ export function ServicesSection() {
 
               {/* Content */}
               <div className="flex-grow space-y-4 px-2">
-                <h3 className="font-serif text-3xl text-charcoal font-black leading-tight group-hover:text-gold transition-colors duration-500">
+                <h3 className="font-serif text-3xl text-primary font-black leading-tight group-hover:text-gold transition-colors duration-500">
                   {service.title}
                 </h3>
-                <p className="text-charcoal/40 text-base font-light leading-relaxed">
+                <p className="text-primary/40 text-base font-light leading-relaxed">
                   {service.description}
                 </p>
               </div>
@@ -115,10 +108,10 @@ export function ServicesSection() {
               <div className="mt-8 px-2">
                 <button
                   onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
-                  className={`group/btn relative w-full py-6 rounded-full text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden transition-all duration-700 shadow-xl ${
+                  className={`group/btn relative w-full py-6 rounded-full text-xs font-bold uppercase tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
                     service.available
-                      ? "bg-charcoal text-white hover:shadow-gold/20"
-                      : "bg-white text-charcoal/20 border border-charcoal/5 cursor-not-allowed shadow-none"
+                      ? "bg-primary text-white hover:shadow-gold/20"
+                      : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"
                   }`}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-4">

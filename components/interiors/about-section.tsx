@@ -30,7 +30,7 @@ export function AboutSection() {
   ];
 
   return (
-    <section className="relative py-32 bg-white overflow-hidden">
+    <section className="relative py-20 bg-background overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-warm-cream/30 -skew-x-12 translate-x-1/2 pointer-events-none" />
       
@@ -56,7 +56,7 @@ export function AboutSection() {
                 </div>
                 <div className="bg-gold p-8 rounded-[2rem] text-white space-y-2 shadow-xl">
                   <span className="text-4xl font-serif font-black">20+</span>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
+                  <p className="text-xs font-semibold opacity-80">
                     Bespoke Sanctuaries <br />Crafted
                   </p>
                 </div>
@@ -77,7 +77,7 @@ export function AboutSection() {
                     className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                   />
                 </div>
-                <div className="relative aspect-square rounded-full overflow-hidden border-8 border-white shadow-2xl group">
+                <div className="relative aspect-square rounded-full overflow-hidden border-8 border-background shadow-2xl group">
                   <Image
                     src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&q=80"
                     alt="Artisan Detail"
@@ -89,7 +89,7 @@ export function AboutSection() {
             </div>
 
             {/* Background text decoration */}
-            <div className="absolute -bottom-10 -left-10 text-[10vw] font-serif font-black text-charcoal/[0.02] pointer-events-none select-none -z-10">
+            <div className="absolute -bottom-10 -left-10 text-[10vw] font-serif font-black text-primary/[0.02] pointer-events-none select-none -z-10">
               EST. 2024
             </div>
           </div>
@@ -101,15 +101,15 @@ export function AboutSection() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="text-[10px] tracking-[0.5em] text-gold font-black uppercase block"
+                className="text-lg uppercase font-serif font-bold block"
               >
-                Our Philosophy
+                Our philosophy and approach
               </motion.span>
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="font-serif text-5xl md:text-6xl text-charcoal font-black leading-tight"
+                className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight"
               >
                 Design with <span className="italic font-light text-gold">Purpose.</span> <br />
                 Executed with Precision.
@@ -119,7 +119,7 @@ export function AboutSection() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="text-charcoal/50 text-lg font-light leading-relaxed max-w-xl"
+                className="text-primary/50 text-lg font-light leading-relaxed max-w-xl"
               >
                 Banaya Interiors transforms spaces into legacies. We don&apos;t just design rooms; we curate experiences that resonate with your heritage and aspirations.
               </motion.p>
@@ -140,10 +140,10 @@ export function AboutSection() {
                     <feature.icon className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-charcoal mb-1">
+                    <h4 className="text-xs font-semibold text-primary mb-1">
                       {feature.title}
                     </h4>
-                    <p className="text-charcoal/40 text-sm leading-relaxed max-w-sm">
+                    <p className="text-primary/40 text-sm leading-relaxed max-w-sm">
                       {feature.desc}
                     </p>
                   </div>
@@ -152,8 +152,8 @@ export function AboutSection() {
             </div>
 
             <div className="pt-8">
-              <button className="group relative px-12 py-6 bg-charcoal text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4">
+              <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
+                <span className="relative z-10 flex items-center gap-4 tracking-widest uppercase">
                   Explore Our Legacy <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />

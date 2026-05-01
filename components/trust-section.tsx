@@ -28,7 +28,7 @@ const trustItems = [
 
 export function TrustSection() {
   return (
-    <section className="relative py-16 bg-charcoal text-white overflow-hidden">
+    <section className="relative py-16 bg-primary text-white overflow-hidden">
       {/* Decorative Background Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
         <span className="text-[10vw] font-serif font-black italic whitespace-nowrap">
@@ -56,7 +56,7 @@ export function TrustSection() {
               </div>
 
               <div className="space-y-1.5">
-                <h4 className="text-base font-serif font-bold text-gold uppercase tracking-[0.12em]">
+                <h4 className="text-base font-serif font-bold text-gold">
                   {item.title}
                 </h4>
                 <p className="text-[11px] text-white/50 leading-relaxed font-light">

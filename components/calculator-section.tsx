@@ -51,7 +51,7 @@ const ToggleSwitch = ({ on, onClick }: { on: boolean; onClick: () => void }) => 
       e.stopPropagation();
       onClick();
     }}
-    className={`w-12 h-6 rounded-full relative transition-colors flex items-center px-1 ${on ? "bg-slate-900" : "bg-slate-200"}`}
+    className={`w-12 h-6 rounded-full relative transition-colors flex items-center px-1 ${on ? "bg-primary" : "bg-slate-200"}`}
   >
     <div
       className={`w-4 h-4 rounded-full bg-white transition-all shadow-sm ${on ? "translate-x-6" : "translate-x-0"}`}
@@ -62,8 +62,8 @@ const ToggleSwitch = ({ on, onClick }: { on: boolean; onClick: () => void }) => 
 /* ─── Card Component ─── */
 const BrandSelection = ({ selBrand, setSelBrand }: { selBrand: string; setSelBrand: (id: string) => void }) => (
   <div className="space-y-8">
-    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] flex items-center gap-6">
-      Brand Level <div className="h-px bg-slate-100 flex-1" />
+    <label className="text-xs font-semibold text-slate-400 flex items-center gap-6">
+      Brand level <div className="h-px bg-slate-100 flex-1" />
     </label>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {BRAND_OPTIONS.map((opt) => {
@@ -73,20 +73,20 @@ const BrandSelection = ({ selBrand, setSelBrand }: { selBrand: string; setSelBra
             key={opt.id}
             onClick={() => setSelBrand(opt.id)}
             className={`p-6 rounded-3xl border transition-all space-y-6 text-left ${
-              active ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-lg" : "border-slate-100 bg-white hover:border-slate-200"
+              active ? "border-primary bg-slate-50 ring-1 ring-primary shadow-lg" : "border-slate-100 bg-white hover:border-slate-200"
             }`}
           >
             <div className="aspect-video rounded-2xl overflow-hidden relative bg-slate-50">
               <img src={opt.image} alt={opt.name} className="w-full h-full object-cover" />
               {active && (
-                <div className="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
-                  <CheckCircle2 className="text-slate-900" size={32} />
+                <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                  <CheckCircle2 className="text-primary" size={32} />
                 </div>
               )}
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-widest block text-slate-900">{opt.name}</span>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+              <span className="text-xs font-bold block text-primary">{opt.name}</span>
+              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
                 {opt.multiplier === 1 ? "Standard Pricing" : `${Math.round((opt.multiplier - 1) * 100)}% Premium`}
               </p>
             </div>
@@ -100,40 +100,40 @@ const BrandSelection = ({ selBrand, setSelBrand }: { selBrand: string; setSelBra
 const FinalEstimateForm = ({ register, handleSubmit, onSubmit, errors, back, estimate }: any) => (
   <div className="space-y-10">
     <div className="space-y-2 text-center">
-      <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto border-2 border-slate-900 mb-8">
-        <Calculator size={32} className="text-slate-900" />
+      <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto border-2 border-primary mb-8">
+        <Calculator size={32} className="text-primary" />
       </div>
-      <h3 className="text-3xl font-bold text-slate-900">Your Estimate is Ready</h3>
+      <h3 className="text-3xl font-bold text-primary">Your Estimate is Ready</h3>
       <p className="text-slate-500">Fill in your details to receive the detailed proposal and lock in this pricing.</p>
     </div>
 
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-2xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-10 rounded-3xl border border-slate-100 bg-white shadow-xl">
         <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Full Name</label>
-          <Input {...register("name")} placeholder="Your name" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.name ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          <label className="text-xs font-semibold text-slate-400">Full name</label>
+          <Input {...register("name")} placeholder="Your name" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.name ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-primary"}`} />
           {errors.name && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.name.message}</p>}
         </div>
         <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Email Address</label>
-          <Input {...register("email")} placeholder="you@email.com" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.email ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          <label className="text-xs font-semibold text-slate-400">Email address</label>
+          <Input {...register("email")} placeholder="you@email.com" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.email ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-primary"}`} />
           {errors.email && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.email.message}</p>}
         </div>
         <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">Phone Number</label>
-          <Input {...register("phone")} placeholder="+91 00000 00000" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.phone ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          <label className="text-xs font-semibold text-slate-400">Phone number</label>
+          <Input {...register("phone")} placeholder="+91 00000 00000" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.phone ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-primary"}`} />
           {errors.phone && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.phone.message}</p>}
         </div>
         <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em]">City</label>
-          <Input {...register("city")} placeholder="Your city" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.city ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          <label className="text-xs font-semibold text-slate-400">City</label>
+          <Input {...register("city")} placeholder="Your city" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.city ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-primary"}`} />
           {errors.city && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.city.message}</p>}
         </div>
       </div>
 
       <div className="flex gap-4 pt-12 pb-8">
         <Button type="button" variant="outline" onClick={back} className="px-10 py-8 rounded-2xl font-bold uppercase tracking-widest border-slate-200">Back</Button>
-        <Button type="submit" className="flex-1 bg-slate-900 text-white py-8 rounded-2xl font-bold uppercase tracking-[0.2em] shadow-xl">Submit & Get Detailed Quote</Button>
+        <Button type="submit" className="flex-1 bg-primary text-white py-8 rounded-2xl font-bold uppercase tracking-widest shadow-xl">Submit & Get Detailed Quote</Button>
       </div>
     </form>
   </div>
@@ -152,11 +152,11 @@ const ItemCard = ({
   onUpdateQty: (d: number | string) => void;
   qty: number;
 }) => (
-  <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-slate-900 ring-1 ring-slate-900" : "border-slate-100 bg-white"}`}>
+  <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-primary ring-1 ring-primary" : "border-slate-100 bg-white"}`}>
     <div className="p-5 space-y-2">
       <div className="flex justify-between items-start">
         <div className="space-y-1">
-          <h4 className="font-bold text-slate-900">{item.name}</h4>
+          <h4 className="font-bold text-primary">{item.name}</h4>
           <p className="text-sm font-bold text-slate-600">₹{item.price.toLocaleString()}{item.unit === "sqft" ? "/sqft" : ""}</p>
         </div>
         <ToggleSwitch on={isSelected} onClick={onToggle} />
@@ -165,8 +165,8 @@ const ItemCard = ({
     
     {isSelected && (
       <div className="mt-auto border-t border-slate-100 p-4 bg-slate-50/50 rounded-b-xl flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
-          {item.unit === "sqft" ? "Square Ft" : "Quantity"}
+        <span className="text-xs font-semibold text-slate-400">
+          {item.unit === "sqft" ? "Square ft" : "Quantity"}
         </span>
         <div className="flex items-center gap-3">
           {item.unit === "sqft" ? (
@@ -176,7 +176,7 @@ const ItemCard = ({
                 min="1"
                 value={qty}
                 onChange={(e) => onUpdateQty(e.target.value)}
-                className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-slate-900 text-center"
+                className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-primary text-center"
                 placeholder="0"
               />
             </div>
