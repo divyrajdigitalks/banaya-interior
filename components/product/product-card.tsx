@@ -58,7 +58,7 @@ export function ProductCard({
     <Link href={`/product/${id}`} className="group block">
       <motion.div 
         whileHover={{ y: -8 }}
-        className="flex flex-col gap-4 bg-white p-3 rounded-2xl border border-primary/5 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
+        className="flex flex-col gap-4 bg-background p-3 rounded-2xl border border-primary/5 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
       >
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden rounded-xl bg-[#fdf9f3]">
@@ -75,7 +75,7 @@ export function ProductCard({
               e.preventDefault();
               e.stopPropagation();
             }}
-            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm text-primary opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary hover:text-white shadow-md"
+            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-background/90 backdrop-blur-sm text-primary opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 hover:bg-primary hover:text-white shadow-md"
           >
             <Heart className="h-4 w-4" />
           </button>

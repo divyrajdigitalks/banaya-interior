@@ -47,7 +47,7 @@ export function FeaturedProjectsSection() {
     : PROJECTS.filter(p => p.category === activeFilter);
 
   return (
-    <section className="py-24 bg-[#fdf9f3]">
+    <section className="py-24 bg-background">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div>
@@ -62,7 +62,7 @@ export function FeaturedProjectsSection() {
                   className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
                     activeFilter === f 
                       ? "bg-primary text-white shadow-lg" 
-                      : "bg-white text-primary/40 hover:bg-white hover:text-primary border border-primary/5"
+                      : "bg-background text-primary/40 hover:bg-background hover:text-primary border border-primary/5"
                   }`}
                 >
                   {f}

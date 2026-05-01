@@ -22,18 +22,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FEATURED_PRODUCTS, CATEGORIES } from "@/lib/constants";
 import { ProductCard } from "@/components/product/product-card";
 import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 import Image from "next/image";
 import Link from "next/link";
-
-const CATEGORY_MENU = [
-  { name: "Serveware", icon: "🍽️" },
-  { name: "Bar Essentials", icon: "🍸" },
-  { name: "Lighting", icon: "💡" },
-  { name: "Home Decor", icon: "🏠" },
-  { name: "Organisers", icon: "📦" },
-  { name: "Gifting", icon: "🎁" },
-  { name: "Customisation", icon: "✏️" },
-];
 
 function ShopContent() {
   const router = useRouter();
@@ -95,86 +86,10 @@ function ShopContent() {
 
   return (
     <div className="min-h-screen bg-[#fdf9f3]">
-      {/* ── Top Announcement Bar ── */}
-      <div className="bg-primary text-white py-2 px-4 text-center">
-        <p className="text-[10px] font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2">
-          <Sparkles className="h-3 w-3 text-gold" />
-          Free shipping on orders above ₹1499 | COD Available
-        </p>
-      </div>
-
-      {/* ── Top Header ── */}
-      <header className="bg-white border-b border-primary/5 sticky top-0 z-50">
-        <div className="container mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
-          {/* Logo */}
-            <Link href="/" className="flex flex-col items-center group">
-              <span className="text-2xl font-serif font-black tracking-wider text-primary group-hover:text-gold transition-colors">Banaya</span>
-              <span className="text-[10px] tracking-widest text-primary/40 -mt-1 uppercase">Decor</span>
-            </Link>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-2xl relative group">
-            <input
-              type="text"
-              placeholder="Search for masterpieces..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#f8f5f0] border border-primary/5 rounded-xl py-3 pl-5 pr-12 text-sm focus:ring-2 focus:ring-gold/10 focus:bg-white outline-none transition-all placeholder:text-primary/30"
-            />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary rounded-lg text-white">
-              <Search className="h-4 w-4" />
-            </div>
-          </div>
-
-          {/* Icons */}
-          <div className="flex items-center gap-8 text-primary/80">
-            <button className="flex flex-col items-center gap-1 group">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <User className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Account</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 group">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <Heart className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Wishlist</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 group relative">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <ShoppingBag className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Cart</span>
-              <span className="absolute top-1 right-1 bg-gold text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">0</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Category Menu */}
-        <nav className="border-t border-primary/5 bg-white">
-          <div className="container mx-auto px-4 md:px-8 overflow-x-auto scrollbar-hide">
-            <ul className="flex items-center justify-center gap-10 py-3">
-              {CATEGORY_MENU.map((item) => (
-                <li key={item.name}>
-                  <button 
-                    className={`flex items-center gap-2.5 text-[11px] font-bold transition-all relative py-1 group ${
-                      selectedCategory === item.name ? "text-primary" : "text-primary/40 hover:text-primary"
-                    }`}
-                    onClick={() => updateCategory(item.name)}
-                  >
-                    <span className="text-base group-hover:scale-110 transition-transform">{item.icon}</span>
-                    <span className="uppercase tracking-widest">{item.name}</span>
-                    <ChevronDown className={`h-3 w-3 transition-transform ${selectedCategory === item.name ? "rotate-180" : ""}`} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-      </header>
+      <Header variant="light" />
 
       {/* ── Breadcrumbs & Banner ── */}
-      <section className="container mx-auto px-4 md:px-8 pt-8">
+      <section className="container mx-auto px-4 md:px-8 pt-48">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-primary/30 mb-8">
           <Link href="/" className="hover:text-gold transition-colors">Home</Link>

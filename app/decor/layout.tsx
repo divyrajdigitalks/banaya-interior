@@ -6,7 +6,7 @@ export default function DecorLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header variant="light" />
       <main className="pt-20">{children}</main>
     </div>
