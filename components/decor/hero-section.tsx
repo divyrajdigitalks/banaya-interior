@@ -8,23 +8,24 @@ import { ArrowRight } from "lucide-react";
 export function DecorHeroSection() {
   return (
     <section className="relative h-screen bg-background overflow-hidden">
-      {/* 🎥 YOUTUBE BACKGROUND VIDEO */}
+      {/* 🎥 LOCAL BACKGROUND VIDEO */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Loading Overlay: Starts solid black and fades to 50% opacity to hide YouTube's initial UI */}
+        {/* Loading Overlay: Starts solid black and fades to 50% opacity */}
         <motion.div 
           initial={{ opacity: 1 }}
           animate={{ opacity: 0.5 }}
-          transition={{ duration: 1.5, delay: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
           className="absolute inset-0 bg-black z-20" 
         />
-        <iframe 
-          className="absolute top-1/2 left-1/2 w-[115vw] h-[115vh] -translate-x-1/2 -translate-y-1/2 scale-[1.5] md:scale-[1.2] z-10"
-          src="https://www.youtube.com/embed/0UUyEB-_sow?autoplay=1&mute=1&loop=1&controls=0&playlist=0UUyEB-_sow&playsinline=1&rel=0&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3" 
-          title="YouTube video player" 
-          frameBorder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-          allowFullScreen
-        ></iframe>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-1/2 left-1/2 w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 z-10"
+        >
+          <source src="/loop.mp4" type="video/mp4" />
+        </video>
       </div>
 
       <div className="relative h-full flex items-center justify-center">

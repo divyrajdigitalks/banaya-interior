@@ -157,7 +157,6 @@ const ItemCard = ({
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <h4 className="font-bold text-primary">{item.name}</h4>
-          <p className="text-sm font-bold text-slate-600">₹{item.price.toLocaleString()}{item.unit === "sqft" ? "/sqft" : ""}</p>
         </div>
         <ToggleSwitch on={isSelected} onClick={onToggle} />
       </div>
@@ -166,27 +165,19 @@ const ItemCard = ({
     {isSelected && (
       <div className="mt-auto border-t border-slate-100 p-4 bg-slate-50/50 rounded-b-xl flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-400">
-          {item.unit === "sqft" ? "Square ft" : "Quantity"}
+          Enter sq.ft
         </span>
         <div className="flex items-center gap-3">
-          {item.unit === "sqft" ? (
-            <div className="relative w-24">
-              <input
-                type="number"
-                min="1"
-                value={qty}
-                onChange={(e) => onUpdateQty(e.target.value)}
-                className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-primary text-center"
-                placeholder="0"
-              />
-            </div>
-          ) : (
-            <>
-              <QtyBtn onClick={() => onUpdateQty(qty - 1)} icon={Minus} />
-              <span className="font-bold w-6 text-center text-sm">{qty}</span>
-              <QtyBtn onClick={() => onUpdateQty(qty + 1)} icon={Plus} />
-            </>
-          )}
+          <div className="relative w-24">
+            <input
+              type="number"
+              min="1"
+              value={qty}
+              onChange={(e) => onUpdateQty(e.target.value)}
+              className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-primary text-center"
+              placeholder="0"
+            />
+          </div>
         </div>
       </div>
     )}
