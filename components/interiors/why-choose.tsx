@@ -41,7 +41,7 @@ export function WhyChooseSection() {
             <motion.h2 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="text-2xl font-serif font-black text-primary uppercase tracking-wider"
+              className="text-2xl font-serif font-black text-primary tracking-wider"
             >
               Why Choose Banaya Interiors?
             </motion.h2>
@@ -59,7 +59,7 @@ export function WhyChooseSection() {
                     <feature.icon size={24} />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-xs font-black text-primary uppercase tracking-widest">{feature.title}</h4>
+                    <h4 className="text-xs font-black text-primary tracking-widest">{feature.title}</h4>
                     <p className="text-[10px] text-primary/40 font-medium leading-relaxed">{feature.desc}</p>
                   </div>
                 </motion.div>

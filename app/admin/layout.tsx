@@ -18,16 +18,28 @@ import {
   Search,
   ChevronRight,
   Sparkles,
-  Calculator
+  Calculator,
+  Layers,
+  Grid,
+  Package,
+  FolderTree,
+  Briefcase,
+  GalleryHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const sidebarLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { name: "Shop Inventory", icon: ShoppingBag, href: "/admin/shop" },
-  { name: "Interior Design", icon: Palette, href: "/admin/interiors" },
-  { name: "Decor Collection", icon: Sparkles, href: "/admin/decor" },
+  { type: "label", name: "Decor Management" },
+  { name: "Decor Categories", icon: Layers, href: "/admin/categories" },
+  { name: "Decor Subcategories", icon: Grid, href: "/admin/subcategories" },
+  { name: "Decor Products", icon: Package, href: "/admin/products" },
+  { type: "label", name: "Interiors Management" },
+  { name: "Interior Categories", icon: FolderTree, href: "/admin/interiors/categories" },
+  { name: "Interior Projects", icon: Briefcase, href: "/admin/interiors/projects" },
+  { name: "Interior Gallery", icon: GalleryHorizontal, href: "/admin/interiors/gallery" },
+  { type: "label", name: "System" },
   { name: "Calculators", icon: Calculator, href: "/admin/calculators" },
   { name: "Inquiries", icon: Users, href: "/admin/inquiries" },
   { name: "Settings", icon: Settings, href: "/admin/settings" },
@@ -86,22 +98,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Navigation Links */}
-            <nav className="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-hide">
-              <p className="text-xs text-white/40 font-medium mb-4 ml-2">Main Menu</p>
-              {sidebarLinks.map((link) => {
-                const isActive = pathname === link.href;
+            <nav className="flex-1 overflow-y-auto p-6 space-y-1 scrollbar-hide">
+              {sidebarLinks.map((link, i) => {
+                if ('type' in link && link.type === "label") {
+                  return (
+                    <p key={i} className="px-5 pt-6 pb-2 text-[11px] font-bold tracking-tight text-white/30">
+                      {link.name}
+                    </p>
+                  );
+                }
+                
+                const navLink = link as { name: string; icon: any; href: string };
+                const isActive = pathname === navLink.href;
+                
                 return (
                   <Link
-                    key={link.href}
-                    href={link.href}
+                    key={navLink.href}
+                    href={navLink.href}
                     className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group relative ${
                       isActive 
                         ? "bg-gold text-charcoal shadow-lg shadow-gold/20 font-medium" 
                         : "text-white/50 hover:text-white hover:bg-white/5 font-normal"
                     }`}
                   >
-                    <link.icon size={18} className={isActive ? "text-charcoal" : "text-white/30 group-hover:text-gold transition-colors"} />
-                    <span className="text-sm">{link.name}</span>
+                    <navLink.icon size={18} className={isActive ? "text-charcoal" : "text-white/30 group-hover:text-gold transition-colors"} />
+                    <span className="text-sm">{navLink.name}</span>
                     {isActive && (
                       <motion.div 
                         layoutId="active-nav"

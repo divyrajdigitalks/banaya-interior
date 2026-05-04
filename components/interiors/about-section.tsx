@@ -101,7 +101,7 @@ export function AboutSection() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="text-lg uppercase font-serif font-bold block"
+                className="text-lg font-serif font-bold block"
               >
                 Our philosophy and approach
               </motion.span>
@@ -153,7 +153,7 @@ export function AboutSection() {
 
             <div className="pt-8">
               <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4 tracking-widest uppercase">
+                <span className="relative z-10 flex items-center gap-4 tracking-widest">
                   Explore Our Legacy <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />

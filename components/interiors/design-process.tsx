@@ -54,7 +54,7 @@ export function DesignProcessSection() {
           
           {/* Design Process */}
           <div className="lg:col-span-8 space-y-16">
-            <h2 className="text-2xl font-serif font-black text-primary uppercase tracking-wider">
+            <h2 className="text-2xl font-serif font-black text-primary tracking-wider">
               Our Design Process
             </h2>
 
@@ -75,8 +75,8 @@ export function DesignProcessSection() {
                       <item.icon size={20} />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[10px] font-black text-gold/40 uppercase tracking-widest">{item.step}</span>
-                      <h4 className="text-xs font-black text-primary uppercase tracking-widest">{item.title}</h4>
+                      <span className="text-[10px] font-black text-gold/40 tracking-widest">{item.step}</span>
+                      <h4 className="text-xs font-black text-primary tracking-widest">{item.title}</h4>
                       <p className="text-[10px] text-primary/40 font-medium leading-relaxed max-w-[120px] mx-auto">{item.desc}</p>
                     </div>
                   </motion.div>
@@ -88,7 +88,7 @@ export function DesignProcessSection() {
           {/* Testimonials */}
           <div className="lg:col-span-4 space-y-12">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-black text-primary uppercase tracking-widest">
+              <h2 className="text-xs font-black text-primary tracking-widest">
                 What Our Clients Say
               </h2>
               <div className="flex items-center gap-2">

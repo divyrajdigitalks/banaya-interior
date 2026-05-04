@@ -48,7 +48,7 @@ export function CategoryGrid() {
     <section className="py-24 bg-[#fdf9f3]">
       <div className="container mx-auto px-4 md:px-8">
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-sm font-black uppercase tracking-[0.4em] text-primary/40">Shop by Category</h2>
+          <h2 className="text-sm font-black tracking-[0.4em] text-primary/40">Shop by Category</h2>
           <div className="w-24 h-px bg-gold mx-auto" />
         </div>
 
@@ -70,11 +70,11 @@ export function CategoryGrid() {
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
               
               <div className="absolute inset-0 p-4 flex flex-col justify-end items-center text-center space-y-4">
-                <h3 className="text-white text-[10px] font-black uppercase tracking-widest leading-tight">
+                <h3 className="text-white text-[10px] font-black tracking-widest leading-tight">
                   {cat.name}
                 </h3>
                 <Link href={cat.href}>
-                  <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[8px] font-black uppercase tracking-widest px-4 py-2 rounded-lg hover:bg-white hover:text-primary transition-all">
+                  <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[8px] font-black tracking-widest px-4 py-2 rounded-lg hover:bg-white hover:text-primary transition-all">
                     Shop Now
                   </button>
                 </Link>

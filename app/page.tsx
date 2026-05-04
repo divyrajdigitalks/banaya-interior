@@ -94,7 +94,7 @@ export default function HomePage() {
           {/* Content */}
           <div className={`relative z-20 flex flex-col justify-end h-full p-8 md:p-12 lg:p-16 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '300ms' }}>
             {/* Section Label */}
-            <span className={`text-[#c9a962] text-xs tracking-[0.3em] uppercase mb-4 transition-all duration-500 ${hoveredSide === "left" ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-50'}`}>
+            <span className={`text-[#c9a962] text-xs tracking-[0.3em] font-medium mb-4 transition-all duration-500 ${hoveredSide === "left" ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-50'}`}>
               Interior Design Studio
             </span>
 
@@ -116,7 +116,7 @@ export default function HomePage() {
 
             {/* CTA */}
             <div className={`flex items-center gap-4 transition-all duration-500 ${hoveredSide === "left" ? 'opacity-100 translate-x-0' : 'opacity-70 -translate-x-2'}`}>
-              <span className="text-white text-xs tracking-[0.2em] uppercase">Explore</span>
+              <span className="text-white text-xs tracking-[0.2em]">Explore</span>
               <div className={`w-12 h-px bg-[#c9a962] transition-all duration-500 ${hoveredSide === "left" ? 'w-20' : 'w-12'}`} />
               <ArrowRight className={`w-4 h-4 text-[#c9a962] transition-transform duration-500 ${hoveredSide === "left" ? 'translate-x-2' : ''}`} />
             </div>
@@ -159,7 +159,7 @@ export default function HomePage() {
           {/* Content */}
           <div className={`relative z-20 flex flex-col justify-end h-full p-8 md:p-12 lg:p-16 text-right items-end transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: '500ms' }}>
             {/* Section Label */}
-            <span className={`text-[#c9a962] text-xs tracking-[0.3em] uppercase mb-4 transition-all duration-500 ${hoveredSide === "right" ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-50'}`}>
+            <span className={`text-[#c9a962] text-xs tracking-[0.3em] font-medium mb-4 transition-all duration-500 ${hoveredSide === "right" ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-50'}`}>
               Handcrafted Collection
             </span>
 
@@ -183,7 +183,7 @@ export default function HomePage() {
             <div className={`flex items-center gap-4 transition-all duration-500 ${hoveredSide === "right" ? 'opacity-100 translate-x-0' : 'opacity-70 translate-x-2'}`}>
               <ArrowRight className={`w-4 h-4 text-[#c9a962] rotate-180 transition-transform duration-500 ${hoveredSide === "right" ? '-translate-x-2' : ''}`} />
               <div className={`w-12 h-px bg-[#c9a962] transition-all duration-500 ${hoveredSide === "right" ? 'w-20' : 'w-12'}`} />
-              <span className="text-white text-xs tracking-[0.2em] uppercase">Discover</span>
+              <span className="text-white text-xs tracking-[0.2em]">Discover</span>
             </div>
           </div>
 

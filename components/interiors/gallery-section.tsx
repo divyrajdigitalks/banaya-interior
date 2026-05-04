@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Plus, Play, Pause } from "lucide-react";
 
 const galleryImages = [
   {
@@ -81,14 +80,13 @@ export function GallerySection() {
       handlePrev();
     }
     setDragX(0);
-    setIsAutoPlaying(false);
   };
 
   return (
     <section className="py-20 bg-background relative overflow-hidden">
       {/* Decorative Background Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
-        <span className="text-[12vw] font-black tracking-tighter uppercase whitespace-nowrap">
+        <span className="text-[12vw] font-black tracking-tighter whitespace-nowrap">
           Portfolio
         </span>
       </div>
@@ -97,14 +95,14 @@ export function GallerySection() {
       <div className="container mx-auto px-6 md:px-12 mb-16 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
             className="space-y-4"
           >
-            <span className="text-lg uppercase  text-gold font-bold block">
-              A curated sanctuary for you
-            </span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-px bg-gold" />
+              <span className="text-xs tracking-tight text-gold font-bold">Curated Spaces</span>
+            </div>
             <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
               A Glimpse of <br />
               <span className="italic font-light text-gold transition-all duration-700">
@@ -114,24 +112,7 @@ export function GallerySection() {
           </motion.div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={handlePrev}
-              className="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl bg-background"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-500 shadow-xl bg-background"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center text-gold hover:bg-gold hover:text-white transition-all duration-500 shadow-lg"
-            >
-              {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </button>
+            {/* Removed controls as per user request */}
           </div>
         </div>
       </div>
@@ -176,7 +157,6 @@ export function GallerySection() {
                   onClick={() => {
                     if (isActive) return;
                     setCurrentIndex(index);
-                    setIsAutoPlaying(false);
                   }}
                 >
                   <div className="relative w-full h-full group overflow-hidden rounded-3xl shadow-2xl border border-charcoal/10 bg-charcoal/5">
@@ -198,7 +178,7 @@ export function GallerySection() {
                           <motion.span 
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="text-gold text-[10px] font-black uppercase tracking-[0.4em] mb-3"
+                            className="text-[11px] font-bold tracking-tight text-gold mb-3 block italic"
                           >
                             {image.category}
                           </motion.span>
@@ -209,9 +189,7 @@ export function GallerySection() {
                           >
                             {image.title}
                           </motion.h3>
-                          <button className="w-12 h-12 rounded-full bg-gold flex items-center justify-center text-charcoal hover:scale-110 transition-transform shadow-lg group/btn">
-                            <Plus className="w-5 h-5 group-hover/btn:rotate-90 transition-transform" />
-                          </button>
+                        
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -240,7 +218,6 @@ export function GallerySection() {
                 key={index}
                 onClick={() => {
                   setCurrentIndex(index);
-                  setIsAutoPlaying(false);
                 }}
                 className="group relative py-2"
               >

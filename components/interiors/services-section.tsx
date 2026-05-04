@@ -108,7 +108,7 @@ export function ServicesSection() {
               <div className="mt-8 px-2">
                 <button
                   onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
-                  className={`group/btn relative w-full py-6 rounded-full text-xs font-bold uppercase tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
+                  className={`group/btn relative w-full py-6 rounded-full text-xs font-bold tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
                     service.available
                       ? "bg-primary text-white hover:shadow-gold/20"
                       : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"

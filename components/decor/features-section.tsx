@@ -13,7 +13,7 @@ export function FeaturesSection() {
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 0.03, scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
-          className="font-serif text-[25vw] text-primary tracking-[0.1em] uppercase whitespace-nowrap"
+          className="font-serif text-[25vw] text-primary tracking-[0.1em] whitespace-nowrap"
         >
           CRAFTSMANSHIP
         </motion.h2>
@@ -122,7 +122,7 @@ export function FeaturesSection() {
 
             <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
               <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4 tracking-widest uppercase">
+                <span className="relative z-10 flex items-center gap-4 tracking-widest">
                   Acquire Piece <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />

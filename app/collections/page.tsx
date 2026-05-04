@@ -146,7 +146,7 @@ export default function CollectionsPage() {
                 <div className="lg:col-span-5 space-y-6">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-[8px] font-black uppercase tracking-[0.4em] text-gold">Collection {String(i + 1).padStart(2, "0")}</span>
+                      <span className="text-[8px] font-black tracking-[0.4em] text-gold">Collection {String(i + 1).padStart(2, "0")}</span>
                       <div className="h-px flex-1 bg-gold/10" />
                     </div>
                     <h2 className="text-4xl md:text-5xl font-serif font-black text-charcoal leading-tight tracking-tighter">
@@ -156,17 +156,17 @@ export default function CollectionsPage() {
                   </div>
 
                   <p className="text-charcoal/60 text-base font-light leading-relaxed">
-                    A collection that redefines the boundaries of {cat.name.toLowerCase()} design. Crafted from sustainably sourced heritage woods and finished with our signature organic oils.
+                    A collection that redefines the boundaries of {cat.name} design. Crafted from sustainably sourced heritage woods and finished with our signature organic oils.
                   </p>
 
                   <div className="grid grid-cols-2 gap-4 py-4 border-y border-charcoal/5">
                     <div>
                       <p className="text-xl font-serif font-black text-charcoal">{cat.count}+</p>
-                      <p className="text-[7px] uppercase tracking-widest text-charcoal/40 font-bold">Unique Pieces</p>
+                      <p className="text-[7px] tracking-widest text-charcoal/40 font-bold">Unique Pieces</p>
                     </div>
                     <div>
                       <p className="text-xl font-serif font-black text-charcoal">Legacy</p>
-                      <p className="text-[7px] uppercase tracking-widest text-charcoal/40 font-bold">Design Language</p>
+                      <p className="text-[7px] tracking-widest text-charcoal/40 font-bold">Design Language</p>
                     </div>
                   </div>
 

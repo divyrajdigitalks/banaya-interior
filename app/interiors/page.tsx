@@ -7,7 +7,6 @@ import { DesignProcessSection } from "@/components/interiors/design-process";
 import { ServicesSection } from "@/components/interiors/services-section";
 import { ProjectsSection } from "@/components/interiors/projects-section";
 import { GallerySection } from "@/components/interiors/gallery-section";
-import { CategoriesSection } from "@/components/interiors/categories-section";
 import { TrustSection } from "@/components/trust-section";
 import { Footer } from "@/components/footer";
 import { CalculatorSection } from "@/components/calculator-section";
@@ -20,7 +19,6 @@ export default function InteriorsPage() {
       <HeroSection />
       <AboutSection />
       <WhyChooseSection />
-      <CategoriesSection />
       <FeaturedProjectsSection />
       <CostGuideSection />
       <DesignProcessSection />

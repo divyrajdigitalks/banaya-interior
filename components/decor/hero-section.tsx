@@ -1,112 +1,67 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export function DecorHeroSection() {
-  const containerRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  // ✅ FIXED & ORDERED ITEMS
-  const items = [
-    {
-      src: "/momos.png",
-      range: [0.1, 0.20],
-      rotate: -5,
-      className: "bottom-[46%] right-[20%] w-[16%] h-[26%]",
-    },
-    {
-      src: "/momos2.png",
-      range: [0.20, 0.25],
-      rotate: -2,
-      className: "bottom-[40%] right-[22%] w-[22%] h-[26%]",
-    },
-    {
-      src: "/sushi.png",
-      range: [0.25, 0.30],
-      rotate: 16,
-      className: "top-[30%] left-[18%] w-[26%] h-[30%]",
-    },
-    {
-      src: "/rolls.png",
-      range: [0.30, 0.35],
-      rotate: 6,
-      className: "top-[16%] left-[36%] w-[38%] h-[32%]",
-    },
-    {
-      src: "/mit.png",
-      range: [0.35, 0.40],
-      rotate: -10,
-      className: "top-[16%] left-[28%] w-[24%] h-[38%]",
-    },
-    {
-      src: "/mit1.png",
-      range: [0.40, 0.45],
-      rotate: -10,
-      className: "top-[21%] left-[33%] w-[21%] h-[38%]",
-    },
-    {
-      src: "/noodles.png",
-      range: [0.45, 0.50], 
-      rotate: -10,
-      className: "bottom-[28%] left-[32%] w-[38%] h-[30%]",
-    },
-      {
-      src: "/lamon.png",
-      range: [0.50, 0.55], 
-      rotate: -8,
-      className: "bottom-[38%] left-[40%] w-[8%] h-[7%]",
-    },
-  ];
-
   return (
-    <section ref={containerRef} className="relative h-[400vh] bg-background overflow-visible">
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-        
-        {/* BACKGROUND DECORATIVE TEXT */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] select-none">
-          <span className="font-serif italic text-[25vw] font-black text-primary tracking-tighter">HERITAGE</span>
-        </div>
+    <section className="relative h-screen bg-background overflow-hidden">
+      {/* 🎥 YOUTUBE BACKGROUND VIDEO */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Loading Overlay: Starts solid black and fades to 50% opacity to hide YouTube's initial UI */}
+        <motion.div 
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 1.5, delay: 1.5, ease: "easeInOut" }}
+          className="absolute inset-0 bg-black z-20" 
+        />
+        <iframe 
+          className="absolute top-1/2 left-1/2 w-[115vw] h-[115vh] -translate-x-1/2 -translate-y-1/2 scale-[1.5] md:scale-[1.2] z-10"
+          src="https://www.youtube.com/embed/0UUyEB-_sow?autoplay=1&mute=1&loop=1&controls=0&playlist=0UUyEB-_sow&playsinline=1&rel=0&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3" 
+          title="YouTube video player" 
+          frameBorder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowFullScreen
+        ></iframe>
+      </div>
+
+      <div className="relative h-full flex items-center justify-center">
+        {/* Removed HERITAGE background text */}
 
         {/* LEFT TEXT - ROYAL STYLE */}
-        <div className="absolute left-12 top-24 max-w-[320px] z-50">
+        <div className="absolute left-8 md:left-20 top-[20%] md:top-[25%] max-w-[380px] z-30">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
           >
-            <p className="text-xs text-gold font-semibold mb-3 flex items-center gap-2">
-              <span className="w-5 h-px bg-gold" /> Est. Since 2020
+            <p className="text-sm text-gold font-bold mb-4 flex items-center gap-3">
+              <span className="w-8 h-px bg-gold" /> Est. Since 2020
             </p>
-            <h1 className="font-serif text-4xl md:text-6xl text-primary font-black leading-[0.9] tracking-tighter mb-5">
+            <h1 className="font-serif text-5xl md:text-8xl text-white font-black leading-[0.9] tracking-tighter mb-8">
               Banaya <br />
               <span className="italic font-light text-gold">Decor</span>
             </h1>
-            <p className="text-foreground/50 text-sm font-light leading-relaxed mb-6">
-              Masterfully handcrafted wooden <br />
-              serving treasures designed for <br />
-              the most distinguished dining <br />
+            <p className="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-10">
+              Masterfully handcrafted wooden <br className="hidden md:block" />
+              serving treasures designed for <br className="hidden md:block" />
+              the most distinguished dining <br className="hidden md:block" />
               experiences.
             </p>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/shop?category=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 bg-primary text-white text-sm font-semibold rounded-full hover:bg-gold transition-all duration-700 shadow-xl hover:shadow-gold/20">
+                <button className="group flex items-center justify-between gap-4 px-8 py-5 bg-gold text-primary text-sm font-bold rounded-full hover:bg-white transition-all duration-500 shadow-2xl shadow-gold/20">
                   Shop Collection
-                  <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
               <Link href="/collections?type=Decor">
-                <button className="group w-full flex items-center justify-between gap-3 px-6 py-4 border border-primary/10 text-primary text-sm font-semibold rounded-full hover:bg-primary hover:text-white transition-all duration-700">
+                <button className="group flex items-center justify-between gap-4 px-8 py-5 border border-white/30 text-white text-sm font-bold rounded-full hover:bg-white hover:text-primary transition-all duration-500">
                   View Lookbook
-                  <ArrowRight className="h-3 w-3 group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
             </div>
@@ -114,127 +69,39 @@ export function DecorHeroSection() {
         </div>
 
         {/* RIGHT TEXT - PREMIUM QUALITY */}
-        <div className="absolute right-12 bottom-16 max-w-[350px] text-right z-50">
+        <div className="absolute right-8 md:right-20 bottom-[15%] md:bottom-[20%] max-w-[400px] text-right z-30">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
           >
-            <p className="text-xs text-gold font-semibold mb-3">Uncompromising quality and detail</p>
-            <p className="text-foreground/60 text-base font-light leading-relaxed mb-6 italic">
-              "Elevate every culinary ritual with our signature <br />
+            <p className="text-sm text-gold font-bold mb-4">Uncompromising quality and detail</p>
+            <p className="text-white/90 text-lg md:text-xl font-medium leading-relaxed mb-8 italic">
+              "Elevate every culinary ritual with our signature <br className="hidden md:block" />
               heritage-fit tray collection."
             </p>
-            <div className="ml-auto w-12 h-[1.5px] bg-gold mb-6" />
-            <div className="space-y-2">
+            <div className="ml-auto w-16 h-px bg-gold mb-8" />
+            <div className="space-y-3">
               {[
                 "100% Sustainable Acacia Wood",
                 "Heritage Artisan Craftsmanship",
                 "Food-Safe Royal Finish",
                 "Modular Interlock Design"
               ].map((text, i) => (
-                <p key={i} className="text-xs text-foreground/50 font-medium">
+                <p key={i} className="text-sm text-white/70 font-bold">
                   {text}
                 </p>
               ))}
             </div>
           </motion.div>
         </div>
-
-        {/* 🪵 TRAY - ANIMATED */}
-        <motion.div 
-          className="relative w-full max-w-[1000px] aspect-4/3 z-20"
-          style={{
-            scale: useTransform(scrollYProgress, [0, 0.1], [1, 1.1]),
-            rotateX: useTransform(scrollYProgress, [0, 0.1], [0, 5]),
-          }}
-        >
-          <Image
-            src="/Dish.png"
-            alt="tray"
-            fill
-            priority
-            className="object-contain drop-shadow-[0_50px_100px_rgba(0,0,0,0.15)]"
-          />
-
-          {/* 🍜 ITEMS */}
-          {items.map((item, index) => (
-            <AnimatedItem
-              key={index}
-              src={item.src}
-              progress={scrollYProgress}
-              range={item.range}
-              rotate={item.rotate}
-              className={item.className}
-              zIndex={index + 20}
-            />
-          ))}
-        </motion.div>
       </div>
 
       {/* SCROLL GUIDE */}
-      <div className="absolute top-[90vh] left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
-        <span className="text-xs text-primary/40 font-semibold">Experience the Ritual</span>
-        <div className="w-px h-24 bg-linear-to-b from-gold to-transparent" />
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-4">
+        <span className="text-xs text-white/50 font-bold tracking-widest">Explore the Ritual</span>
+        <div className="w-px h-16 bg-linear-to-b from-gold to-transparent animate-pulse" />
       </div>
     </section>
-  );
-}
-
-// 🍜 ITEM COMPONENT
-function AnimatedItem({
-  src,
-  progress,
-  range,
-  rotate,
-  className,
-  zIndex,
-}: {
-  src: string;
-  progress: import("framer-motion").MotionValue<number>;
-  range: [number, number];
-  rotate: number;
-  className: string;
-  zIndex: number;
-}) {
-  const opacity = useTransform(progress, (v: number) => {
-    if (v < range[0]) return 0;
-    if (v >= range[1]) return 1;
-    return (v - range[0]) / (range[1] - range[0]);
-  });
-
-  const scale = useTransform(progress, (v: number) => {
-    if (v < range[0]) return 0.85;
-    if (v >= range[1]) return 1;
-    const t = (v - range[0]) / (range[1] - range[0]);
-    return 0.85 + t * 0.15;
-  });
-
-  const y = useTransform(progress, (v: number) => {
-    if (v < range[0]) return 40;
-    if (v >= range[1]) return 0;
-    const t = (v - range[0]) / (range[1] - range[0]);
-    return 40 - t * 40;
-  });
-
-  return (
-    <motion.div
-      style={{
-        opacity,
-        scale,
-        y,
-        rotate: `${rotate}deg`,
-        zIndex,
-        willChange: "transform, opacity",
-      }}
-      className={`absolute ${className}`}
-    >
-      <Image
-        src={src}
-        alt="food"
-        fill
-        className="object-contain drop-shadow-2xl"
-      />
-    </motion.div>
   );
 }

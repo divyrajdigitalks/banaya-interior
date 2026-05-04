@@ -91,7 +91,7 @@ function ShopContent() {
       {/* ── Breadcrumbs & Banner ── */}
       <section className="container mx-auto px-4 md:px-8 pt-48">
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-primary/30 mb-8">
+        <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/30 mb-8">
           <Link href="/" className="hover:text-gold transition-colors">Home</Link>
           <ChevronRight className="h-3 w-3" />
           <Link href="/shop" className="hover:text-gold transition-colors">Shop</Link>
@@ -113,7 +113,7 @@ function ShopContent() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-4"
             >
-              <span className="text-xs text-gold font-bold uppercase tracking-[0.3em]">The Collection</span>
+              <span className="text-xs text-gold font-bold tracking-[0.3em]">The Collection</span>
               <h1 className="text-5xl md:text-7xl font-serif font-black text-white leading-none">
                 {selectedCategory === "All" ? "Royal Decor" : selectedCategory}
               </h1>
@@ -136,7 +136,7 @@ function ShopContent() {
           {/* Sidebar Filters - Fixed Sticky */}
           <aside className="w-72 hidden lg:block shrink-0 sticky top-[180px] h-[calc(100vh-200px)] overflow-y-auto pr-6 scrollbar-hide">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/5">
-              <h2 className="text-xs font-black tracking-[0.2em] text-primary uppercase">
+              <h2 className="text-xs font-black tracking-[0.2em] text-primary">
                 Refine Sanctuary
               </h2>
               <button className="text-[10px] text-gold font-bold hover:text-primary transition-colors">Reset</button>

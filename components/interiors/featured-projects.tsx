@@ -51,7 +51,7 @@ export function FeaturedProjectsSection() {
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div>
-            <h2 className="text-2xl font-serif font-black text-primary uppercase tracking-wider mb-8">
+            <h2 className="text-2xl font-serif font-black text-primary tracking-wider mb-8">
               Featured Projects
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -59,7 +59,7 @@ export function FeaturedProjectsSection() {
                 <button
                   key={f}
                   onClick={() => setActiveFilter(f)}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`px-6 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${
                     activeFilter === f 
                       ? "bg-primary text-white shadow-lg" 
                       : "bg-background text-primary/40 hover:bg-background hover:text-primary border border-primary/5"
@@ -70,7 +70,7 @@ export function FeaturedProjectsSection() {
               ))}
             </div>
           </div>
-          <Link href="/projects" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary hover:text-gold transition-colors">
+          <Link href="/projects" className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary hover:text-gold transition-colors">
             View All Projects <ArrowRight size={14} />
           </Link>
         </div>

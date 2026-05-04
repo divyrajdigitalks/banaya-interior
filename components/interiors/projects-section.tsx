@@ -65,7 +65,7 @@ export function ProjectsSection() {
               viewport={{ once: true }}
               className="space-y-4"
             >
-              <span className="text-lg uppercase  text-gold font-bold block">
+              <span className="text-lg text-gold font-bold block">
                 Portfolio of distinction
               </span>
               <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">

@@ -42,7 +42,7 @@ export function CostGuideSection() {
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-12">
-          <h2 className="text-2xl font-serif font-black text-primary uppercase tracking-wider mb-2">
+          <h2 className="text-2xl font-serif font-black text-primary tracking-wider mb-2">
             Interior Cost Guide
           </h2>
           <p className="text-xs text-primary/40 font-medium">Estimated range for different spaces</p>
@@ -59,7 +59,7 @@ export function CostGuideSection() {
                 className="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-[#f8f5f0] border border-primary/5 hover:border-gold transition-all group"
               >
                 <item.icon size={28} className="text-primary/20 group-hover:text-gold transition-colors mb-4" />
-                <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">{item.title}</h4>
+                <h4 className="text-[10px] font-black text-primary tracking-widest mb-1">{item.title}</h4>
                 <p className="text-xs font-black text-gold">{item.range}</p>
               </motion.div>
             ))}
@@ -79,7 +79,7 @@ export function CostGuideSection() {
               <p className="text-xs text-white/70 font-light leading-relaxed mb-8">
                 Let us help you build a space you'll love coming home to.
               </p>
-              <button className="flex items-center justify-between w-full px-6 py-4 bg-gold text-primary text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all shadow-xl">
+              <button className="flex items-center justify-between w-full px-6 py-4 bg-gold text-primary text-[10px] font-black tracking-widest rounded-xl hover:bg-white transition-all shadow-xl">
                 Get Detailed Quote <ArrowRight size={14} />
               </button>
             </div>
