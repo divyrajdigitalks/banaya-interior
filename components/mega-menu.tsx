@@ -10,7 +10,8 @@ import {
   Gift, 
   Pencil,
   ChevronDown,
-  ArrowRight
+  ArrowRight,
+  X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -111,19 +112,19 @@ export function MegaMenu() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   return (
-    <div className="w-full bg-background border-b border-primary/5">
+    <div className="w-full bg-[#fdf9f3] border-b border-primary/5">
       <div className="container mx-auto px-6">
         <nav className="flex items-center justify-center gap-2 md:gap-8 overflow-x-auto no-scrollbar py-4">
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onMouseEnter={() => setActiveTab(cat.id)}
+              onClick={() => setActiveTab(activeTab === cat.id ? null : cat.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap group ${
-                activeTab === cat.id ? "bg-primary/5 text-primary" : "text-primary/60 hover:text-primary"
+                activeTab === cat.id ? "bg-primary text-white" : "text-primary/60 hover:text-primary"
               }`}
             >
-              <cat.icon size={16} strokeWidth={1.5} className="group-hover:text-gold transition-colors" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{cat.title}</span>
+              <cat.icon size={16} strokeWidth={1.5} className={activeTab === cat.id ? "text-white" : "group-hover:text-gold"} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{cat.title}</span>
               <ChevronDown size={12} className={`transition-transform duration-300 ${activeTab === cat.id ? "rotate-180" : ""}`} />
             </button>
           ))}
@@ -136,58 +137,68 @@ export function MegaMenu() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            onMouseLeave={() => setActiveTab(null)}
             className="absolute left-0 right-0 bg-[#fdf9f3]/98 backdrop-blur-2xl z-[60] border-b border-primary/10 shadow-2xl"
           >
             <div className="container mx-auto px-6 py-12">
-              <div className="grid grid-cols-7 gap-8">
-                {categories.map((cat) => (
+              <div className="max-w-4xl mx-auto">
+                {categories.filter(cat => cat.id === activeTab).map((cat) => (
                   <div 
                     key={cat.id} 
-                    onMouseEnter={() => setActiveTab(cat.id)}
-                    className={`space-y-6 transition-all duration-500 ${
-                      activeTab === cat.id ? "opacity-100 scale-[1.02]" : "opacity-20 blur-[1px]"
-                    }`}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-16 animate-in fade-in slide-in-from-top-4 duration-500"
                   >
-                    <div className="flex items-center gap-3 border-b border-primary/5 pb-4">
-                      <cat.icon size={18} className="text-gold" />
-                      <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">{cat.title}</h4>
-                    </div>
-                    
-                    <ul className="space-y-3">
-                      {cat.subItems.map((item) => (
-                        <li key={item}>
-                          <Link 
-                            href={`/shop?category=${cat.title}&sub=${item}`}
-                            className="text-xs text-primary/60 hover:text-gold transition-colors duration-300 block font-medium"
-                          >
-                            {item}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-8">
+                      <ul className="grid grid-cols-2 gap-x-8 gap-y-4">
+                        {cat.subItems.map((item) => (
+                          <li key={item}>
+                            <Link 
+                              href={`/shop?category=${cat.title}&sub=${item}`}
+                              onClick={() => setActiveTab(null)}
+                              className="text-sm text-primary/60 hover:text-gold transition-colors duration-300 flex items-center gap-2 group/item"
+                            >
+                              <div className="w-1.5 h-px bg-gold scale-x-0 group-hover/item:scale-x-100 transition-transform origin-left" />
+                              {item}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
 
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group">
+                      <div className="pt-8">
+                        <Link href="/shop" onClick={() => setActiveTab(null)}>
+                          <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary hover:text-gold transition-all group">
+                            Explore All {cat.title} <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl group">
                       <Image
                         src={cat.image}
                         alt={cat.title}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-primary/20 group-hover:opacity-0 transition-opacity" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+                      <div className="absolute bottom-8 left-8">
+                        <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-1">Featured Collection</p>
+                        <p className="text-white text-xl font-serif font-black tracking-tight">{cat.title} Essentials</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-12 pt-8 border-t border-primary/5 flex justify-center">
-                <Link href="/shop">
-                  <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-primary hover:text-gold transition-all group">
-                    View Entire Collection <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                  </button>
-                </Link>
+                <button 
+                  onClick={() => setActiveTab(null)}
+                  className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40 hover:text-primary transition-all flex items-center gap-2"
+                >
+                  <X size={14} /> Close Menu
+                </button>
               </div>
             </div>
+            {/* Click outside to close */}
+            <div className="fixed inset-0 -z-10" onClick={() => setActiveTab(null)} />
           </motion.div>
         )}
       </AnimatePresence>

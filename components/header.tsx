@@ -4,7 +4,7 @@ import { Logo } from "./logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShoppingBag, Heart, Search, User, ShoppingCart } from "lucide-react";
+import { ShoppingBag, Heart, Search, User } from "lucide-react";
 import { MegaMenu } from "./mega-menu";
 import { useStore } from "@/context/StoreContext";
 
@@ -98,38 +98,40 @@ export function Header({ variant = "dark" }: HeaderProps) {
                 ))}
               </div>
 
-              <div className={`flex items-center gap-6 text-primary/80 ${isInteriorsPage ? 'hidden' : ''}`}>
-                <Link 
-                  href="/wishlist" 
-                  className={`relative group hover:text-gold transition-colors duration-300 flex items-center gap-2`}
-                >
-                  <Heart size={18} strokeWidth={2} />
-                  <span className="text-[10px] font-black tracking-widest hidden xl:block">WISHLIST</span>
-                </Link>
-                
-                <Link 
-                  href="/cart" 
-                  className={`relative group hover:text-gold transition-colors duration-300 flex items-center gap-2`}
-                >
-                  <div className="relative">
-                    <ShoppingBag size={18} strokeWidth={2} />
-                    {cartItemsCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-gold text-primary text-[8px] font-bold rounded-full flex items-center justify-center">
-                        {cartItemsCount}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] font-black tracking-widest hidden xl:block">CART</span>
-                </Link>
+              {!isInteriorsPage && (
+              <div className="flex items-center gap-8 text-primary">
+                  <Link 
+                    href="/account" 
+                    className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
+                  >
+                    <User size={22} strokeWidth={1.5} />
+                    <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Account</span>
+                  </Link>
 
-                <Link 
-                  href="/shop" 
-                  className={`relative group hover:text-gold transition-colors duration-300 flex items-center gap-2`}
-                >
-                  <ShoppingCart size={18} strokeWidth={2} />
-                  <span className="text-[10px] font-black tracking-widest hidden xl:block">SHOP</span>
-                </Link>
-              </div>
+                  <Link 
+                    href="/wishlist" 
+                    className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
+                  >
+                    <Heart size={22} strokeWidth={1.5} />
+                    <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Wishlist</span>
+                  </Link>
+                  
+                  <Link 
+                    href="/cart" 
+                    className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
+                  >
+                    <div className="relative">
+                      <ShoppingBag size={22} strokeWidth={1.5} />
+                      {cartItemsCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-primary text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-[#fdf9f3]">
+                          {cartItemsCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Cart</span>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -16,7 +16,8 @@ import {
   Heart,
   ShoppingBag,
   Filter,
-  Check
+  Check,
+  ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FEATURED_PRODUCTS, CATEGORIES } from "@/lib/constants";
@@ -126,7 +127,7 @@ function ShopContent() {
                 </p>
                 
                 <div className="pt-4">
-                  <button className="bg-[#020e23] text-white text-xs font-black tracking-[0.2em] px-12 py-5 rounded-full hover:bg-gold transition-all shadow-2xl uppercase">
+                  <button className="bg-[#020e23] text-white text-xs font-black tracking-[0.2em] px-12 py-5 rounded-xl hover:bg-gold transition-all shadow-2xl uppercase">
                     Shop Collection
                   </button>
                 </div>
@@ -142,75 +143,74 @@ function ShopContent() {
           {/* Sidebar Filters - Fixed Sticky */}
           <aside className="w-72 hidden lg:block shrink-0 sticky top-[180px] h-[calc(100vh-200px)] overflow-y-auto pr-6 scrollbar-hide">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/5">
-              <h2 className="text-xs font-black tracking-[0.2em] text-primary">
+              <h2 className="text-sm font-black ">
                 Refine Sanctuary
               </h2>
               <button className="text-[10px] text-gold font-bold hover:text-primary transition-colors">Reset</button>
             </div>
 
-            <div className="space-y-12">
-              {/* Price Filter */}
-              <div className="space-y-6">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Price <ChevronDown className="h-3 w-3 text-gold" />
-                </button>
-                <div className="px-2 pt-4 pb-2">
-                  <div className="h-1 w-full bg-slate-200 rounded-full relative">
-                    <div className="absolute h-full w-full bg-[#4F3D31] rounded-full" />
-                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-4 bg-[#4F3D31] rounded-full border-2 border-white shadow-md cursor-pointer" />
-                    <div className="absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 bg-[#4F3D31] rounded-full border-2 border-white shadow-md cursor-pointer" />
-                  </div>
-                  <div className="flex justify-between mt-4">
-                    <span className="text-[10px] font-bold text-primary/60">₹0</span>
-                    <span className="text-[10px] font-bold text-primary/60">₹10,000+</span>
+            <div className="space-y-10">
+              {[
+                { title: "Type", options: ["Wooden", "Metal", "Ceramic", "Glass"] },
+                { title: "Colour", options: ["Royal Brown", "Beige", "Black", "Gold"] },
+                { title: "Materials", options: ["Teak Wood", "Mango Wood", "Brass", "Steel"] },
+              ].map((filter) => (
+                <div key={filter.title} className="space-y-4">
+                  <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                    {filter.title} <ChevronDown className="h-3 w-3 text-gold" />
+                  </button>
+                  <div className="grid grid-cols-1 gap-2.5">
+                    {filter.options.map((opt) => (
+                      <label 
+                        key={opt} 
+                        className="flex items-center gap-3 cursor-pointer group"
+                        onClick={() => toggleFilter(filter.title as any, opt)}
+                      >
+                        <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
+                            ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                            : "border-primary/10 group-hover:border-gold"
+                        }`}>
+                          <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                            (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
+                              ? "scale-100" 
+                              : "scale-0"
+                          }`} />
+                        </div>
+                        <span className={`text-xs transition-colors duration-300 ${
+                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
+                            ? "text-primary font-bold" 
+                            : "text-primary/50 group-hover:text-primary"
+                        }`}>{opt}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
-              </div>
+              ))}
 
-              {/* Occasion Filter */}
               <div className="space-y-6">
                 <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Occasion <ChevronDown className="h-3 w-3 text-gold" />
+                  Price range <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
-                <div className="grid grid-cols-1 gap-4">
-                  {["Birthday (18)", "Anniversary (12)", "Housewarming (14)", "Festive (20)"].map((opt) => (
-                    <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="w-4 h-4 border border-primary/20 rounded flex items-center justify-center transition-colors group-hover:border-gold">
-                        <Check className="w-3 h-3 text-gold scale-0 transition-transform group-hover:scale-0" />
-                      </div>
-                      <span className="text-xs text-primary/60 group-hover:text-primary transition-colors">{opt}</span>
+                <div className="space-y-3">
+                  {["Under ₹500", "₹500 - ₹2000", "₹2000 - ₹5000", "Above ₹5000"].map((range) => (
+                    <label key={range} className="flex items-center gap-3 cursor-pointer group">
+                      <div className="w-5 h-5 border-2 border-primary/10 rounded-lg group-hover:border-gold transition-colors" />
+                      <span className="text-xs text-primary/50 group-hover:text-primary transition-colors">{range}</span>
                     </label>
                   ))}
                 </div>
-              </div>
-
-              {/* Recipient Filter */}
-              <div className="space-y-6">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Recipient <ChevronDown className="h-3 w-3 text-gold" />
-                </button>
-                <div className="grid grid-cols-1 gap-4">
-                  {["For Her (18)", "For Him (14)", "For Couple (12)", "Corporate (10)"].map((opt) => (
-                    <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="w-4 h-4 border border-primary/20 rounded flex items-center justify-center transition-colors group-hover:border-gold">
-                        <Check className="w-3 h-3 text-gold scale-0 transition-transform group-hover:scale-0" />
-                      </div>
-                      <span className="text-xs text-primary/60 group-hover:text-primary transition-colors">{opt}</span>
-                    </label>
-                  ))}
+                <div className="flex items-center gap-3 pt-2">
+                  <div className="flex-1 relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
+                    <input type="text" placeholder="Min" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
+                  </div>
+                  <div className="flex-1 relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
+                    <input type="text" placeholder="Max" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
+                  </div>
                 </div>
-              </div>
-
-              {/* Color Filter */}
-              <div className="space-y-6">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Color <ChevronDown className="h-3 w-3 text-gold" />
-                </button>
-                <div className="flex flex-wrap gap-3">
-                  {["bg-black", "bg-[#F5E6D3]", "bg-[#C41E3A]", "bg-[#E5E4E2]", "bg-gradient-to-r from-green-800 to-amber-900"].map((color, i) => (
-                    <button key={i} className={`w-6 h-6 rounded-full border border-primary/10 ${color} shadow-sm hover:scale-110 transition-transform`} />
-                  ))}
-                </div>
+                <button className="w-full bg-primary text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest hover:bg-gold transition-all shadow-lg shadow-primary/5">Apply filter</button>
               </div>
             </div>
           </aside>
@@ -307,6 +307,35 @@ function ShopContent() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+     {/* ── CTA SECTION ── */}
+      <section className="py-24 bg-[#020e23] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <Image 
+            src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=80" 
+            alt="CTA Background" 
+            fill 
+            className="object-cover"
+          />
+        </div>
+        <div className="container mx-auto px-6 relative z-10 text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-5xl font-serif font-black text-white tracking-tight">
+              Ready to Start Your Dream Project?
+            </h2>
+            <p className="text-white/70 text-lg font-light tracking-wide">
+              Book your free consultation with our experts today.
+            </p>
+          </div>
+          <div className="pt-4">
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent("open-calculator", { detail: { type: "homes" } }))}
+              className="bg-[#C9A962] text-primary font-black uppercase tracking-[0.2em] text-[10px] px-12 py-5 rounded-lg hover:bg-white transition-all shadow-2xl flex items-center gap-4 mx-auto group"
+            >
+              BOOK FREE CONSULTATION <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+            </button>
           </div>
         </div>
       </section>

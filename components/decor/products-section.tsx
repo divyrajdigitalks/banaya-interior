@@ -97,17 +97,9 @@ export function ProductsSection() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <ProductCard {...product} />
-            </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
+          {products.map((product, idx) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
 
