@@ -14,15 +14,27 @@ import { DoorTransition } from "@/components/door-transition";
 
 export default function InteriorsPage() {
   return (
-    <>
+    <main className="scroll-smooth">
       <DoorTransition />
-      <HeroSection />
-      <AboutSection />
+      <section id="home">
+        <HeroSection />
+      </section>
+      <section id="about">
+        <AboutSection />
+      </section>
       <WhyChooseSection />
-      <FeaturedProjectsSection />
-      <CostGuideSection />
-      <DesignProcessSection />
-      <ServicesSection />
+      <section id="projects">
+        <FeaturedProjectsSection />
+      </section>
+      <section id="cost-calculator">
+        <CostGuideSection />
+      </section>
+      <section id="process">
+        <DesignProcessSection />
+      </section>
+      <section id="services">
+        <ServicesSection />
+      </section>
       <div className="hidden">
         <CalculatorSection />
       </div>
@@ -30,6 +42,6 @@ export default function InteriorsPage() {
       <GallerySection />
       <TrustSection />
       <Footer />
-    </>
+    </main>
   );
 }

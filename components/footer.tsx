@@ -5,7 +5,7 @@ import { Instagram, Facebook, Linkedin, Phone, Mail, MapPin } from "lucide-react
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-white py-16 px-8 md:px-16">
+    <footer id="contact" className="bg-primary text-white py-16 px-8 md:px-16">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Logo & Description */}
@@ -83,7 +83,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/40 text-xs">
-            © 2024 Banayaa. All rights reserved.
+            © 2024 Banaya. All rights reserved.
           </p>
           <div className="flex gap-4">
             <a

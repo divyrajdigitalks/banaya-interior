@@ -137,12 +137,18 @@ export function MegaMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             onMouseLeave={() => setActiveTab(null)}
-            className="absolute left-0 right-0 bg-background/95 backdrop-blur-xl z-[60] border-b border-primary/10 shadow-2xl"
+            className="absolute left-0 right-0 bg-[#fdf9f3]/98 backdrop-blur-2xl z-[60] border-b border-primary/10 shadow-2xl"
           >
             <div className="container mx-auto px-6 py-12">
               <div className="grid grid-cols-7 gap-8">
                 {categories.map((cat) => (
-                  <div key={cat.id} className={`space-y-6 ${activeTab === cat.id ? "opacity-100" : "opacity-40"}`}>
+                  <div 
+                    key={cat.id} 
+                    onMouseEnter={() => setActiveTab(cat.id)}
+                    className={`space-y-6 transition-all duration-500 ${
+                      activeTab === cat.id ? "opacity-100 scale-[1.02]" : "opacity-20 blur-[1px]"
+                    }`}
+                  >
                     <div className="flex items-center gap-3 border-b border-primary/5 pb-4">
                       <cat.icon size={18} className="text-gold" />
                       <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">{cat.title}</h4>

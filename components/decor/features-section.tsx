@@ -121,12 +121,16 @@ export function FeaturesSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-              <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4 tracking-widest">
-                  Acquire Piece <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                </span>
-                <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
-              </button>
+            <button className="group relative px-12 py-6 bg-gold text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
+  
+  <span className="relative z-10 flex items-center gap-4 tracking-widest">
+    Acquire Piece 
+    <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+  </span>
+
+  <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
+
+</button>
 
               <div className="flex items-center gap-4 group cursor-pointer">
                 <div className="w-14 h-14 rounded-full bg-warm-cream flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-white transition-all duration-500 shadow-lg">

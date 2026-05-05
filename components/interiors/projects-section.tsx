@@ -79,7 +79,7 @@ export function ProjectsSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-primary/50 text-lg font-light leading-relaxed max-w-sm"
+              className=" text-lg font-light leading-relaxed max-w-sm"
             >
               Each project is a unique dialogue between architecture and soul, meticulously crafted to reflect the essence of its inhabitants.
             </motion.p>

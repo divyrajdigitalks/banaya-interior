@@ -27,16 +27,7 @@ import { FEATURED_PRODUCTS } from "@/lib/constants";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/footer";
-
-const CATEGORY_MENU = [
-  { name: "Serveware", icon: "🍽️" },
-  { name: "Bar Essentials", icon: "🍸" },
-  { name: "Lighting", icon: "💡" },
-  { name: "Home Decor", icon: "🏠" },
-  { name: "Organisers", icon: "📦" },
-  { name: "Gifting", icon: "🎁" },
-  { name: "Customisation", icon: "✏️" },
-];
+import { Header } from "@/components/header";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -71,78 +62,9 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#fdf9f3]">
-      {/* ── Top Announcement Bar ── */}
-      <div className="bg-primary text-white py-2 px-4 text-center">
-        <p className="text-[10px] font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2">
-          <Sparkles className="h-3 w-3 text-gold" />
-          Free shipping on orders above ₹1499 | COD Available
-        </p>
-      </div>
+      <Header />
 
-      {/* ── Top Header ── */}
-      <header className="bg-white border-b border-primary/5 sticky top-0 z-50">
-        <div className="container mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-8">
-          {/* Logo */}
-          <Link href="/" className="flex flex-col items-center group">
-            <span className="text-2xl font-serif font-black tracking-wider text-primary group-hover:text-gold transition-colors">Banaya</span>
-            <span className="text-[10px] tracking-widest text-primary/40 -mt-1 uppercase">Decor</span>
-          </Link>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-2xl relative group">
-            <input
-              type="text"
-              placeholder="Search for trays, decor, organisers..."
-              className="w-full bg-[#f8f5f0] border border-primary/5 rounded-xl py-3 pl-5 pr-12 text-sm focus:ring-2 focus:ring-gold/10 focus:bg-white outline-none transition-all placeholder:text-primary/30"
-            />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary rounded-lg text-white">
-              <Search className="h-4 w-4" />
-            </div>
-          </div>
-
-          {/* Icons */}
-          <div className="flex items-center gap-8 text-primary/80">
-            <button className="flex flex-col items-center gap-1 group">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <User className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Account</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 group">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <Heart className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Wishlist</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 group relative">
-              <div className="p-2 rounded-full group-hover:bg-gold/10 transition-all">
-                <ShoppingBag className="h-5 w-5 group-hover:text-gold transition-colors" />
-              </div>
-              <span className="text-[9px] font-bold uppercase tracking-wider">Cart</span>
-              <span className="absolute top-1 right-1 bg-gold text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">2</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Category Menu */}
-        <nav className="border-t border-primary/5 bg-white">
-          <div className="container mx-auto px-4 md:px-8 overflow-x-auto scrollbar-hide">
-            <ul className="flex items-center justify-center gap-10 py-3">
-              {CATEGORY_MENU.map((item) => (
-                <li key={item.name}>
-                  <button className="flex items-center gap-2.5 text-[11px] font-bold transition-all relative py-1 group text-primary/40 hover:text-primary">
-                    <span className="text-base group-hover:scale-110 transition-transform">{item.icon}</span>
-                    <span className="uppercase tracking-widest">{item.name}</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-      </header>
-
-      <div className="container mx-auto px-4 md:px-8 py-6">
+      <div className="container mx-auto px-4 md:px-8 py-12 pt-40">
         {/* ── Breadcrumbs ── */}
         <nav className="flex items-center gap-2 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
           <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Home</Link>
@@ -222,13 +144,96 @@ export default function ProductDetailPage() {
                 <p className="text-primary/70 text-sm leading-relaxed">
                   Serve in style with our {product.name}, handcrafted from premium Sheesham wood. Perfect for serving snacks, tea, breakfast in bed or even for organizing your essentials with elegance.
                 </p>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-8 border-b border-primary/5">
                   {["Elegant natural wood finish", "Sturdy handles for easy grip", "Multipurpose – serve, organize or display", "Food safe & easy to clean"].map((feat) => (
                     <li key={feat} className="flex items-center gap-3 text-xs text-primary/60">
                       <div className="w-1.5 h-1.5 rounded-full bg-gold" /> {feat}
                     </li>
                   ))}
                 </ul>
+
+                {/* Bulk Purchase Link */}
+                <div className="pt-4">
+                  <p className="text-xs font-bold text-primary/60">
+                    Want to buy this in bulk? <Link href="#" className="text-gold border-b border-gold pb-0.5 hover:text-primary hover:border-primary transition-all">Click here</Link>
+                  </p>
+                </div>
+
+                {/* BEST OFFERS SECTION */}
+                <div className="mt-12 p-8 border-2 border-dashed border-primary/10 rounded-2xl bg-white space-y-8">
+                  <h3 className="text-sm font-black text-[#e87d3e] uppercase tracking-[0.2em]">Best Offers For You!</h3>
+                  
+                  <div className="space-y-6">
+                    <div className="pb-6 border-b border-primary/5">
+                      <p className="text-sm font-black text-primary mb-2">Get 5% off sitewide <span className="font-light text-primary/60">No minimum spend</span></p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold text-primary/40 uppercase">Use Code:</span>
+                        <div className="px-4 py-1.5 border border-dashed border-primary/30 rounded bg-[#f8f5f0] text-xs font-black tracking-widest text-primary">
+                          MAKEHOMESPECIAL
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-black text-primary mb-2">Get ₹150 off on your first order <span className="font-light text-primary/60">Min. purchase of ₹1500</span></p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold text-primary/40 uppercase">Use Code:</span>
+                        <div className="px-4 py-1.5 border border-dashed border-primary/30 rounded bg-[#f8f5f0] text-xs font-black tracking-widest text-primary">
+                          NESTTRY
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* COMBO SECTION - People Also Shopped For */}
+                <div className="mt-16 space-y-8">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black text-primary/40 uppercase tracking-[0.3em]">People Also Shopped For</h3>
+                  </div>
+                  
+                  <div className="p-8 bg-white border border-primary/5 rounded-3xl shadow-sm">
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                      <div className="flex-1 grid grid-cols-3 gap-6 items-center">
+                        <div className="space-y-3 text-center">
+                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
+                            <Image src="https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400&q=80" alt="Item 1" fill className="object-cover" />
+                          </div>
+                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Wooden Tray With Handles</p>
+                          <p className="text-[10px] font-black text-primary">₹1,390 <span className="text-[8px] text-primary/20 line-through">₹2,150</span></p>
+                        </div>
+                        <div className="text-2xl text-primary/20 font-light">+</div>
+                        <div className="space-y-3 text-center">
+                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
+                            <Image src="https://images.unsplash.com/photo-1581428982868-e410dd047a90?w=400&q=80" alt="Item 2" fill className="object-cover" />
+                          </div>
+                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Snack Platter With Bowls</p>
+                          <p className="text-[10px] font-black text-primary">₹1,550 <span className="text-[8px] text-primary/20 line-through">₹2,340</span></p>
+                        </div>
+                        <div className="text-2xl text-primary/20 font-light">+</div>
+                        <div className="space-y-3 text-center">
+                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
+                            <Image src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80" alt="Item 3" fill className="object-cover" />
+                          </div>
+                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Acacia Wood Cake Stand</p>
+                          <p className="text-[10px] font-black text-primary">₹1,550 <span className="text-[8px] text-primary/20 line-through">₹2,340</span></p>
+                        </div>
+                      </div>
+
+                      <div className="w-px h-24 bg-primary/5 hidden md:block" />
+
+                      <div className="w-full md:w-56 space-y-4 text-center">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Total Price</p>
+                          <p className="text-xl font-black text-primary">₹4,490</p>
+                        </div>
+                        <button className="w-full py-4 bg-[#4F3D31] hover:bg-gold text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-primary/5">
+                          Add All 3 To Cart
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

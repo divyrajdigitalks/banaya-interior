@@ -89,43 +89,49 @@ function ShopContent() {
       <Header variant="light" />
 
       {/* ── Breadcrumbs & Banner ── */}
-      <section className="container mx-auto px-4 md:px-8 pt-48">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/30 mb-8">
-          <Link href="/" className="hover:text-gold transition-colors">Home</Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link href="/shop" className="hover:text-gold transition-colors">Shop</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-primary">{selectedCategory}</span>
+      <section className="pt-40">
+        {/* Breadcrumbs - Moved inside container for alignment */}
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/30 mb-8">
+            <Link href="/" className="hover:text-gold transition-colors">Home</Link>
+            <ChevronRight className="h-3 w-3" />
+            <Link href="/shop" className="hover:text-gold transition-colors">Shop</Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-primary">{selectedCategory}</span>
+          </div>
         </div>
 
-        {/* Category Banner */}
-        <div className="relative w-full h-[320px] rounded-[2rem] overflow-hidden mb-12 shadow-2xl shadow-primary/5 group">
+        {/* Category Banner - FULL WIDTH */}
+        <div className="relative w-full h-[450px] overflow-hidden mb-12 group">
           <Image 
             src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=80" 
             alt="Category Banner"
             fill
             className="object-cover transition-transform duration-[3s] group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/40 to-transparent flex flex-col justify-center px-16">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <span className="text-xs text-gold font-bold tracking-[0.3em]">The Collection</span>
-              <h1 className="text-5xl md:text-7xl font-serif font-black text-white leading-none">
-                {selectedCategory === "All" ? "Royal Decor" : selectedCategory}
-              </h1>
-              <p className="text-white/70 text-lg font-light max-w-md leading-relaxed">
-                Handpicked masterpieces designed to bring <br />
-                heritage and warmth into your home.
-              </p>
-            </motion.div>
-          </div>
-          {/* Decorative element */}
-          <div className="absolute bottom-8 right-8 w-24 h-24 border border-white/20 rounded-full flex items-center justify-center animate-pulse">
-            <div className="w-16 h-16 border border-white/10 rounded-full" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/40 to-transparent flex flex-col justify-center">
+            <div className="container mx-auto px-4 md:px-16">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-6"
+              >
+                <span className="text-xs text-gold font-bold tracking-[0.3em]">The Collection</span>
+                <h1 className="text-6xl md:text-8xl font-serif font-black text-white leading-none">
+                  {selectedCategory === "All" ? "Decor" : selectedCategory}
+                </h1>
+                <p className="text-white/70 text-lg md:text-xl font-light max-w-xl leading-relaxed">
+                  Handpicked masterpieces designed to bring <br />
+                  heritage and warmth into your home.
+                </p>
+                
+                <div className="pt-4">
+                  <button className="bg-[#020e23] text-white text-xs font-black tracking-[0.2em] px-12 py-5 rounded-full hover:bg-gold transition-all shadow-2xl uppercase">
+                    Shop Collection
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -142,68 +148,69 @@ function ShopContent() {
               <button className="text-[10px] text-gold font-bold hover:text-primary transition-colors">Reset</button>
             </div>
 
-            <div className="space-y-10">
-              {[
-                { title: "Type", options: ["Wooden", "Metal", "Ceramic", "Glass"] },
-                { title: "Colour", options: ["Royal Brown", "Beige", "Black", "Gold"] },
-                { title: "Materials", options: ["Teak Wood", "Mango Wood", "Brass", "Steel"] },
-              ].map((filter) => (
-                <div key={filter.title} className="space-y-4">
-                  <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                    {filter.title} <ChevronDown className="h-3 w-3 text-gold" />
-                  </button>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {filter.options.map((opt) => (
-                      <label 
-                        key={opt} 
-                        className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => toggleFilter(filter.title as any, opt)}
-                      >
-                        <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                            ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                            : "border-primary/10 group-hover:border-gold"
-                        }`}>
-                          <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
-                            (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                              ? "scale-100" 
-                              : "scale-0"
-                          }`} />
-                        </div>
-                        <span className={`text-xs transition-colors duration-300 ${
-                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                            ? "text-primary font-bold" 
-                            : "text-primary/50 group-hover:text-primary"
-                        }`}>{opt}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
+            <div className="space-y-12">
+              {/* Price Filter */}
               <div className="space-y-6">
                 <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Price range <ChevronDown className="h-3 w-3 text-gold" />
+                  Price <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
-                <div className="space-y-3">
-                  {["Under ₹500", "₹500 - ₹2000", "₹2000 - ₹5000", "Above ₹5000"].map((range) => (
-                    <label key={range} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="w-5 h-5 border-2 border-primary/10 rounded-lg group-hover:border-gold transition-colors" />
-                      <span className="text-xs text-primary/50 group-hover:text-primary transition-colors">{range}</span>
+                <div className="px-2 pt-4 pb-2">
+                  <div className="h-1 w-full bg-slate-200 rounded-full relative">
+                    <div className="absolute h-full w-full bg-[#4F3D31] rounded-full" />
+                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-4 bg-[#4F3D31] rounded-full border-2 border-white shadow-md cursor-pointer" />
+                    <div className="absolute top-1/2 -translate-y-1/2 right-0 w-4 h-4 bg-[#4F3D31] rounded-full border-2 border-white shadow-md cursor-pointer" />
+                  </div>
+                  <div className="flex justify-between mt-4">
+                    <span className="text-[10px] font-bold text-primary/60">₹0</span>
+                    <span className="text-[10px] font-bold text-primary/60">₹10,000+</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Occasion Filter */}
+              <div className="space-y-6">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Occasion <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-4">
+                  {["Birthday (18)", "Anniversary (12)", "Housewarming (14)", "Festive (20)"].map((opt) => (
+                    <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                      <div className="w-4 h-4 border border-primary/20 rounded flex items-center justify-center transition-colors group-hover:border-gold">
+                        <Check className="w-3 h-3 text-gold scale-0 transition-transform group-hover:scale-0" />
+                      </div>
+                      <span className="text-xs text-primary/60 group-hover:text-primary transition-colors">{opt}</span>
                     </label>
                   ))}
                 </div>
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
-                    <input type="text" placeholder="Min" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
-                  </div>
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
-                    <input type="text" placeholder="Max" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
-                  </div>
+              </div>
+
+              {/* Recipient Filter */}
+              <div className="space-y-6">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Recipient <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-4">
+                  {["For Her (18)", "For Him (14)", "For Couple (12)", "Corporate (10)"].map((opt) => (
+                    <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                      <div className="w-4 h-4 border border-primary/20 rounded flex items-center justify-center transition-colors group-hover:border-gold">
+                        <Check className="w-3 h-3 text-gold scale-0 transition-transform group-hover:scale-0" />
+                      </div>
+                      <span className="text-xs text-primary/60 group-hover:text-primary transition-colors">{opt}</span>
+                    </label>
+                  ))}
                 </div>
-                <button className="w-full bg-primary text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest hover:bg-gold transition-all shadow-lg shadow-primary/5">Apply filter</button>
+              </div>
+
+              {/* Color Filter */}
+              <div className="space-y-6">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Color <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="flex flex-wrap gap-3">
+                  {["bg-black", "bg-[#F5E6D3]", "bg-[#C41E3A]", "bg-[#E5E4E2]", "bg-gradient-to-r from-green-800 to-amber-900"].map((color, i) => (
+                    <button key={i} className={`w-6 h-6 rounded-full border border-primary/10 ${color} shadow-sm hover:scale-110 transition-transform`} />
+                  ))}
+                </div>
               </div>
             </div>
           </aside>

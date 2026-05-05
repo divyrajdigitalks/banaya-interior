@@ -17,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Banayaa | Interior Design & Decor Studio',
+  title: 'Banaya | Interior Design & Decor Studio',
   description: 'Where architecture breathes and every room tells its story. Premium interior design and handcrafted decor pieces.',
   generator: 'v0.app',
   icons: {

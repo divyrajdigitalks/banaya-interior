@@ -99,35 +99,37 @@ export function ServicesSection() {
                 <h3 className="font-serif text-3xl text-primary font-black leading-tight group-hover:text-gold transition-colors duration-500">
                   {service.title}
                 </h3>
-                <p className="text-primary/40 text-base font-light leading-relaxed">
+                <p className="text-[#5a5a5a] text-base font-light leading-relaxed">
                   {service.description}
                 </p>
               </div>
 
               {/* Action Button */}
-              <div className="mt-8 px-2">
-                <button
-                  onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
-                  className={`group/btn relative w-full py-6 rounded-full text-xs font-bold tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
-                    service.available
-                      ? "bg-primary text-white hover:shadow-gold/20"
-                      : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"
-                  }`}
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-4">
-                    {service.available ? (
-                      <>
-                        Begin Calculation <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
-                      </>
-                    ) : (
-                      "Locked"
-                    )}
-                  </span>
-                  {service.available && (
-                    <div className="absolute inset-0 bg-gold translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
-                  )}
-                </button>
-              </div>
+            <div className="mt-8 px-2">
+  <button
+    onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
+    className={`group/btn relative w-full py-6 rounded-full text-xs font-bold tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
+      service.available
+        ? "bg-gold text-white hover:shadow-gold/20"
+        : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"
+    }`}
+  >
+    <span className="relative z-10 flex items-center justify-center gap-4">
+      {service.available ? (
+        <>
+          Begin Calculation 
+          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
+        </>
+      ) : (
+        "Locked"
+      )}
+    </span>
+
+    {service.available && (
+      <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
+    )}
+  </button>
+</div>
             </motion.div>
           ))}
         </div>

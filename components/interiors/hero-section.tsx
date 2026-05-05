@@ -42,7 +42,7 @@ export function HeroSection() {
             className="flex items-center gap-4 mb-6"
           >
             <div className="h-px w-8 bg-gold" />
-            <p className="text-xs text-gold font-semibold">The Royal Interior Experience</p>
+            <p className="text-sm text-gold font-semibold">The Royal Interior Experience</p>
           </motion.div>
 
           {/* Main Heading */}
@@ -52,12 +52,12 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="space-y-3"
           >
-            <p className="text-xs text-white/70 font-medium">
+            <p className="text-sm text-white/70 font-medium">
               Architectural Excellence & Heritage Design
             </p>
             <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white leading-[0.9] font-black tracking-tighter drop-shadow-2xl">
               Spaces that <br />
-              <span className="italic font-light text-gold">Speak Softly.</span>
+              <span className=" font-bold font-serif text-gold tracking-normal">Speak Softly.</span>
             </h1>
           </motion.div>
 
@@ -78,15 +78,14 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-wrap gap-5 mt-10"
           >
+            <button className="px-8 py-4 bg-[#C9A962] text-white font-semibold text-sm rounded-lg hover:bg-[#4F3D31] transition-all duration-700 shadow-xl hover:scale-105 active:scale-95 uppercase tracking-wider">
+              Book Free Consultation
+            </button>
             <Link href="/collections">
-              <button className="px-8 py-4 bg-gold text-primary font-semibold text-sm rounded-full hover:bg-white transition-all duration-700 shadow-xl hover:scale-105 active:scale-95">
+              <button className="px-8 py-4 border border-white/20 text-white font-semibold text-sm rounded-lg hover:bg-white hover:text-primary transition-all duration-700 shadow-xl hover:scale-105 active:scale-95">
                 Explore Collections
               </button>
             </Link>
-            <button className="group flex items-center gap-3 text-white text-sm font-semibold hover:text-gold transition-all duration-500">
-              View Portfolio
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-2 transition-transform text-gold" />
-            </button>
           </motion.div>
         </div>
       </div>
