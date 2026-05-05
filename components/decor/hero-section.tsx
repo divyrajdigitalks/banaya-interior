@@ -43,7 +43,7 @@ export function DecorHeroSection() {
             </p>
             <h1 className="font-serif text-5xl md:text-8xl text-white font-black leading-[0.9] tracking-tighter mb-8">
               Banaya <br />
-              <span className="italic font-light text-gold">Decor</span>
+              <span className=" font-light text-gold">Decor</span>
             </h1>
             <p className="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-10">
               Masterfully handcrafted wooden <br className="hidden md:block" />
@@ -77,7 +77,7 @@ export function DecorHeroSection() {
             transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
           >
             <p className="text-sm text-gold font-bold mb-4">Uncompromising quality and detail</p>
-            <p className="text-white/90 text-lg md:text-xl font-medium leading-relaxed mb-8 italic">
+            <p className="text-white/90 text-lg md:text-xl font-medium leading-relaxed mb-8">
               "Elevate every culinary ritual with our signature <br className="hidden md:block" />
               heritage-fit tray collection."
             </p>

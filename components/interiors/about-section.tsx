@@ -111,7 +111,7 @@ export function AboutSection() {
                 viewport={{ once: true }}
                 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight"
               >
-                Design with <span className="italic font-light text-gold">Purpose.</span> <br />
+                Design with <span className="font-bold text-gold">Purpose.</span> <br />
                 Executed with Precision.
               </motion.h2>
               <motion.p 

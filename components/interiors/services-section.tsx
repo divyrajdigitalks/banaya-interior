@@ -51,7 +51,7 @@ export function ServicesSection() {
             className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
           >
             Estimate your <br />
-            <span className="italic font-light text-gold transition-all duration-700">
+            <span className="font-bold text-gold transition-all duration-700">
               {activeWord}.
             </span>
           </motion.h2>

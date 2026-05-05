@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, FolderTree } from "lucide-react";
+import { Search, FolderTree, Edit3, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -12,7 +12,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { AdminGridCard } from "@/components/admin/grid-card";
+import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 
@@ -28,6 +28,52 @@ export default function InteriorCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [formData, setFormData] = useState<any>({ name: "", image: "" });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const columns = [
+    {
+      header: "Category Info",
+      accessorKey: "name",
+      cell: (item: any) => (
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-lg border border-charcoal/5">
+            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+          </div>
+          <span className="font-bold text-charcoal">{item.name}</span>
+        </div>
+      )
+    },
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item.id}</span>
+      )
+    },
+    {
+      header: "Actions",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal"
+          >
+            <Edit3 size={16} />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); setCategories(categories.filter(c => c.id !== item.id)); }}
+            className="p-2 hover:bg-red-50 rounded-xl text-charcoal/30 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   const handleOpenDialog = (category: any = null) => {
     if (category) {
@@ -58,7 +104,7 @@ export default function InteriorCategoriesPage() {
     <div className="space-y-12 pb-12">
       <AdminPageHeader 
         title="Interior Categories"
-        subtitle="Interiors Management"
+        subtitle="Interior Management"
         actionLabel="Add Interior Category"
         onAction={() => handleOpenDialog()}
       />
@@ -66,31 +112,20 @@ export default function InteriorCategoriesPage() {
       <div className="relative w-full md:w-96 group">
         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-gold transition-colors" size={18} />
         <Input 
-          placeholder="Search categories..." 
+          placeholder="Search categories..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all"
+          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredCategories.map((category, index) => (
-          <AdminGridCard 
-            key={category.id}
-            {...category}
-            icon={FolderTree}
-            onEdit={() => handleOpenDialog(category)}
-            onDelete={() => setCategories(categories.filter(c => c.id !== category.id))}
-            index={index}
-          />
-        ))}
-      </div>
+      <AdminTable columns={columns} data={filteredCategories} />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-[2.5rem] p-10">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2.5rem] p-10 mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-serif font-black">
-              {editingCategory ? "Edit" : "Add"} <span className="text-gold italic font-light">Interior Category</span>
+            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
+              {editingCategory ? "Edit" : "Add"} <span className="text-gold font-bold">Interior Category</span>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-8">

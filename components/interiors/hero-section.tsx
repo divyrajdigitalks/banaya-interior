@@ -40,7 +40,7 @@ export function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center w-full">
           
           {/* Left: Text Content */}
-          <div className="lg:col-span-7 space-y-10">
+          <div className="lg:col-span-8 space-y-10">
             <div>
               {/* Top Label */}
               <motion.div
@@ -106,89 +106,91 @@ export function HeroSection() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="lg:col-span-5"
+            className="lg:col-span-4"
           >
-            <div className="bg-[#fdf9f3] backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-white/20 space-y-4 relative overflow-hidden group">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -mr-16 -mt-16 blur-3xl transition-all group-hover:bg-gold/10" />
-              
-              <div className="text-center space-y-2">
-                <h3 className="text-base font-black text-primary leading-tight">
-                  Get Your Interior <br /> Cost Estimate
-                </h3>
-                <div className="w-12 h-1 bg-gold mx-auto rounded-full opacity-30" />
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl w-[360px] mx-auto">
+              {/* Card Header */}
+              <div className="bg-[#C9A962] px-6 py-4 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-black text-primary tracking-wide">Get Cost Estimate</h3>
+                  <p className="text-[10px] text-primary/60 font-medium mt-0.5">Free • Takes 30 seconds</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <ArrowRight size={14} className="text-primary" />
+                </div>
               </div>
 
-              <div className="space-y-5">
-                {/* Property Type */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary/40 uppercase tracking-widest ml-1">Property Type</label>
-                  <div className="relative">
-                    <select className="w-full bg-white border border-primary/5 rounded-lg py-2.5 px-4 text-xs font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
-                      <option>Select Property Type</option>
-                      <option>1 BHK</option>
-                      <option>2 BHK</option>
-                      <option>3 BHK</option>
-                      <option>4 BHK+</option>
-                      <option>Villa</option>
-                    </select>
-                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={16} />
+              {/* Card Body */}
+              <div className="bg-white/95 backdrop-blur-md px-5 py-4 space-y-3">
+                {/* Grid: 1 col */}
+                <div className="space-y-8">
+                  {/* Property Type */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-primary/40 uppercase tracking-widest">Property Type</label>
+                    <div className="relative">
+                      <select className="w-full bg-[#fdf9f3] border border-gold/20 rounded-lg py-1.5 px-3 text-[11px] font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
+                        <option>Select Type</option>
+                        <option>1 BHK</option>
+                        <option>2 BHK</option>
+                        <option>3 BHK</option>
+                        <option>4 BHK+</option>
+                        <option>Villa</option>
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={12} />
+                    </div>
+                  </div>
+
+                  {/* Area */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-primary/40 uppercase tracking-widest">Area</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="e.g. 1200"
+                        className="w-full bg-[#fdf9f3] border border-gold/20 rounded-lg py-1.5 px-3 text-[11px] font-bold text-primary focus:outline-none focus:border-gold transition-colors placeholder:text-primary/20"
+                      />
+                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-primary/30">sqft</span>
+                    </div>
+                  </div>
+
+                  {/* Scope */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-primary/40 uppercase tracking-widest">Scope</label>
+                    <div className="relative">
+                      <select className="w-full bg-[#fdf9f3] border border-gold/20 rounded-lg py-1.5 px-3 text-[11px] font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
+                        <option>Select Scope</option>
+                        <option>Full Home</option>
+                        <option>Living Room</option>
+                        <option>Kitchen Only</option>
+                        <option>Wardrobes</option>
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={12} />
+                    </div>
+                  </div>
+
+                  {/* Style */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-primary/40 uppercase tracking-widest">Style</label>
+                    <div className="relative">
+                      <select className="w-full bg-[#fdf9f3] border border-gold/20 rounded-lg py-1.5 px-3 text-[11px] font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
+                        <option>Select Style</option>
+                        <option>Modern</option>
+                        <option>Heritage</option>
+                        <option>Minimalist</option>
+                        <option>Royal</option>
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={12} />
+                    </div>
                   </div>
                 </div>
 
-                {/* Area */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary/40 uppercase tracking-widest ml-1">Area (sq.ft.)</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      placeholder="Enter Area" 
-                      className="w-full bg-white border border-primary/5 rounded-lg py-2.5 px-4 text-xs font-bold text-primary focus:outline-none focus:border-gold transition-colors placeholder:text-primary/20"
-                    />
-                    <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-primary/30">sq.ft.</span>
-                  </div>
-                </div>
-
-                {/* Scope */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary/40 uppercase tracking-widest ml-1">Scope of Work</label>
-                  <div className="relative">
-                    <select className="w-full bg-white border border-primary/5 rounded-lg py-2.5 px-4 text-xs font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
-                      <option>Select Scope</option>
-                      <option>Full Home</option>
-                      <option>Living Room</option>
-                      <option>Kitchen Only</option>
-                      <option>Wardrobes</option>
-                    </select>
-                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={16} />
-                  </div>
-                </div>
-
-                {/* Style */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary/40 uppercase tracking-widest ml-1">Interior Style</label>
-                  <div className="relative">
-                    <select className="w-full bg-white border border-primary/5 rounded-lg py-2.5 px-4 text-xs font-bold text-primary appearance-none focus:outline-none focus:border-gold transition-colors">
-                      <option>Select Style</option>
-                      <option>Modern</option>
-                      <option>Heritage</option>
-                      <option>Minimalist</option>
-                      <option>Royal</option>
-                    </select>
-                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gold pointer-events-none" size={16} />
-                  </div>
-                </div>
-
-                <button 
+                <button
                   onClick={openCalculator}
-                  className="w-full bg-[#C9A962] text-primary font-black text-[10px] uppercase tracking-[0.2em] py-3 rounded-lg hover:bg-primary hover:text-white transition-all duration-500 shadow-xl shadow-gold/10 flex items-center justify-center gap-3 group/btn"
+                  className="w-full bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] py-2.5 rounded-lg hover:bg-[#C9A962] hover:text-primary transition-all duration-300 flex items-center justify-center gap-2 group/btn"
                 >
-                  Calculate Estimate <ArrowRight size={16} className="group-hover/btn:translate-x-2 transition-transform" />
+                  Calculate My Estimate
+                  <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
                 </button>
-
-                <p className="text-[10px] text-center text-primary/40 font-bold tracking-tight">
-                  It's free & only takes 30 seconds!
-                </p>
               </div>
             </div>
           </motion.div>

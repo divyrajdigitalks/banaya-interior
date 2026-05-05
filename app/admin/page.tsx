@@ -181,8 +181,8 @@ export default function AdminDashboardPage() {
           <Card className="border-charcoal/5 shadow-xl rounded-3xl bg-charcoal text-white overflow-hidden">
             <CardHeader className="p-8 border-b border-white/5">
               <CardTitle className="text-xl font-serif font-semibold tracking-tight flex items-center gap-3">
-                Quick <span className="italic font-light text-gold">Actions</span>
-              </CardTitle>
+              Quick <span className="font-bold text-gold">Actions</span>
+            </CardTitle>
             </CardHeader>
             <CardContent className="p-8 space-y-4">
               <Link href="/admin/shop">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Grid } from "lucide-react";
+import { Search, Grid, Edit3, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { AdminGridCard } from "@/components/admin/grid-card";
+import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 
@@ -43,6 +43,55 @@ export default function AdminSubcategoriesPage() {
   const [editingSubcategory, setEditingSubcategory] = useState<any>(null);
   const [formData, setFormData] = useState<any>({ name: "", categoryId: "", image: "" });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const columns = [
+    {
+      header: "Subcategory Info",
+      accessorKey: "name",
+      cell: (item: any) => (
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-12 rounded-xl overflow-hidden shadow-md border border-charcoal/5">
+            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <p className="font-bold text-charcoal">{item.name}</p>
+            <p className="text-[10px] text-charcoal/40 uppercase tracking-widest font-black">{item.categoryName}</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item.id}</span>
+      )
+    },
+    {
+      header: "Actions",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal"
+          >
+            <Edit3 size={16} />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); setSubcategories(subcategories.filter(s => s.id !== item.id)); }}
+            className="p-2 hover:bg-red-50 rounded-xl text-charcoal/30 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   const handleOpenDialog = (subcategory: any = null) => {
     if (subcategory) {
@@ -88,29 +137,17 @@ export default function AdminSubcategoriesPage() {
           placeholder="Search subcategories..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all"
+          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredSubcategories.map((subcategory, index) => (
-          <AdminGridCard 
-            key={subcategory.id}
-            {...subcategory}
-            category={subcategory.categoryName}
-            icon={Grid}
-            onEdit={() => handleOpenDialog(subcategory)}
-            onDelete={() => setSubcategories(subcategories.filter(s => s.id !== subcategory.id))}
-            index={index}
-          />
-        ))}
-      </div>
+      <AdminTable columns={columns} data={filteredSubcategories} />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-[2.5rem] p-10">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2.5rem] p-10 mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-serif font-black">
-              {editingSubcategory ? "Edit" : "Add"} <span className="text-gold italic font-light">Subcategory</span>
+            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
+              {editingSubcategory ? "Edit" : "Add"} <span className="text-gold font-bold">Subcategory</span>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-8">

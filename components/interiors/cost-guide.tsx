@@ -37,7 +37,7 @@ export function CostGuideSection() {
 
           <h2 className="text-3xl md:text-4xl font-serif font-medium text-primary tracking-tight">
             Investment for Your{" "}
-            <span className="italic text-gold font-semibold">
+            <span className="text-gold font-bold">
               Dream Space
             </span>
           </h2>
@@ -93,7 +93,7 @@ export function CostGuideSection() {
                 
                 <h3 className="text-3xl font-serif font-medium leading-tight">
                   Start Your <br />
-                  <span className="italic text-gold text-4xl font-semibold">
+                  <span className="text-gold text-4xl font-bold">
                     Journey
                   </span>
                 </h3>

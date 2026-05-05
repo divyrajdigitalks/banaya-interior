@@ -61,7 +61,7 @@ export function FeaturedProjectsSection() {
 
             <h2 className="text-3xl md:text-4xl font-serif font-medium text-primary tracking-tight">
               Featured{" "}
-              <span className="italic text-gold font-semibold">
+              <span className="text-gold font-bold">
                 Creations
               </span>
             </h2>

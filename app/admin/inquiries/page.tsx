@@ -104,7 +104,7 @@ export default function InquiriesManagementPage() {
             <span className="text-[10px] tracking-[0.4em] text-gold uppercase font-black">Client Relations</span>
           </motion.div>
           <h1 className="text-4xl md:text-5xl font-serif font-black text-charcoal tracking-tight">
-            Customer <span className="italic font-light text-gold">Inquiries</span>
+            Customer <span className="font-bold text-gold">Inquiries</span>
           </h1>
         </div>
       </header>

@@ -53,7 +53,7 @@ export function CategoryGrid() {
             Curated Collections
           </span>
           <h2 className="text-4xl md:text-5xl font-serif font-light text-primary">
-            Shop by <span className="italic text-gold">Category</span>
+            Shop by <span className="font-bold text-gold">Category</span>
           </h2>
         </div>
 

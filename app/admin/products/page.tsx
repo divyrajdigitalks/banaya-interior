@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Package } from "lucide-react";
+import { Search, Package, Edit3, Trash2, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { AdminGridCard } from "@/components/admin/grid-card";
+import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { MultiImageUpload } from "@/components/admin/multi-image-upload";
@@ -58,6 +58,69 @@ export default function AdminProductsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const columns = [
+    {
+      header: "Product Details",
+      accessorKey: "name",
+      cell: (item: any) => (
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-charcoal/5">
+            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <p className="font-bold text-charcoal">{item.name}</p>
+            <p className="text-[10px] text-charcoal/40 uppercase tracking-widest font-black">
+              {categories.find(c => c.id === item.categoryId)?.name} • {subcategories.find(s => s.id === item.subcategoryId)?.name}
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: "Pricing",
+      accessorKey: "price",
+      cell: (item: any) => (
+        <div className="space-y-0.5">
+          <p className="font-black text-charcoal">₹{item.price}</p>
+          {item.originalPrice && (
+            <p className="text-[10px] text-charcoal/30 line-through">₹{item.originalPrice}</p>
+          )}
+        </div>
+      )
+    },
+    {
+      header: "ID",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item.id}</span>
+      )
+    },
+    {
+      header: "Actions",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal"
+          >
+            <Edit3 size={16} />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); setProducts(products.filter(p => p.id !== item.id)); }}
+            className="p-2 hover:bg-red-50 rounded-xl text-charcoal/30 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   const [formData, setFormData] = useState<any>({
     name: "",
@@ -122,29 +185,17 @@ export default function AdminProductsPage() {
           placeholder="Search products..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all"
+          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {displayProducts.map((product, index) => (
-          <AdminGridCard 
-            key={product.id}
-            {...product}
-            category={`${categories.find(c => c.id === product.categoryId)?.name} • ${subcategories.find(s => s.id === product.subcategoryId)?.name}`}
-            icon={Package}
-            onEdit={() => handleOpenDialog(product)}
-            onDelete={() => setProducts(products.filter(p => p.id !== product.id))}
-            index={index}
-          />
-        ))}
-      </div>
+      <AdminTable columns={columns} data={displayProducts} />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] rounded-[2.5rem] p-10 max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <DialogContent className="sm:max-w-[800px] w-[95vw] rounded-[2.5rem] p-10 max-h-[90vh] overflow-y-auto scrollbar-hide mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-serif font-black">
-              {editingProduct ? "Edit" : "Add"} <span className="text-gold italic font-light">Product</span>
+            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
+              {editingProduct ? "Edit" : "Add"} <span className="text-gold font-bold">Product</span>
             </DialogTitle>
           </DialogHeader>
           

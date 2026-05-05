@@ -39,9 +39,13 @@ const sidebarLinks = [
   { name: "Interior Categories", icon: FolderTree, href: "/admin/interiors/categories" },
   { name: "Interior Projects", icon: Briefcase, href: "/admin/interiors/projects" },
   { name: "Interior Gallery", icon: GalleryHorizontal, href: "/admin/interiors/gallery" },
+  { type: "label", name: "Promotions" },
+  { name: "Offers", icon: Sparkles, href: "/admin/offers" },
+  { name: "Coupons", icon: ShoppingBag, href: "/admin/coupons" },
   { type: "label", name: "System" },
   { name: "Calculators", icon: Calculator, href: "/admin/calculators" },
   { name: "Inquiries", icon: Users, href: "/admin/inquiries" },
+  { name: "Admins", icon: Users, href: "/admin/admins" },
   { name: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
@@ -50,6 +54,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Get current page name from pathname
+  const getCurrentPageName = () => {
+    const segments = pathname.split('/').filter(Boolean);
+    const lastSegment = segments[segments.length - 1];
+    if (!lastSegment || lastSegment === 'admin') return 'Dashboard';
+    
+    // Convert kebab-case or snake_case to Title Case
+    return lastSegment
+      .split(/[-_]/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   // Handle mobile responsiveness
   useEffect(() => {
@@ -170,7 +187,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="hidden md:flex items-center gap-2">
               <span className="text-xs text-charcoal/40 font-medium">Sanctuary</span>
               <ChevronRight size={12} className="text-charcoal/20" />
-              <span className="text-xs text-charcoal font-medium">Dashboard</span>
+              <span className="text-sm text-charcoal font-bold tracking-tight">{getCurrentPageName()}</span>
             </div>
           </div>
 

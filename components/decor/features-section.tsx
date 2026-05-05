@@ -92,7 +92,7 @@ export function FeaturesSection() {
                 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
               >
                 Handcrafted <br />
-                <span className="italic font-light text-gold">Soulful</span> Pieces.
+                <span className="font-bold text-gold">Soulful</span> Pieces.
               </motion.h2>
               <motion.p 
                 initial={{ opacity: 0 }}

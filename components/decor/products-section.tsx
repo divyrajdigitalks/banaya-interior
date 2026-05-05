@@ -82,7 +82,7 @@ export function ProductsSection() {
             viewport={{ once: true }}
             className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
           >
-            Handcrafted with <span className="italic font-light text-gold">soul.</span>
+            Handcrafted with <span className="font-bold text-gold">soul.</span>
           </motion.h2>
           
           <motion.p 
