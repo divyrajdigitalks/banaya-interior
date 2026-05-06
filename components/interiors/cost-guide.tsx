@@ -9,16 +9,26 @@ import {
   Home,
   Building2,
   ArrowRight,
+  LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
 
+const ICONS: Record<string, LucideIcon> = {
+  Layout,
+  Sofa,
+  Bed,
+  Baby,
+  Home,
+  Building2,
+};
+
 const COSTS = [
-  { icon: Layout, title: "Modular Kitchen", range: "₹2.5L - ₹5L" },
-  { icon: Sofa, title: "Living Room", range: "₹1.5L - ₹3.5L" },
-  { icon: Bed, title: "Master Bedroom", range: "₹1.5L - ₹3L" },
-  { icon: Baby, title: "Children's Bedroom", range: "₹1L - ₹2.5L" },
-  { icon: Home, title: "Full Home (2 BHK)", range: "₹8L - ₹15L" },
-  { icon: Building2, title: "Full Home (3 BHK)", range: "₹12L - ₹20L+" },
+  { iconId: "Layout", title: "Modular Kitchen", range: "₹2.5L - ₹5L" },
+  { iconId: "Sofa", title: "Living Room", range: "₹1.5L - ₹3.5L" },
+  { iconId: "Bed", title: "Master Bedroom", range: "₹1.5L - ₹3L" },
+  { iconId: "Baby", title: "Children's Bedroom", range: "₹1L - ₹2.5L" },
+  { iconId: "Home", title: "Full Home (2 BHK)", range: "₹8L - ₹15L" },
+  { iconId: "Building2", title: "Full Home (3 BHK)", range: "₹12L - ₹20L+" },
 ];
 
 export function CostGuideSection() {
@@ -53,29 +63,32 @@ export function CostGuideSection() {
           
           {/* Cost Cards */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {COSTS.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08 }}
-                className="flex flex-col p-6 rounded-2xl bg-white border border-primary/10 hover:border-gold/40 hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="w-11 h-11 rounded-xl bg-[#faf7f2] flex items-center justify-center text-primary/60 group-hover:text-gold transition mb-6">
-                  <item.icon size={22} strokeWidth={1.8} />
-                </div>
+            {COSTS.map((item, idx) => {
+              const Icon = ICONS[item.iconId] || Layout;
+              return (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.08 }}
+                  className="flex flex-col p-6 rounded-2xl bg-white border border-primary/10 hover:border-gold/40 hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-[#faf7f2] flex items-center justify-center text-primary/60 group-hover:text-gold transition mb-6">
+                    <Icon size={22} strokeWidth={1.8} />
+                  </div>
 
-                <div className="space-y-1 mt-auto">
-                  <h4 className="text-[11px] font-semibold text-primary/60 uppercase tracking-wide">
-                    {item.title}
-                  </h4>
+                  <div className="space-y-1 mt-auto">
+                    <h4 className="text-[11px] font-semibold text-primary/60 uppercase tracking-wide">
+                      {item.title}
+                    </h4>
 
-                  <p className="text-xl font-semibold text-primary group-hover:text-gold transition">
-                    {item.range}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                    <p className="text-xl font-semibold text-primary group-hover:text-gold transition">
+                      {item.range}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Right Banner */}

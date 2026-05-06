@@ -75,7 +75,9 @@ export default function InteriorProjectsPage() {
           <div className="min-w-0">
             <p className="font-bold text-charcoal truncate">{item.name}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[9px] font-black uppercase tracking-widest text-gold bg-gold/5 px-2 py-0.5 rounded-full border border-gold/10">{item.categoryName}</span>
+              {item.categoryName && (
+                <span className="text-[9px] font-black uppercase tracking-widest text-gold bg-gold/5 px-2 py-0.5 rounded-full border border-gold/10">{item.categoryName}</span>
+              )}
               <span className="text-[9px] font-bold text-charcoal/30 flex items-center gap-1 uppercase tracking-widest">
                 <MapPin size={10} /> {item.location || "Location N/A"}
               </span>
@@ -125,7 +127,10 @@ export default function InteriorProjectsPage() {
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.categoryId || !formData.image) return;
+    if (!formData.name || !formData.image || !formData.categoryId) {
+      alert("Please fill all required fields (Name, Image, and Category)");
+      return;
+    }
     const category = categories.find(c => c.id === formData.categoryId);
     const dataWithCategoryName = { ...formData, categoryName: category?.name || "" };
 

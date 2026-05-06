@@ -41,6 +41,7 @@ const PROJECTS = [
 
 export function FeaturedProjectsSection() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [categories] = useState(FILTERS); // This would come from an API/Admin in a real app
 
   const filteredProjects =
     activeFilter === "All"
@@ -68,7 +69,7 @@ export function FeaturedProjectsSection() {
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 md:gap-6 pt-2">
-              {FILTERS.map((f) => (
+              {categories.map((f) => (
                 <button
                   key={f}
                   onClick={() => setActiveFilter(f)}
@@ -92,7 +93,7 @@ export function FeaturedProjectsSection() {
           </div>
 
           <Link
-            href="/projects"
+            href="/interiors/projects"
             className="group flex items-center gap-2 text-[12px] font-semibold tracking-wide uppercase text-primary border-b border-primary/20 pb-1 hover:border-gold transition"
           >
             Explore All
@@ -104,7 +105,7 @@ export function FeaturedProjectsSection() {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, idx) => (
               <motion.div

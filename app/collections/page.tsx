@@ -151,12 +151,12 @@ export default function CollectionsPage() {
                     </div>
                     <h2 className="text-4xl md:text-5xl font-serif font-black text-charcoal leading-tight tracking-tighter">
                       {cat.name.split(' ')[0]} <br />
-                      <span className="text-gold italic font-light">{cat.name.split(' ')[1] || 'Living'}</span>
+                      <span className="text-gold italic font-light">{cat.name.split(' ').slice(1).join(' ') || 'Series'}</span>
                     </h2>
                   </div>
 
                   <p className="text-charcoal/60 text-base font-light leading-relaxed">
-                    A collection that redefines the boundaries of {cat.name} design. Crafted from sustainably sourced heritage woods and finished with our signature organic oils.
+                    An exclusive interior collection that redefines luxury living. Each series is a testament to our architectural vision and design precision.
                   </p>
 
                   <div className="grid grid-cols-2 gap-4 py-4 border-y border-charcoal/5">
