@@ -20,7 +20,10 @@ import {
   Sparkles,
   User,
   Search,
-  Check
+  Check,
+  Camera,
+  FileText,
+  Type
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FEATURED_PRODUCTS } from "@/lib/constants";
@@ -28,6 +31,16 @@ import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -36,12 +49,35 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedSize, setSelectedImageSize] = useState("Medium (16 x 10 in)");
+  const [selectedSize, setSelectedImageSize] = useState(product?.sizes?.[0] || "Medium (16 x 10 in)");
+  const [activeTab, setActiveTab] = useState("Description");
+  
+  // Personalisation State
+  const [isPersonaliseOpen, setIsPersonaliseOpen] = useState(false);
+  const [personalisation, setPersonalisation] = useState({
+    name: "",
+    description: "",
+    image: null as string | null
+  });
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPersonalisation(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     const foundProduct = FEATURED_PRODUCTS.find((p) => p.id === id);
     if (foundProduct) {
       setProduct(foundProduct);
+      if (foundProduct.sizes?.length > 0) {
+        setSelectedImageSize(foundProduct.sizes[0]);
+      }
     }
   }, [id]);
 
@@ -128,32 +164,96 @@ export default function ProductDetailPage() {
 
             {/* ── Product Tabs ── */}
             <div className="mt-12">
-              <div className="flex border-b border-primary/10">
+              <div className="flex border-b border-primary/10 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 {["Description", "Specifications", "Care Instructions", "Shipping & Returns"].map((tab) => (
                   <button 
                     key={tab} 
+                    onClick={() => setActiveTab(tab)}
                     className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all ${
-                      tab === "Description" ? "border-primary text-primary" : "border-transparent text-primary/40 hover:text-primary"
+                      activeTab === tab ? "border-primary text-primary" : "border-transparent text-primary/40 hover:text-primary"
                     }`}
                   >
                     {tab}
                   </button>
                 ))}
               </div>
-              <div className="py-8 space-y-4">
-                <p className="text-primary/70 text-sm leading-relaxed">
-                  Serve in style with our {product.name}, handcrafted from premium Sheesham wood. Perfect for serving snacks, tea, breakfast in bed or even for organizing your essentials with elegance.
-                </p>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-8 border-b border-primary/5">
-                  {["Elegant natural wood finish", "Sturdy handles for easy grip", "Multipurpose – serve, organize or display", "Food safe & easy to clean"].map((feat) => (
-                    <li key={feat} className="flex items-center gap-3 text-xs text-primary/60">
-                      <div className="w-1.5 h-1.5 rounded-full bg-gold" /> {feat}
-                    </li>
-                  ))}
-                </ul>
+              <div className="py-8 min-h-[200px]">
+                <AnimatePresence mode="wait">
+                  {activeTab === "Description" && (
+                    <motion.div
+                      key="description"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-6"
+                    >
+                      <p className="text-primary/70 text-sm leading-relaxed">
+                        {product.description || `Serve in style with our ${product.name}, handcrafted from premium Sheesham wood. Perfect for serving snacks, tea, breakfast in bed or even for organizing your essentials with elegance.`}
+                      </p>
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 border-b border-primary/5">
+                        {(product.features || ["Elegant natural wood finish", "Sturdy handles for easy grip", "Multipurpose – serve, organize or display", "Food safe & easy to clean"]).map((feat: string) => (
+                          <li key={feat} className="flex items-center gap-3 text-xs text-primary/60">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gold" /> {feat}
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+
+                  {activeTab === "Specifications" && (
+                    <motion.div
+                      key="specifications"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-4"
+                    >
+                      <div className="grid grid-cols-1 gap-2">
+                        {(product.specifications || [
+                          { label: "Material", value: "Premium Sheesham Wood" },
+                          { label: "Finish", value: "Food Safe Natural Oil" },
+                          { label: "Origin", value: "Handcrafted in India" }
+                        ]).map((spec: any, idx: number) => (
+                          <div key={idx} className="flex items-center justify-between py-3 border-b border-primary/5">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">{spec.label}</span>
+                            <span className="text-xs font-bold text-primary">{spec.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {activeTab === "Care Instructions" && (
+                    <motion.div
+                      key="care"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-4"
+                    >
+                      <p className="text-primary/70 text-sm leading-relaxed">
+                        {product.careInstructions || "Wipe with a soft damp cloth. Do not soak in water. Use mild soap if necessary and dry immediately. Apply food-grade oil occasionally to maintain the wood's natural luster."}
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {activeTab === "Shipping & Returns" && (
+                    <motion.div
+                      key="shipping"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-4"
+                    >
+                      <p className="text-primary/70 text-sm leading-relaxed">
+                        {product.shippingReturns || "Free shipping on all orders above ₹1499. Orders are usually dispatched within 24-48 hours. We offer a 7-day easy return policy for unused products in their original packaging."}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Bulk Purchase Link */}
-                <div className="pt-4">
+                <div className="pt-8 border-t border-primary/5 mt-8">
                   <p className="text-xs font-bold text-primary/60">
                     Want to buy this in bulk? <Link href="#" className="text-gold border-b border-gold pb-0.5 hover:text-primary hover:border-primary transition-all">Click here</Link>
                   </p>
@@ -283,7 +383,7 @@ export default function ProductDetailPage() {
               <div className="space-y-3">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Size</p>
                 <div className="flex flex-wrap gap-2">
-                  {["Small (12 x 8 in)", "Medium (16 x 10 in)", "Large (18 x 12 in)"].map((size) => (
+                  {(product.sizes || ["Small (12 x 8 in)", "Medium (16 x 10 in)", "Large (18 x 12 in)"]).map((size: string) => (
                     <button 
                       key={size}
                       onClick={() => setSelectedImageSize(size)}
@@ -304,10 +404,110 @@ export default function ProductDetailPage() {
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Personalisation (Optional)</p>
                 </div>
                 <p className="text-[9px] text-primary/40 italic">Add engraving, name or logo to make it special.</p>
-                <button className="flex items-center gap-2 px-4 py-2 border border-primary/10 rounded-lg text-[10px] font-bold text-primary/60 hover:border-primary transition-all">
+                <button 
+                  onClick={() => setIsPersonaliseOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 border border-primary/10 rounded-lg text-[10px] font-bold text-primary/60 hover:border-primary transition-all"
+                >
                   <Plus size={14} /> ADD PERSONALISATION
                 </button>
               </div>
+
+              {/* Personalisation Dialog */}
+              <Dialog open={isPersonaliseOpen} onOpenChange={setIsPersonaliseOpen}>
+                <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-8">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-serif font-black text-primary">
+                      Add <span className="text-gold">Personalisation</span>
+                    </DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6 py-6">
+                    {/* Image Upload */}
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-primary/40">Upload Reference Image</Label>
+                      <div className="relative group">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="personalisation-image"
+                        />
+                        <label
+                          htmlFor="personalisation-image"
+                          className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/10 rounded-2xl cursor-pointer hover:border-gold/30 hover:bg-gold/5 transition-all group overflow-hidden"
+                        >
+                          {personalisation.image ? (
+                            <div className="relative w-full h-full">
+                              <Image 
+                                src={personalisation.image} 
+                                alt="Preview" 
+                                fill 
+                                className="object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Camera className="text-white" size={24} />
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <Camera className="text-primary/20 group-hover:text-gold transition-colors mb-2" size={32} />
+                              <span className="text-[10px] font-bold text-primary/40 uppercase">Click to upload image</span>
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Name Input */}
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-primary/40">Name / Title</Label>
+                      <div className="relative">
+                        <Type className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/20" size={16} />
+                        <Input 
+                          placeholder="Enter name for engraving..."
+                          value={personalisation.name}
+                          onChange={(e) => setPersonalisation({ ...personalisation, name: e.target.value })}
+                          className="pl-12 h-14 bg-[#f8f5f0] border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-gold/20"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-primary/40">Instructions</Label>
+                      <div className="relative">
+                        <FileText className="absolute left-4 top-4 text-primary/20" size={16} />
+                        <Textarea 
+                          placeholder="Any specific instructions for the personalisation?"
+                          value={personalisation.description}
+                          onChange={(e) => setPersonalisation({ ...personalisation, description: e.target.value })}
+                          className="pl-12 pt-4 min-h-[100px] bg-[#f8f5f0] border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-gold/20 resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <DialogFooter className="flex gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsPersonaliseOpen(false)}
+                      className="flex-1 h-14 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        console.log("Personalisation saved:", personalisation);
+                        setIsPersonaliseOpen(false);
+                      }}
+                      className="flex-1 h-14 bg-primary hover:bg-gold text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
+                    >
+                      Save Details
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
 
               <div className="flex gap-4 pt-4">
                 <div className="flex items-center bg-[#f8f5f0] rounded-xl px-2">

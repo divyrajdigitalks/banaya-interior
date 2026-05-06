@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Package, Info, Image as ImageIcon, LayoutGrid, Tag, IndianRupee, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Package, Info, Image as ImageIcon, LayoutGrid, Tag, IndianRupee, Sparkles, Plus, Trash2, ListChecks, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,6 +16,7 @@ import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { MultiImageUpload } from "@/components/admin/multi-image-upload";
 import { motion } from "framer-motion";
+import { Switch } from "@/components/ui/switch";
 
 const INITIAL_CATEGORIES = [
   { id: "1", name: "Living Room" },
@@ -42,13 +43,62 @@ export default function AddProductPage() {
     subImages: ["", "", ""],
     description: "",
     stock: "",
-    sku: ""
+    sku: "",
+    sizes: ["Small (12 x 8 in)", "Medium (16 x 10 in)", "Large (18 x 12 in)"],
+    tags: ["Bestseller"],
+    isPersonalisable: true,
+    features: ["Elegant natural wood finish", "Sturdy handles for easy grip"],
+    specifications: [
+      { label: "Material", value: "Premium Sheesham Wood" },
+      { label: "Finish", value: "Food Safe Natural Oil" }
+    ],
+    careInstructions: "Wipe with a soft damp cloth. Do not soak in water.",
+    shippingReturns: "Free shipping on orders above ₹1499. 7 days easy return policy."
   });
+
+  const [newSize, setNewSize] = useState("");
+  const [newFeature, setNewFeature] = useState("");
 
   const filteredSubcategories = useMemo(() => {
     if (!formData.categoryId) return [];
     return INITIAL_SUBCATEGORIES.filter(s => s.categoryId === formData.categoryId);
   }, [formData.categoryId]);
+
+  const addSize = () => {
+    if (newSize.trim()) {
+      setFormData({ ...formData, sizes: [...formData.sizes, newSize.trim()] });
+      setNewSize("");
+    }
+  };
+
+  const removeSize = (index: number) => {
+    setFormData({ ...formData, sizes: formData.sizes.filter((_: any, i: number) => i !== index) });
+  };
+
+  const addFeature = () => {
+    if (newFeature.trim()) {
+      setFormData({ ...formData, features: [...formData.features, newFeature.trim()] });
+      setNewFeature("");
+    }
+  };
+
+  const removeFeature = (index: number) => {
+    setFormData({ ...formData, features: formData.features.filter((_: any, i: number) => i !== index) });
+  };
+
+  const addSpec = () => {
+    setFormData({ ...formData, specifications: [...formData.specifications, { label: "", value: "" }] });
+  };
+
+  const updateSpec = (index: number, field: string, value: string) => {
+    const newSpecs = [...formData.specifications];
+    newSpecs[index][field] = value;
+    setFormData({ ...formData, specifications: newSpecs });
+  };
+
+  const removeSpec = (index: number) => {
+    setFormData({ ...formData, specifications: formData.specifications.filter((_: any, i: number) => i !== index) });
+  };
 
   const handleSave = () => {
     if (!formData.name || !formData.categoryId || !formData.subcategoryId || !formData.image) {
@@ -240,10 +290,216 @@ export default function AddProductPage() {
               onChange={(val) => setFormData({ ...formData, subImages: val })}
             />
           </motion.div>
+
+          {/* Card: Features & Specifications */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white p-10 rounded-[32px] shadow-sm border border-slate-200/60 space-y-10"
+          >
+            <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-inner">
+                  <ListChecks size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900">Features & Specifications</h2>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5 uppercase tracking-widest">Technical and Aesthetic Details</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-10">
+              {/* Features List */}
+              <div className="space-y-4">
+                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Key Features</Label>
+                <div className="flex gap-4">
+                  <input 
+                    value={newFeature}
+                    onChange={(e) => setNewFeature(e.target.value)}
+                    placeholder="Add a feature (e.g. Handcrafted from Teak)"
+                    className="flex-1 h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white transition-all outline-none font-bold"
+                  />
+                  <Button onClick={addFeature} type="button" className="h-14 w-14 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white">
+                    <Plus size={24} />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {formData.features.map((feature: string, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 group">
+                      <span className="text-sm font-bold text-slate-600">{feature}</span>
+                      <button onClick={() => removeFeature(idx)} className="text-slate-300 hover:text-red-500 transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Specifications */}
+              <div className="space-y-4 pt-6 border-t border-slate-50">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Detailed Specifications</Label>
+                  <Button onClick={addSpec} variant="ghost" className="text-xs font-black text-amber-600 uppercase tracking-widest hover:bg-amber-50">
+                    <Plus size={14} className="mr-2" /> Add Spec
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  {formData.specifications.map((spec: any, idx: number) => (
+                    <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                      <div className="md:col-span-5">
+                        <input 
+                          value={spec.label}
+                          onChange={(e) => updateSpec(idx, 'label', e.target.value)}
+                          placeholder="Label (e.g. Material)"
+                          className="w-full h-12 px-6 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white transition-all outline-none font-bold text-sm"
+                        />
+                      </div>
+                      <div className="md:col-span-6">
+                        <input 
+                          value={spec.value}
+                          onChange={(e) => updateSpec(idx, 'value', e.target.value)}
+                          placeholder="Value (e.g. Sheesham Wood)"
+                          className="w-full h-12 px-6 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white transition-all outline-none font-bold text-sm"
+                        />
+                      </div>
+                      <div className="md:col-span-1 flex justify-center">
+                        <button onClick={() => removeSpec(idx)} className="text-slate-300 hover:text-red-500 transition-colors">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card: Care & Shipping */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white p-10 rounded-[32px] shadow-sm border border-slate-200/60 space-y-10"
+          >
+            <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
+                  <Info size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900">Care & Shipping</h2>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5 uppercase tracking-widest">Post-Purchase Information</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Care Instructions</Label>
+                <textarea 
+                  value={formData.careInstructions}
+                  onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
+                  placeholder="How to take care of this product..."
+                  className="w-full h-32 p-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-blue-500/50 transition-all outline-none text-base font-medium leading-relaxed resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Shipping & Returns</Label>
+                <textarea 
+                  value={formData.shippingReturns}
+                  onChange={(e) => setFormData({ ...formData, shippingReturns: e.target.value })}
+                  placeholder="Details about shipping and return policy for this item..."
+                  className="w-full h-32 p-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-blue-500/50 transition-all outline-none text-base font-medium leading-relaxed resize-none"
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Sidebar Controls */}
         <div className="lg:col-span-4 space-y-10">
+          {/* Card: Options & Sizes */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white p-10 rounded-[32px] shadow-sm border border-slate-200/60 space-y-8"
+          >
+            <div className="flex items-center gap-4 pb-2 border-b border-slate-50">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <Settings2 size={20} />
+              </div>
+              <h3 className="text-lg font-black text-slate-900">Options</h3>
+            </div>
+
+            <div className="space-y-8">
+              {/* Personalisation Switch */}
+              <div className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="space-y-1">
+                  <p className="text-sm font-black text-slate-900 uppercase tracking-wider">Personalisation</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Enable custom engraving</p>
+                </div>
+                <Switch 
+                  checked={formData.isPersonalisable}
+                  onCheckedChange={(val) => setFormData({ ...formData, isPersonalisable: val })}
+                />
+              </div>
+
+              {/* Sizes Dynamic List */}
+              <div className="space-y-4">
+                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Available Sizes</Label>
+                <div className="flex gap-2">
+                  <input 
+                    value={newSize}
+                    onChange={(e) => setNewSize(e.target.value)}
+                    placeholder="e.g. Medium (16x10 in)"
+                    className="flex-1 h-12 px-4 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white transition-all outline-none font-bold text-xs"
+                  />
+                  <Button onClick={addSize} type="button" className="h-12 w-12 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white p-0">
+                    <Plus size={20} />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.sizes.map((size: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                      {size}
+                      <button onClick={() => removeSize(idx)} className="hover:text-red-500 transition-colors">
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Product Tags */}
+              <div className="space-y-4 pt-4">
+                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Product Badges/Tags</Label>
+                <div className="flex flex-wrap gap-3">
+                  {["Bestseller", "New Arrival", "Limited Edition", "Handcrafted"].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => {
+                        const tags = formData.tags.includes(tag)
+                          ? formData.tags.filter((t: string) => t !== tag)
+                          : [...formData.tags, tag];
+                        setFormData({ ...formData, tags });
+                      }}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                        formData.tags.includes(tag)
+                          ? "bg-slate-900 border-slate-900 text-white"
+                          : "bg-white border-slate-200 text-slate-400 hover:border-slate-300"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Card: Main Image */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}

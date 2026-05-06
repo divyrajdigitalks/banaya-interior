@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { 
   Search, 
   Sparkles, 
@@ -62,6 +63,7 @@ const INITIAL_OFFERS = [
 ];
 
 export default function OffersManagementPage() {
+  const router = useRouter();
   const [offers, setOffers] = useState(INITIAL_OFFERS);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -146,7 +148,7 @@ export default function OffersManagementPage() {
             {item.isActive ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            onClick={(e) => { e.stopPropagation(); router.push(`/admin/offers/add?id=${item.id}`); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
           >
             <Edit3 size={14} />
@@ -162,34 +164,8 @@ export default function OffersManagementPage() {
     }
   ];
 
-  const handleOpenDialog = (offer: any = null) => {
-    if (offer) {
-      setEditingOffer(offer);
-      setFormData(offer);
-    } else {
-      setEditingOffer(null);
-      setFormData({
-        name: "",
-        description: "",
-        discount: "",
-        startDate: "",
-        endDate: "",
-        image: "",
-        isActive: true
-      });
-    }
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    if (!formData.name || !formData.discount) return;
-    
-    if (editingOffer) {
-      setOffers(offers.map(o => o.id === editingOffer.id ? formData : o));
-    } else {
-      setOffers([{ id: Date.now().toString(), ...formData }, ...offers]);
-    }
-    setIsDialogOpen(false);
+  const handleOpenAddPage = () => {
+    router.push("/admin/offers/add");
   };
 
   const handleDelete = (id: string) => {
@@ -220,7 +196,7 @@ export default function OffersManagementPage() {
         </div>
 
         <Button 
-          onClick={() => handleOpenDialog()}
+          onClick={handleOpenAddPage}
           className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
         >
           <Sparkles className="group-hover:rotate-90 transition-transform duration-500" size={16} />
@@ -229,88 +205,6 @@ export default function OffersManagementPage() {
       </div>
 
       <AdminTable columns={columns} data={filteredOffers} />
-
-      {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] w-[95vw] rounded-[2.5rem] p-10 overflow-hidden mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
-              {editingOffer ? "Edit" : "Create"} <span className="text-gold font-bold">Marketing Offer</span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-2 gap-6 py-8">
-            <div className="col-span-2">
-              <AdminFormInput 
-                label="Offer Name"
-                value={formData.name}
-                onChange={(val) => setFormData({ ...formData, name: val })}
-                placeholder="e.g. Mega Monsoon Sale"
-              />
-            </div>
-
-            <div className="col-span-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40 ml-2">Description</label>
-              <textarea 
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full mt-2 h-32 bg-warm-cream/50 border-none rounded-2xl p-6 text-sm font-medium text-charcoal focus:ring-2 focus:ring-gold/20 outline-none resize-none"
-                placeholder="Describe the offer details..."
-              />
-            </div>
-            
-            <AdminFormInput 
-              label="Discount Badge Text"
-              value={formData.discount}
-              onChange={(val) => setFormData({ ...formData, discount: val })}
-              placeholder="e.g. 20% OFF or Flat ₹1000"
-            />
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40 ml-2">Status</label>
-              <select 
-                value={formData.isActive ? "true" : "false"}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.value === "true" })}
-                className="w-full h-14 bg-warm-cream/50 border-none rounded-2xl px-6 text-sm font-bold text-charcoal focus:ring-2 focus:ring-gold/20 outline-none appearance-none cursor-pointer"
-              >
-                <option value="true">Active / Live</option>
-                <option value="false">Inactive / Paused</option>
-              </select>
-            </div>
-
-            <AdminFormInput 
-              label="Start Date"
-              type="date"
-              value={formData.startDate}
-              onChange={(val) => setFormData({ ...formData, startDate: val })}
-            />
-
-            <AdminFormInput 
-              label="End Date"
-              type="date"
-              value={formData.endDate}
-              onChange={(val) => setFormData({ ...formData, endDate: val })}
-            />
-
-            <div className="col-span-2">
-              <ImageUpload 
-                label="Offer Banner Image"
-                value={formData.image}
-                onChange={(val) => setFormData({ ...formData, image: val })}
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="flex gap-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1 h-14 rounded-2xl border-charcoal/10 text-[10px] font-black uppercase tracking-widest">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-gold/20">
-              Save Marketing Offer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

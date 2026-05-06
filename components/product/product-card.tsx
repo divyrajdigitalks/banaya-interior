@@ -58,10 +58,10 @@ export function ProductCard({
     <Link href={`/product/${id}`} className="group block">
       <motion.div 
         whileHover={{ y: -5 }}
-        className="flex flex-col gap-3 bg-[#fdf9f3] p-3 rounded-2xl border border-primary/5 shadow-sm hover:shadow-xl transition-all duration-500"
+        className="flex flex-col h-full gap-2 bg-[#fdf9f3] p-2 rounded-xl border border-primary/5 shadow-sm hover:shadow-xl transition-all duration-500"
       >
         {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-white">
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-white flex-shrink-0">
           {discount && (
             <div className="absolute top-2 left-2 z-10">
               <span className="bg-[#e87d3e] text-white text-[8px] font-black px-2 py-1 rounded-md shadow-lg uppercase">
@@ -83,37 +83,37 @@ export function ProductCard({
         </div>
 
         {/* Product Info */}
-        <div className="flex flex-col gap-2 px-0.5">
-          <div className="space-y-1">
-            <span className="text-[8px] font-black text-gold uppercase tracking-widest">{category}</span>
-            <h3 className="text-xs font-bold text-[#4F3D31] line-clamp-1 group-hover:text-gold transition-colors duration-500">
+        <div className="flex flex-col flex-1 gap-1 px-0.5 min-h-[90px]">
+          <div className="space-y-0.5">
+            <span className="text-[7px] font-black text-gold uppercase tracking-widest">{category}</span>
+            <h3 className="text-[10px] font-bold text-[#4F3D31] line-clamp-1 h-4 group-hover:text-gold transition-colors duration-500">
               {name}
             </h3>
           </div>
           
           <div className="flex items-center justify-between">
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-black text-[#4F3D31]">₹{price.toLocaleString()}</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm font-black text-[#4F3D31]">₹{price.toLocaleString()}</span>
               {originalPrice && (
-                <span className="text-[10px] text-[#4F3D31]/20 line-through font-medium">₹{originalPrice.toLocaleString()}</span>
+                <span className="text-[9px] text-[#4F3D31]/20 line-through font-medium">₹{originalPrice.toLocaleString()}</span>
               )}
             </div>
             
-            <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-full border border-primary/5">
-              <Star className="h-2.5 w-2.5 fill-gold text-gold" />
-              <span className="text-[9px] font-black text-gold">{rating}</span>
+            <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-full border border-primary/5">
+              <Star className="h-2 w-2 fill-gold text-gold" />
+              <span className="text-[8px] font-black text-gold">{rating}</span>
             </div>
           </div>
 
-          <div className="pt-1">
+          <div className="pt-0.5">
             <button
               onClick={handleQuickAdd}
               disabled={isAdding}
-              className="w-full py-3 bg-[#4F3D31] text-white text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-gold transition-all duration-700 disabled:opacity-50 group/btn relative overflow-hidden"
+              className="w-full py-2 bg-[#4F3D31] text-white text-[7px] font-black uppercase tracking-widest rounded-md hover:bg-gold transition-all duration-700 disabled:opacity-50 group/btn relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 {isAdding ? <Check className="h-3 w-3" /> : <ShoppingBag className="h-3 w-3" />}
-                {isAdding ? "ADDED" : "ACQUIRE PIECE"}
+                {isAdding ? "ADDED" : "ADD TO CART"}
               </span>
               <div className="absolute inset-0 bg-gold translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
             </button>

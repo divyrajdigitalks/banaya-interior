@@ -144,7 +144,7 @@ export default function CouponsManagementPage() {
             {item.isActive ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            onClick={(e) => { e.stopPropagation(); router.push(`/admin/coupons/add?id=${item.id}`); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
           >
             <Edit3 size={14} />
@@ -160,33 +160,8 @@ export default function CouponsManagementPage() {
     }
   ];
 
-  const handleOpenDialog = (coupon: any = null) => {
-    if (coupon) {
-      setEditingCoupon(coupon);
-      setFormData(coupon);
-    } else {
-      setEditingCoupon(null);
-      setFormData({
-        code: "",
-        discountType: "Percentage",
-        value: "",
-        expiryDate: "",
-        minOrder: "",
-        isActive: true
-      });
-    }
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    if (!formData.code || !formData.value) return;
-    
-    if (editingCoupon) {
-      setCoupons(coupons.map(c => c.id === editingCoupon.id ? formData : c));
-    } else {
-      setCoupons([{ id: Date.now().toString(), ...formData }, ...coupons]);
-    }
-    setIsDialogOpen(false);
+  const handleOpenAddPage = () => {
+    router.push("/admin/coupons/add");
   };
 
   const handleDelete = (id: string) => {
@@ -216,7 +191,7 @@ export default function CouponsManagementPage() {
         </div>
 
         <Button 
-          onClick={() => handleOpenDialog()}
+          onClick={handleOpenAddPage}
           className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
         >
           <Plus className="group-hover:rotate-90 transition-transform duration-500" size={16} />
@@ -225,72 +200,6 @@ export default function CouponsManagementPage() {
       </div>
 
       <AdminTable columns={columns} data={filteredCoupons} />
-
-      {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] w-[95vw] rounded-[2.5rem] p-10 overflow-hidden mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
-              {editingCoupon ? "Edit" : "Create"} <span className="text-gold font-bold">Promo Coupon</span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-2 gap-6 py-8">
-            <div className="col-span-2">
-              <AdminFormInput 
-                label="Coupon Code"
-                value={formData.code}
-                onChange={(val) => setFormData({ ...formData, code: val.toUpperCase() })}
-                placeholder="e.g. SUMMER2024"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40 ml-2">Discount Type</label>
-              <select 
-                value={formData.discountType}
-                onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
-                className="w-full h-14 bg-warm-cream/50 border-none rounded-2xl px-6 text-sm font-bold text-charcoal focus:ring-2 focus:ring-gold/20 outline-none appearance-none cursor-pointer"
-              >
-                <option value="Percentage">Percentage (%)</option>
-                <option value="Flat">Flat Amount (₹)</option>
-              </select>
-            </div>
-
-            <AdminFormInput 
-              label="Discount Value"
-              type="number"
-              value={formData.value}
-              onChange={(val) => setFormData({ ...formData, value: val })}
-              placeholder={formData.discountType === "Percentage" ? "e.g. 10" : "e.g. 500"}
-            />
-
-            <AdminFormInput 
-              label="Expiry Date"
-              type="date"
-              value={formData.expiryDate}
-              onChange={(val) => setFormData({ ...formData, expiryDate: val })}
-            />
-
-            <AdminFormInput 
-              label="Min Order Value (₹)"
-              type="number"
-              value={formData.minOrder}
-              onChange={(val) => setFormData({ ...formData, minOrder: val })}
-              placeholder="e.g. 1000"
-            />
-          </div>
-
-          <DialogFooter className="flex gap-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1 h-14 rounded-2xl border-charcoal/10 text-[10px] font-black uppercase tracking-widest">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-gold/20">
-              Save Coupon
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
