@@ -30,12 +30,12 @@ export function Header({ variant = "dark" }: HeaderProps) {
   const showMegaMenu = pathname.includes("/shop") || pathname.includes("/product");
 
   const interiorNavLinks = [
-    { name: "HOME", href: "#home" },
-    { name: "ABOUT US", href: "#about" },
-    { name: "SERVICES", href: "#services" },
-    { name: "PROJECTS", href: "#projects" },
-    { name: "COST CALCULATOR", href: "#cost-calculator" },
-    { name: "PROCESS", href: "#process" },
+    { name: "HOME", href: "/interiors" },
+    { name: "ABOUT US", href: "/interiors/about" },
+    { name: "SERVICES", href: "/interiors#services" },
+    { name: "PROJECTS", href: "/interiors/projects" },
+    { name: "COST CALCULATOR", href: "/interiors/cost-calculator" },
+    { name: "PROCESS", href: "/interiors#process" },
     { name: "BLOG", href: "#" },
     { name: "CONTACT US", href: "#contact" },
   ];
@@ -69,7 +69,9 @@ export function Header({ variant = "dark" }: HeaderProps) {
           <div className="flex items-center justify-between h-20 md:h-24 gap-8">
             {/* Left: Logo Only */}
             <div className="flex-shrink-0">
-              <Logo variant="dark" className="scale-90 md:scale-100" />
+              <Link href="/">
+                <Logo variant="dark" className="scale-90 md:scale-100 cursor-pointer" />
+              </Link>
             </div>
 
             {/* Center: Search Bar (Hidden on interiors page) */}
@@ -88,13 +90,13 @@ export function Header({ variant = "dark" }: HeaderProps) {
             <div className="flex items-center justify-end gap-6 md:gap-8 flex-shrink-0">
               <div className="hidden lg:flex items-center gap-6">
                 {isInteriorsPage && interiorNavLinks.map((link) => (
-                  <a 
+                  <Link 
                     key={link.name} 
                     href={link.href}
                     className="text-[10px] font-black tracking-widest text-primary/60 hover:text-gold transition-colors whitespace-nowrap"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
 

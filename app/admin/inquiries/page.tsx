@@ -92,23 +92,6 @@ export default function InquiriesManagementPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-10 h-px bg-gold" />
-            <span className="text-[10px] tracking-[0.4em] text-gold uppercase font-black">Client Relations</span>
-          </motion.div>
-          <h1 className="text-4xl md:text-5xl font-serif font-black text-charcoal tracking-tight">
-            Customer <span className="font-bold text-gold">Inquiries</span>
-          </h1>
-        </div>
-      </header>
-
       {/* Toolbar */}
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
         <div className="relative w-full lg:w-96 group">

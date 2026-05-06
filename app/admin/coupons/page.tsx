@@ -33,7 +33,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AdminPageHeader } from "@/components/admin/page-header";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 
@@ -129,42 +128,33 @@ export default function CouponsManagementPage() {
       )
     },
     {
-      header: "Actions",
+      header: "Action",
       accessorKey: "id",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
-            className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal"
+          <button 
+            onClick={(e) => { e.stopPropagation(); toggleStatus(item.id); }}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all shadow-sm ${
+              item.isActive 
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white' 
+                : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-600 hover:text-white'
+            }`}
+            title={item.isActive ? "Deactivate" : "Activate"}
           >
-            <Edit3 size={16} />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30">
-                <MoreVertical size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border-charcoal/5 rounded-2xl shadow-2xl p-2">
-              <DropdownMenuItem 
-                onClick={() => toggleStatus(item.id)} 
-                className={`rounded-xl text-[10px] font-black uppercase tracking-widest p-4 cursor-pointer transition-colors ${
-                  item.isActive ? 'focus:bg-red-50 focus:text-red-500' : 'focus:bg-emerald-50 focus:text-emerald-500'
-                }`}
-              >
-                {item.isActive ? 'Deactivate' : 'Activate'}
-              </DropdownMenuItem>
-              <div className="h-px bg-charcoal/5 my-1" />
-              <DropdownMenuItem 
-                onClick={() => handleDelete(item.id)} 
-                className="rounded-xl text-[10px] font-black uppercase tracking-widest p-4 cursor-pointer focus:bg-red-50 focus:text-red-500 transition-colors"
-              >
-                Delete Coupon
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            {item.isActive ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
+          >
+            <Edit3 size={14} />
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100/50"
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
       )
     }
@@ -213,13 +203,6 @@ export default function CouponsManagementPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      <AdminPageHeader 
-        title="Promo Coupons"
-        subtitle="Promotions Management"
-        actionLabel="Create New Coupon"
-        onAction={() => handleOpenDialog()}
-      />
-
       {/* Toolbar */}
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
         <div className="relative w-full lg:w-96 group">
@@ -231,6 +214,14 @@ export default function CouponsManagementPage() {
             className="bg-white border-charcoal/5 rounded-2xl pl-11 py-6 text-[10px] uppercase tracking-widest font-bold focus:ring-2 focus:ring-gold/5 shadow-xl shadow-charcoal/5"
           />
         </div>
+
+        <Button 
+          onClick={() => handleOpenDialog()}
+          className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
+        >
+          <Plus className="group-hover:rotate-90 transition-transform duration-500" size={16} />
+          Create New Coupon
+        </Button>
       </div>
 
       <AdminTable columns={columns} data={filteredCoupons} />

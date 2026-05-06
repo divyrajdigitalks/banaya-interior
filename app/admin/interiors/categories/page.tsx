@@ -11,7 +11,6 @@ import {
   DialogTitle, 
   DialogFooter
 } from "@/components/ui/dialog";
-import { AdminPageHeader } from "@/components/admin/page-header";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
@@ -50,26 +49,22 @@ export default function InteriorCategoriesPage() {
       )
     },
     {
-      header: "Actions",
+      header: "Action",
       accessorKey: "id",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm"
+          <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
-            className="p-2 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal"
+            className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
           >
-            <Edit3 size={16} />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
+            <Edit3 size={14} />
+          </button>
+          <button 
             onClick={(e) => { e.stopPropagation(); setCategories(categories.filter(c => c.id !== item.id)); }}
-            className="p-2 hover:bg-red-50 rounded-xl text-charcoal/30 hover:text-red-500"
+            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100/50"
           >
-            <Trash2 size={16} />
-          </Button>
+            <Trash2 size={14} />
+          </button>
         </div>
       )
     }
@@ -102,21 +97,24 @@ export default function InteriorCategoriesPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      <AdminPageHeader 
-        title="Interior Categories"
-        subtitle="Interior Management"
-        actionLabel="Add Interior Category"
-        onAction={() => handleOpenDialog()}
-      />
+      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+        <div className="relative w-full lg:w-96 group">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-gold transition-colors" size={18} />
+          <Input 
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
+          />
+        </div>
 
-      <div className="relative w-full md:w-96 group">
-        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-gold transition-colors" size={18} />
-        <Input 
-          placeholder="Search categories..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
-        />
+        <Button 
+          onClick={() => handleOpenDialog()}
+          className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
+        >
+          <FolderTree className="group-hover:rotate-90 transition-transform duration-500" size={16} />
+          Add Category
+        </Button>
       </div>
 
       <AdminTable columns={columns} data={filteredCategories} />
@@ -136,12 +134,12 @@ export default function InteriorCategoriesPage() {
               placeholder="e.g. Residential"
             />
             <ImageUpload 
-              label="Category Image"
+              label="Category Featured Image"
               value={formData.image}
               onChange={(val) => setFormData({ ...formData, image: val })}
             />
           </div>
-          <DialogFooter className="flex gap-4">
+          <DialogFooter className="flex gap-4 pt-6 border-t border-charcoal/5">
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1 h-14 rounded-2xl border-charcoal/10">Cancel</Button>
             <Button onClick={handleSave} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-bold rounded-2xl">Save Category</Button>
           </DialogFooter>

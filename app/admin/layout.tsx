@@ -32,10 +32,13 @@ import { Input } from "@/components/ui/input";
 const sidebarLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
   { type: "label", name: "Decor Management" },
+  { name: "Decor Hero", icon: GalleryHorizontal, href: "/admin/decor/hero" },
+  { name: "Decor Features", icon: Sparkles, href: "/admin/decor/features" },
   { name: "Decor Categories", icon: Layers, href: "/admin/categories" },
   { name: "Decor Subcategories", icon: Grid, href: "/admin/subcategories" },
   { name: "Decor Products", icon: Package, href: "/admin/products" },
   { type: "label", name: "Interiors Management" },
+  { name: "Interior Hero", icon: GalleryHorizontal, href: "/admin/interiors/hero" },
   { name: "Interior Categories", icon: FolderTree, href: "/admin/interiors/categories" },
   { name: "Interior Projects", icon: Briefcase, href: "/admin/interiors/projects" },
   { name: "Interior Gallery", icon: GalleryHorizontal, href: "/admin/interiors/gallery" },
@@ -58,8 +61,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Get current page name from pathname
   const getCurrentPageName = () => {
     const segments = pathname.split('/').filter(Boolean);
+    if (segments.length === 1 && segments[0] === 'admin') return 'Dashboard';
+    
+    // Handle specific hero paths for better titles
+    if (pathname.includes('/interiors/hero')) return 'Interior Hero Management';
+    if (pathname.includes('/decor/hero')) return 'Decor Hero Management';
+    if (pathname.includes('/decor/features')) return 'Decor Features Management';
+    if (pathname.includes('/products/add')) return 'Add New Product';
+    
     const lastSegment = segments[segments.length - 1];
-    if (!lastSegment || lastSegment === 'admin') return 'Dashboard';
     
     // Convert kebab-case or snake_case to Title Case
     return lastSegment

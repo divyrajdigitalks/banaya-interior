@@ -176,10 +176,6 @@ export function ProjectsSection() {
                 </motion.div>
               </AnimatePresence>
 
-              <button className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-primary hover:text-gold transition-colors pt-4">
-                View Full Case Study
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-              </button>
             </div>
           </div>
 
