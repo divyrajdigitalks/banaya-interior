@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Library, Edit3, Trash2, Plus, Save, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Library, Edit3, Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Dialog, 
   DialogContent, 
@@ -15,44 +25,46 @@ import { Label } from "@/components/ui/label";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
-import { motion } from "framer-motion";
-
-const INITIAL_COLLECTIONS = [
-  { 
-    id: "1", 
-    name: "The Heritage Interiors", 
-    count: "12 Projects",
-    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800",
-    description: "A showcase of traditional interior designs that celebrate heritage and timeless craftsmanship."
-  },
-  { 
-    id: "2", 
-    name: "Modern Sanctuary", 
-    count: "8 Projects",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=800",
-    description: "Minimalist and soul-soothing interior spaces designed for modern urban living."
-  },
-];
+import { collectionService, type Collection } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 export default function InteriorCollectionsPage() {
-  const [collections, setCollections] = useState(INITIAL_COLLECTIONS);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCollection, setEditingCollection] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({ name: "", count: "", description: "", image: "" });
+  const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
+  const [formData, setFormData] = useState<Partial<Collection>>({ name: "", description: "", image: "" });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const loadCollections = async () => {
+    setLoading(true);
+    const data = await collectionService.getCollectionList(true);
+    setCollections(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadCollections(); }, []);
 
   const columns = [
     {
       header: "Collection",
       accessorKey: "name",
-      cell: (item: any) => (
+      cell: (item: Collection) => (
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md border border-charcoal/5 flex-shrink-0">
-            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            {item.image ? (
+              <img src={buildImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-charcoal/5 flex items-center justify-center">
+                <Library size={20} className="text-charcoal/30" />
+              </div>
+            )}
           </div>
           <div>
             <p className="font-bold text-charcoal">{item.name}</p>
-            <p className="text-[10px] text-gold font-black uppercase tracking-widest">{item.count}</p>
           </div>
         </div>
       )
@@ -60,16 +72,16 @@ export default function InteriorCollectionsPage() {
     {
       header: "Description",
       accessorKey: "description",
-      cell: (item: any) => (
+      cell: (item: Collection) => (
         <p className="text-[11px] text-charcoal/50 line-clamp-2 max-w-xs leading-relaxed font-medium">
-          {item.description}
+          {item.description || "No description"}
         </p>
       )
     },
     {
       header: "Action",
       accessorKey: "id",
-      cell: (item: any) => (
+      cell: (item: Collection) => (
         <div className="flex items-center gap-2">
           <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
@@ -78,7 +90,7 @@ export default function InteriorCollectionsPage() {
             <Edit3 size={16} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); setCollections(collections.filter(c => c.id !== item.id)); }}
+            onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
             className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm"
           >
             <Trash2 size={16} />
@@ -88,26 +100,42 @@ export default function InteriorCollectionsPage() {
     }
   ];
 
-  const handleOpenDialog = (collection: any = null) => {
+  const handleOpenDialog = (collection: Collection | null = null) => {
     if (collection) {
       setEditingCollection(collection);
-      setFormData(collection);
+      setFormData({ 
+        name: collection.name, 
+        description: collection.description || "", 
+        image: collection.image
+      });
+      setSelectedFile(null);
     } else {
       setEditingCollection(null);
-      setFormData({ name: "", count: "", description: "", image: "" });
+      setFormData({ name: "", description: "", image: "" });
+      setSelectedFile(null);
     }
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
-    if (!formData.name || !formData.image) return;
-
+  const handleSave = async () => {
+    if (!formData.name) return;
+    setSaving(true);
+    
     if (editingCollection) {
-      setCollections(collections.map(c => c.id === editingCollection.id ? formData : c));
+      await collectionService.updateCollection(editingCollection.id, formData, selectedFile || undefined);
     } else {
-      setCollections([{ id: Date.now().toString(), ...formData }, ...collections]);
+      await collectionService.createCollection(formData as Collection, selectedFile || undefined);
     }
+    
+    await loadCollections();
     setIsDialogOpen(false);
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    await collectionService.deleteCollection(id);
+    await loadCollections();
+    setDeleteId(null);
   };
 
   const filteredCollections = collections.filter(c => 
@@ -139,7 +167,13 @@ export default function InteriorCollectionsPage() {
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-charcoal/5 overflow-hidden">
-        <AdminTable columns={columns} data={filteredCollections} />
+        {loading ? (
+          <div className="flex items-center justify-center py-24 text-charcoal/30 text-sm font-medium">
+            Loading collections...
+          </div>
+        ) : (
+          <AdminTable columns={columns} data={filteredCollections} />
+        )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -159,25 +193,17 @@ export default function InteriorCollectionsPage() {
           </DialogHeader>
           
           <div className="space-y-8 py-10">
-            <div className="grid grid-cols-2 gap-6">
-              <AdminFormInput 
-                label="Collection Name"
-                value={formData.name}
-                onChange={(val) => setFormData({ ...formData, name: val })}
-                placeholder="e.g. The Heritage Interiors"
-              />
-              <AdminFormInput 
-                label="Project Count Label"
-                value={formData.count}
-                onChange={(val) => setFormData({ ...formData, count: val })}
-                placeholder="e.g. 10+ Projects"
-              />
-            </div>
+            <AdminFormInput 
+              label="Collection Name"
+              value={formData.name || ""}
+              onChange={(val) => setFormData({ ...formData, name: val })}
+              placeholder="e.g. The Heritage Interiors"
+            />
 
             <div className="space-y-3">
               <Label className="text-[11px] font-black uppercase tracking-widest text-charcoal/40 ml-1">Collection Narrative</Label>
               <textarea 
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Describe the soul of this interior collection..."
                 className="w-full h-32 p-5 bg-charcoal/5 border-transparent rounded-2xl focus:bg-white focus:ring-gold/20 focus:border-gold transition-all text-sm font-medium leading-relaxed resize-none"
@@ -187,7 +213,10 @@ export default function InteriorCollectionsPage() {
             <ImageUpload 
               label="Collection Cover Image"
               value={formData.image}
-              onChange={(val) => setFormData({ ...formData, image: val })}
+              onChange={(val, file) => {
+                setFormData({ ...formData, image: val });
+                if (file) setSelectedFile(file);
+              }}
             />
           </div>
 
@@ -200,14 +229,35 @@ export default function InteriorCollectionsPage() {
               Cancel
             </Button>
             <Button 
-              onClick={handleSave} 
+              onClick={handleSave}
+              disabled={saving}
               className="flex-1 h-16 bg-slate-900 hover:bg-black text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-charcoal/10 transition-all active:scale-95"
             >
-              Save Interior Collection
+              {saving ? "Saving..." : "Save Interior Collection"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent className="rounded-[3rem]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Collection</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this collection? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-4">
+            <AlertDialogCancel className="flex-1 h-16 rounded-2xl border-charcoal/10 font-bold text-charcoal/60">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="flex-1 h-16 bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

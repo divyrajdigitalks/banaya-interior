@@ -26,7 +26,6 @@ import {
   Type
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FEATURED_PRODUCTS } from "@/lib/constants";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/footer";
@@ -41,15 +40,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { productService, type Product } from "@/lib/api";
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedSize, setSelectedImageSize] = useState(product?.sizes?.[0] || "Medium (16 x 10 in)");
+  const [selectedSize, setSelectedImageSize] = useState("Medium (16 x 10 in)");
   const [activeTab, setActiveTab] = useState("Description");
   
   // Personalisation State
@@ -72,18 +74,43 @@ export default function ProductDetailPage() {
   };
 
   useEffect(() => {
-    const foundProduct = FEATURED_PRODUCTS.find((p) => p.id === id);
-    if (foundProduct) {
-      setProduct(foundProduct);
-      if (foundProduct.sizes?.length > 0) {
-        setSelectedImageSize(foundProduct.sizes[0]);
+    const loadData = async () => {
+      if (id) {
+        const [foundProduct, allProducts] = await Promise.all([
+          productService.getProduct(id),
+          productService.getProductList(true),
+        ]);
+        
+        if (foundProduct) {
+          setProduct(foundProduct);
+          if (foundProduct.sizes?.length > 0) {
+            setSelectedImageSize(foundProduct.sizes[0]);
+          }
+          
+          // Get related products (excluding current product)
+          setRelatedProducts(allProducts.filter(p => p.id !== id).slice(0, 4));
+        }
       }
-    }
+      
+      setLoading(false);
+    };
+    
+    loadData();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fdf9f3]">
+        <div className="text-center space-y-6">
+          <p className="text-charcoal/40">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-[#fdf9f3]">
         <div className="text-center space-y-6">
           <h1 className="text-4xl font-serif font-black text-primary">Masterpiece Not Found</h1>
           <Button onClick={() => router.push("/shop")} variant="outline" className="rounded-full px-8">
@@ -94,7 +121,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = [product.image, product.hoverImage || product.image, product.image, product.image, product.image];
+  const images = [product.image, ...(product.subImages || [])].slice(0, 5);
 
   return (
     <div className="min-h-screen bg-[#fdf9f3]">
@@ -578,8 +605,16 @@ export default function ProductDetailPage() {
             <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest text-gold hover:text-primary transition-colors border-b-2 border-gold pb-1">View Collection</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {FEATURED_PRODUCTS.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} {...p} />
+            {relatedProducts.map((p) => (
+              <ProductCard 
+                key={p.id} 
+                id={p.id}
+                name={p.name}
+                category={p.categoryId}
+                price={p.price}
+                image={p.image}
+                tag={p.tags?.[0]}
+              />
             ))}
           </div>
         </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/logo";
@@ -27,10 +27,12 @@ import {
   GalleryHorizontal,
   IndianRupee,
   PenTool,
-  Library
+  Library,
+  Filter
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AdminProvider, useAdmin } from "@/context/AdminContext";
 
 const sidebarLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
@@ -39,6 +41,7 @@ const sidebarLinks = [
   { name: "Decor Features", icon: Sparkles, href: "/admin/decor/features" },
   { name: "Decor Categories", icon: Layers, href: "/admin/categories" },
   { name: "Decor Subcategories", icon: Grid, href: "/admin/subcategories" },
+  { name: "Filter Options", icon: Filter, href: "/admin/filter-options" },
   { name: "Decor Products", icon: Package, href: "/admin/products" },
   { type: "label", name: "Interiors Management" },
   { name: "Interior Hero", icon: GalleryHorizontal, href: "/admin/interiors/hero" },
@@ -59,18 +62,25 @@ const sidebarLinks = [
   { name: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isAuthenticated, isLoading, logout } = useAdmin();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && pathname !== "/admin/login") {
+      router.push("/admin/login");
+    }
+  }, [isAuthenticated, isLoading, pathname, router]);
 
   // Get current page name from pathname
   const getCurrentPageName = () => {
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length === 1 && segments[0] === 'admin') return 'Dashboard';
     
-    // Handle specific hero paths for better titles
     if (pathname.includes('/interiors/hero')) return 'Interior Hero Management';
     if (pathname.includes('/decor/hero')) return 'Decor Hero Management';
     if (pathname.includes('/decor/features')) return 'Decor Features Management';
@@ -78,7 +88,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     
     const lastSegment = segments[segments.length - 1];
     
-    // Convert kebab-case or snake_case to Title Case
     return lastSegment
       .split(/[-_]/)
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -102,9 +111,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Hide layout for login page
+  // Hide layout for login page or show loading
   if (pathname === "/admin/login") {
     return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-warm-cream flex items-center justify-center">
+        <div className="text-charcoal/30 text-lg font-medium">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated && !isLoading) {
+    return (
+      <div className="min-h-screen bg-warm-cream flex items-center justify-center">
+        <div className="text-charcoal/30 text-lg font-medium">Redirecting to login...</div>
+      </div>
+    );
   }
 
   return (
@@ -175,12 +200,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Users size={18} className="text-gold" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">Admin User</p>
-                  <p className="text-xs text-white/40">Super Admin</p>
+                  <p className="text-sm font-medium text-white">{user?.username || 'Admin'}</p>
+                  <p className="text-xs text-white/40">{user?.role || 'Super Admin'}</p>
                 </div>
               </div>
               <button 
-                onClick={() => router.push("/admin/login")}
+                onClick={logout}
                 className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-white/50 hover:text-red-400 hover:bg-red-400/10 transition-all duration-500 font-normal group"
               >
                 <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
@@ -223,7 +248,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="h-10 w-[1px] bg-charcoal/5 mx-2" />
             <div className="flex items-center gap-3 pl-2">
               <div className="w-10 h-10 rounded-2xl bg-charcoal flex items-center justify-center text-white text-xs font-medium shadow-xl">
-                AU
+                {user?.username?.substring(0, 2).toUpperCase() || 'AU'}
               </div>
             </div>
           </div>
@@ -235,5 +260,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminProvider>
   );
 }

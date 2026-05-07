@@ -5,26 +5,40 @@ import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "./image-upload";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 interface MultiImageUploadProps {
   value: string[];
   onChange: (value: string[]) => void;
+  onFilesSelect?: (files: File[]) => void;
   label?: string;
 }
 
-export function MultiImageUpload({ value, onChange, label }: MultiImageUploadProps) {
+export function MultiImageUpload({ value, onChange, onFilesSelect, label }: MultiImageUploadProps) {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const handleAdd = () => {
     onChange([...value, ""]);
+    setSelectedFiles([...selectedFiles, null as any]);
   };
 
   const handleRemove = (index: number) => {
     onChange(value.filter((_, i) => i !== index));
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(newFiles);
+    onFilesSelect?.(newFiles.filter(f => f !== null));
   };
 
   const handleChange = (index: number, url: string) => {
     const newImages = [...value];
     newImages[index] = url;
     onChange(newImages);
+  };
+
+  const handleFileSelect = (index: number, file: File) => {
+    const newFiles = [...selectedFiles];
+    newFiles[index] = file;
+    setSelectedFiles(newFiles);
+    onFilesSelect?.(newFiles.filter(f => f !== null));
   };
 
   return (
@@ -58,7 +72,8 @@ export function MultiImageUpload({ value, onChange, label }: MultiImageUploadPro
             >
               <ImageUpload 
                 value={url} 
-                onChange={(newUrl) => handleChange(index, newUrl)} 
+                onChange={(newUrl) => handleChange(index, newUrl)}
+                onFileSelect={(file) => handleFileSelect(index, file)}
               />
               {value.length > 1 && (
                 <Button 

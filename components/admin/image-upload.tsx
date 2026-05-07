@@ -1,27 +1,34 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 interface ImageUploadProps {
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, file?: File) => void;
+  onFileSelect?: (file: File) => void;
   label?: string;
   className?: string;
 }
 
-export function ImageUpload({ value, onChange, label, className }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onFileSelect, label, className }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(value || null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      onChange(url);
+      // Create preview immediately
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl);
+      setSelectedFile(file);
+      
+      // Pass the file to parent component
+      onChange(previewUrl, file);
+      onFileSelect?.(file);
     }
   };
 
@@ -29,6 +36,7 @@ export function ImageUpload({ value, onChange, label, className }: ImageUploadPr
     e.preventDefault();
     e.stopPropagation();
     setPreview(null);
+    setSelectedFile(null);
     onChange("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -74,7 +82,9 @@ export function ImageUpload({ value, onChange, label, className }: ImageUploadPr
             <div className="p-4 rounded-full bg-charcoal/5 group-hover:bg-gold/10">
               <Upload size={24} />
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest">Upload Image</span>
+            <span className="text-xs font-bold uppercase tracking-widest">
+              Upload Image
+            </span>
           </div>
         )}
       </div>

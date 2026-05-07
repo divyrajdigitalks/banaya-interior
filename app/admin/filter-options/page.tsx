@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, GalleryHorizontal, Edit3, Trash2, Plus, ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Search, Filter, Edit3, Trash2, Plus, ArrowLeft, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   AlertDialog,
@@ -23,48 +23,54 @@ import {
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
-import { ImageUpload } from "@/components/admin/image-upload";
+import { AdminSelect } from "@/components/admin/admin-select";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminLabel } from "@/components/admin/admin-label";
-import { galleryService, type GalleryImage } from "@/lib/api";
-import { buildImageUrl } from "@/lib/api/axios";
+import { filterService, type FilterOption } from "@/lib/api";
 
-export default function InteriorGalleryPage() {
+const filterGroups = [
+  { value: "Type", label: "Type" },
+  { value: "Colour", label: "Colour" },
+  { value: "Materials", label: "Materials" },
+  { value: "Shape", label: "Shape" },
+  { value: "UsePurpose", label: "Use / Purpose" },
+  { value: "Occasions", label: "Occasions" },
+];
+
+export default function AdminFilterOptionsPage() {
   const router = useRouter();
-  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [filterOptions, setFilterOptions] = useState<FilterOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<GalleryImage | null>(null);
-  const [formData, setFormData] = useState<Partial<GalleryImage>>({ title: "", subtitle: "", src: "" });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editingFilterOption, setEditingFilterOption] = useState<FilterOption | null>(null);
+  const [formData, setFormData] = useState<Partial<FilterOption>>({ name: "", filterGroup: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState<string>("All");
+  const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadGallery();
+    loadFilterOptions();
   }, []);
 
-  const loadGallery = async () => {
+  const loadFilterOptions = async () => {
     setLoading(true);
-    const data = await galleryService.getGalleryList(true);
-    setGallery(data);
+    const data = await filterService.getFilterOptionList(true);
+    setFilterOptions(data);
     setLoading(false);
   };
 
   const columns = [
     {
-      header: "Gallery Item",
-      accessorKey: "title",
-      cell: (item: GalleryImage) => (
+      header: "Option",
+      accessorKey: "name",
+      cell: (item: FilterOption) => (
         <div className="flex items-center gap-4">
-          <div className="w-16 h-12 rounded-xl overflow-hidden border border-charcoal/10 bg-charcoal/5">
-            <img src={buildImageUrl(item.src)} alt={item.title} className="w-full h-full object-cover" />
+          <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
+            <Filter size={16} className="text-gold" />
           </div>
           <div>
-            <p className="text-sm font-medium text-charcoal">{item.title}</p>
-            {item.subtitle && (
-              <p className="text-[11px] text-charcoal/40">{item.subtitle}</p>
-            )}
+            <span className="text-sm font-medium text-charcoal">{item.name}</span>
+            <p className="text-[11px] text-charcoal/40 uppercase">{item.filterGroup}</p>
           </div>
         </div>
       )
@@ -72,14 +78,14 @@ export default function InteriorGalleryPage() {
     {
       header: "ID",
       accessorKey: "id",
-      cell: (item: GalleryImage) => (
+      cell: (item: FilterOption) => (
         <span className="text-[11px] font-mono text-charcoal/40">#{item.id.substring(0, 6)}</span>
       )
     },
     {
       header: "Actions",
       accessorKey: "id",
-      cell: (item: GalleryImage) => (
+      cell: (item: FilterOption) => (
         <div className="flex items-center gap-2">
           <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
@@ -98,46 +104,46 @@ export default function InteriorGalleryPage() {
     }
   ];
 
-  const handleOpenDialog = (item: GalleryImage | null = null) => {
-    if (item) {
-      setEditingItem(item);
-      setFormData({
-        title: item.title,
-        subtitle: item.subtitle,
-        src: item.src,
+  const handleOpenDialog = (filterOption: FilterOption | null = null) => {
+    if (filterOption) {
+      setEditingFilterOption(filterOption);
+      setFormData({ 
+        name: filterOption.name, 
+        filterGroup: filterOption.filterGroup,
       });
-      setSelectedFile(null);
     } else {
-      setEditingItem(null);
-      setFormData({ title: "", subtitle: "", src: "" });
-      setSelectedFile(null);
+      setEditingFilterOption(null);
+      setFormData({ name: "", filterGroup: "Type" });
     }
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.title || (!formData.src && !selectedFile)) return;
+    if (!formData.name || !formData.filterGroup) return;
+    setSaving(true);
     
-    if (editingItem) {
-      await galleryService.updateGalleryImage(editingItem.id, formData, selectedFile || undefined);
+    if (editingFilterOption) {
+      await filterService.updateFilterOption(editingFilterOption.id, formData);
     } else {
-      await galleryService.createGalleryImage(formData as GalleryImage, selectedFile || undefined);
+      await filterService.createFilterOption(formData as FilterOption);
     }
     
-    await loadGallery();
+    await loadFilterOptions();
     setIsDialogOpen(false);
+    setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    await galleryService.deleteGalleryImage(id);
-    await loadGallery();
+    await filterService.deleteFilterOption?.(id);
+    await loadFilterOptions();
     setDeleteId(null);
   };
 
-  const filteredGallery = gallery.filter(item => 
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.subtitle && item.subtitle.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredFilterOptions = filterOptions.filter(opt => {
+    const matchesSearch = opt.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesGroup = selectedGroup === "All" || opt.filterGroup === selectedGroup;
+    return matchesSearch && matchesGroup;
+  });
 
   if (loading) {
     return (
@@ -159,22 +165,32 @@ export default function InteriorGalleryPage() {
             <ArrowLeft size={18} className="text-charcoal/60" />
           </Button>
           <div>
-            <h1 className="text-xl font-semibold text-charcoal">Gallery Management</h1>
-            <p className="text-xs text-charcoal/40 mt-0.5">Manage your interior gallery items</p>
+            <h1 className="text-xl font-semibold text-charcoal">Filter Options</h1>
+            <p className="text-xs text-charcoal/40 mt-0.5">Manage product filter options</p>
           </div>
         </div>
       </div>
 
       <AdminCard>
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-            <input 
-              placeholder="Search gallery..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-            />
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
+              <input 
+                placeholder="Search options..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <AdminSelect 
+                value={selectedGroup}
+                onChange={setSelectedGroup}
+                options={[{ value: "All", label: "All Groups" }, ...filterGroups]}
+                placeholder="Filter by group"
+              />
+            </div>
           </div>
 
           <Button 
@@ -182,50 +198,44 @@ export default function InteriorGalleryPage() {
             className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
           >
             <Plus size={16} className="mr-2" />
-            Add Item
+            Add Option
           </Button>
         </div>
       </AdminCard>
 
       <AdminCard>
-        <AdminTable columns={columns} data={filteredGallery} />
+        <AdminTable columns={columns} data={filteredFilterOptions} />
       </AdminCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-charcoal">
-              {editingItem ? "Edit Gallery Item" : "Add Gallery Item"}
+              {editingFilterOption ? "Edit Filter Option" : "Add Filter Option"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminFormInput 
-              label="Title"
-              value={formData.title || ""}
-              onChange={(val) => setFormData({ ...formData, title: val })}
-              placeholder="e.g. Elegant Living Space"
+            <AdminSelect 
+              label="Filter Group"
+              value={formData.filterGroup || ""}
+              onChange={(val) => setFormData({ ...formData, filterGroup: val })}
+              options={filterGroups}
+              placeholder="Select filter group"
               required
             />
             <AdminFormInput 
-              label="Subtitle"
-              value={formData.subtitle || ""}
-              onChange={(val) => setFormData({ ...formData, subtitle: val })}
-              placeholder="e.g. Modern luxury interior design"
-            />
-            <ImageUpload 
-              label="Gallery Image"
-              value={formData.src}
-              onChange={(val, file) => {
-                setFormData({ ...formData, src: val });
-                if (file) setSelectedFile(file);
-              }}
+              label="Option Name"
+              value={formData.name || ""}
+              onChange={(val) => setFormData({ ...formData, name: val })}
+              placeholder="e.g. Trays, Round, Teak Wood"
+              required
             />
           </div>
           <DialogFooter className="flex gap-3">
             <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
               <Save size={16} className="mr-2" />
-              Save
+              {saving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -234,9 +244,9 @@ export default function InteriorGalleryPage() {
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Gallery Item</AlertDialogTitle>
+            <AlertDialogTitle>Delete Filter Option</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this gallery item? This action cannot be undone.
+              Are you sure you want to delete this filter option? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3">

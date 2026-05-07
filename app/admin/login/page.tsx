@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/logo";
@@ -8,24 +8,56 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock, User, ArrowRight, Sparkles } from "lucide-react";
+import { Lock, User, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
+import { useAdmin } from "@/context/AdminContext";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading: authLoading } = useAdmin();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  // Check if already logged in and redirect
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace("/admin");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
     
-    // Simulate login for now
-    setTimeout(() => {
+    try {
+      const success = await login(email, password);
+      if (success) {
+        router.replace("/admin");
+      } else {
+        setError("Invalid email or password");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      router.push("/admin");
-    }, 1500);
+    }
   };
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-charcoal/30 text-lg font-medium">Loading...</div>
+      </div>
+    );
+  }
+
+  // Don't show login if already authenticated
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
@@ -59,6 +91,13 @@ export default function AdminLoginPage() {
           
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-6 pt-8 px-8">
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                  <AlertCircle size={16} />
+                  {error}
+                </div>
+              )}
+              
               <div className="space-y-2.5">
                 <Label htmlFor="email" className="text-xs font-semibold text-primary/60 ml-1">Identity</Label>
                 <div className="relative group">

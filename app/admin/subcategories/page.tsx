@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Grid, Edit3, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Grid, Edit3, Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Dialog, 
   DialogContent, 
@@ -12,64 +22,79 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
+import { AdminSelect } from "@/components/admin/admin-select";
 import { ImageUpload } from "@/components/admin/image-upload";
-
-const INITIAL_CATEGORIES = [
-  { id: "1", name: "Living Room" },
-  { id: "2", name: "Bedroom" },
-  { id: "3", name: "Kitchen" },
-];
-
-const INITIAL_SUBCATEGORIES = [
-  { id: "1", name: "Coffee Tables", categoryId: "1", categoryName: "Living Room", image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800" },
-  { id: "2", name: "Sofas", categoryId: "1", categoryName: "Living Room", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800" },
-  { id: "3", name: "Beds", categoryId: "2", categoryName: "Bedroom", image: "https://images.unsplash.com/photo-1505693333510-5d03d203c53a?auto=format&fit=crop&q=80&w=800" },
-];
+import { categoryService, type Category, type Subcategory } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 export default function AdminSubcategoriesPage() {
-  const [categories] = useState(INITIAL_CATEGORIES);
-  const [subcategories, setSubcategories] = useState(INITIAL_SUBCATEGORIES);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingSubcategory, setEditingSubcategory] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({ name: "", categoryId: "", image: "" });
+  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
+  const [formData, setFormData] = useState<Partial<Subcategory>>({ name: "", image: "", categoryId: "" });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const loadSubcategories = async () => {
+    setLoading(true);
+    const data = await categoryService.getSubcategoryList(true);
+    setSubcategories(data);
+    setLoading(false);
+  };
+
+  const loadCategories = async () => {
+    const data = await categoryService.getCategoryList();
+    setCategories(data);
+  };
+
+  useEffect(() => { 
+    loadSubcategories(); 
+    loadCategories();
+  }, []);
 
   const columns = [
     {
       header: "Subcategory Info",
       accessorKey: "name",
-      cell: (item: any) => (
+      cell: (item: Subcategory) => (
         <div className="flex items-center gap-4">
-          <div className="w-16 h-12 rounded-xl overflow-hidden shadow-md border border-charcoal/5">
-            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-lg border border-charcoal/5">
+            {item.image ? (
+              <img src={buildImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-charcoal/5 flex items-center justify-center">
+                <Grid size={16} className="text-charcoal/30" />
+              </div>
+            )}
           </div>
           <div>
-            <p className="font-bold text-charcoal">{item.name}</p>
-            <p className="text-[10px] text-charcoal/40 uppercase tracking-widest font-black">{item.categoryName}</p>
+            <span className="font-bold text-charcoal">{item.name}</span>
           </div>
         </div>
       )
     },
     {
-      header: "ID",
-      accessorKey: "id",
-      cell: (item: any) => (
-        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item.id}</span>
-      )
+      header: "Category",
+      accessorKey: "categoryId",
+      cell: (item: Subcategory) => {
+        const category = categories.find(c => c.id === item.categoryId);
+        return (
+          <span className="text-sm font-medium text-charcoal/60">
+            {category?.name || "No Category"}
+          </span>
+        );
+      }
     },
     {
       header: "Action",
       accessorKey: "id",
-      cell: (item: any) => (
+      cell: (item: Subcategory) => (
         <div className="flex items-center gap-2">
           <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
@@ -78,7 +103,7 @@ export default function AdminSubcategoriesPage() {
             <Edit3 size={14} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); setSubcategories(subcategories.filter(s => s.id !== item.id)); }}
+            onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100/50"
           >
             <Trash2 size={14} />
@@ -88,34 +113,54 @@ export default function AdminSubcategoriesPage() {
     }
   ];
 
-  const handleOpenDialog = (subcategory: any = null) => {
+  const handleOpenDialog = (subcategory: Subcategory | null = null) => {
     if (subcategory) {
       setEditingSubcategory(subcategory);
-      setFormData(subcategory);
+      setFormData({ 
+        name: subcategory.name, 
+        image: subcategory.image || "",
+        categoryId: subcategory.categoryId
+      });
+      setSelectedFile(null);
     } else {
       setEditingSubcategory(null);
-      setFormData({ name: "", categoryId: "", image: "" });
+      setFormData({ name: "", image: "", categoryId: "" });
+      setSelectedFile(null);
     }
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
-    if (!formData.name || !formData.categoryId || !formData.image) return;
-    const category = categories.find(c => c.id === formData.categoryId);
-    const dataWithCategoryName = { ...formData, categoryName: category?.name || "" };
-
+  const handleSave = async () => {
+    if (!formData.name || !formData.categoryId) return;
+    setSaving(true);
+    
     if (editingSubcategory) {
-      setSubcategories(subcategories.map(s => s.id === editingSubcategory.id ? dataWithCategoryName : s));
+      await categoryService.updateSubcategory(editingSubcategory.id, formData, selectedFile || undefined);
     } else {
-      setSubcategories([{ id: Date.now().toString(), ...dataWithCategoryName }, ...subcategories]);
+      await categoryService.createSubcategory(formData as Subcategory, selectedFile || undefined);
     }
+    
+    await loadSubcategories();
     setIsDialogOpen(false);
+    setSaving(false);
   };
 
-  const filteredSubcategories = subcategories.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleDelete = async (id: string) => {
+    await categoryService.deleteSubcategory(id);
+    await loadSubcategories();
+    setDeleteId(null);
+  };
+
+  const filteredSubcategories = subcategories.filter(c => {
+    const category = categories.find(cat => cat.id === c.categoryId);
+    return c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           (category?.name.toLowerCase().includes(searchQuery.toLowerCase()) || false);
+  });
+
+  const categoryOptions = categories.map(cat => ({
+    value: cat.id,
+    label: cat.name
+  }));
 
   return (
     <div className="space-y-12 pb-12">
@@ -139,7 +184,15 @@ export default function AdminSubcategoriesPage() {
         </Button>
       </div>
 
-      <AdminTable columns={columns} data={filteredSubcategories} />
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-24 text-charcoal/30 text-sm font-medium">
+            Loading subcategories...
+          </div>
+        ) : (
+          <AdminTable columns={columns} data={filteredSubcategories} />
+        )}
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2.5rem] p-10 mx-auto">
@@ -149,40 +202,57 @@ export default function AdminSubcategoriesPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-8">
-            <div className="space-y-3">
-              <Label className="text-xs font-black uppercase tracking-widest text-charcoal/40">Select Category</Label>
-              <Select 
-                value={formData.categoryId} 
-                onValueChange={(val) => setFormData({...formData, categoryId: val})}
-              >
-                <SelectTrigger className="h-14 bg-charcoal/5 border-transparent rounded-2xl focus:bg-white focus:ring-gold/20 focus:border-gold transition-all">
-                  <SelectValue placeholder="Choose a category" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-charcoal/5 shadow-xl">
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id} className="rounded-xl py-3 px-4">{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <AdminFormInput 
               label="Subcategory Name"
-              value={formData.name}
+              value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
-              placeholder="e.g. Coffee Tables"
+              placeholder="e.g. Sofas"
+            />
+            <AdminSelect
+              label="Parent Category"
+              value={formData.categoryId || ""}
+              onChange={(val) => setFormData({ ...formData, categoryId: val })}
+              options={categoryOptions}
+              placeholder="Select Category"
+              required
             />
             <ImageUpload 
               label="Subcategory Image"
               value={formData.image}
-              onChange={(val) => setFormData({ ...formData, image: val })}
+              onChange={(val, file) => {
+                setFormData({ ...formData, image: val });
+                if (file) setSelectedFile(file);
+              }}
             />
           </div>
           <DialogFooter className="flex gap-4">
             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1 h-14 rounded-2xl border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-bold rounded-2xl">Save Subcategory</Button>
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-bold rounded-2xl">
+              {saving ? "Saving..." : "Save Subcategory"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent className="rounded-[2.5rem]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Subcategory</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this subcategory? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-4">
+            <AlertDialogCancel className="flex-1 h-14 rounded-2xl border-charcoal/10">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="flex-1 h-14 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

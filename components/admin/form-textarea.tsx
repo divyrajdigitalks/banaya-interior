@@ -1,41 +1,41 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-interface AdminFormInputProps {
+interface AdminFormTextareaProps {
   label: string;
-  value: string | number;
-  onChange: (val: any) => void;
+  value: string;
+  onChange: (val: string) => void;
   placeholder?: string;
-  type?: string;
   required?: boolean;
   disabled?: boolean;
+  rows?: number;
   className?: string;
 }
 
-export function AdminFormInput({ 
+export function AdminFormTextarea({ 
   label, 
   value, 
   onChange, 
   placeholder, 
-  type = "text", 
   required = false,
   disabled = false,
+  rows = 4,
   className = ""
-}: AdminFormInputProps) {
+}: AdminFormTextareaProps) {
   return (
     <div className="space-y-2">
       <Label className="text-xs font-semibold tracking-wide text-charcoal/60 uppercase">
         {label} {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
-      <Input 
-        type={type}
+      <Textarea 
         value={value}
-        onChange={(e) => onChange(type === "number" ? Number(e.target.value) : e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder} 
         disabled={disabled}
-        className={`h-10 bg-white border border-charcoal/10 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+        rows={rows}
+        className={`min-h-[80px] bg-white border border-charcoal/10 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all resize-y ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
       />
     </div>
   );

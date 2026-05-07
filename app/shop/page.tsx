@@ -20,32 +20,73 @@ import {
   ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FEATURED_PRODUCTS, CATEGORIES } from "@/lib/constants";
 import { ProductCard } from "@/components/product/product-card";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import Image from "next/image";
 import Link from "next/link";
+import { productService, categoryService, filterService, type Product, type Category, type Subcategory, type FilterOptionsByGroup } from "@/lib/api";
 
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Popularity");
   const [isFilterOpen, setIsFilterOpen] = useState(true);
-  
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [filterOptions, setFilterOptions] = useState<FilterOptionsByGroup>({
+    Type: ["Trays", "Platters", "Boards", "Coasters", "Organisers", "Bar Accessories"],
+    Colour: ["Light Wood", "Dark Wood", "Natural Wood"],
+    Discount: ["10% and above", "20% and above", "30% and above", "40% and above", "50% and above"],
+    Materials: ["Teak Wood", "Mango Wood", "Wood + Glass"],
+    Shape: ["Round", "Rectangle", "Square", "Oval", "Abstract"],
+    UsePurpose: ["Coffee Serving", "Snack Serving", "Bar / Drinks", "Hosting / Party", "Gifting", "Everyday Use"],
+    Occasions: ["House Party", "Festive", "Gifting", "Daily Use", "Wedding / Trousseau"],
+  });
+  const [loading, setLoading] = useState(true);
+
   // Advanced filters state
   const [selectedFilters, setSelectedFilters] = useState({
     Type: [] as string[],
     Colour: [] as string[],
+    Discount: [] as string[],
     Materials: [] as string[],
-    PriceRange: "All"
+    Shape: [] as string[],
+    UsePurpose: [] as string[],
+    Occasions: [] as string[],
+    PriceMin: 250,
+    PriceMax: 10000,
   });
 
   useEffect(() => {
+    const loadData = async () => {
+      const [productsData, categoriesData, subcategoriesData, dynamicFilterOptions] = await Promise.all([
+        productService.getProductList(true),
+        categoryService.getCategoryList(true),
+        categoryService.getSubcategoryList(true),
+        filterService.getFilterOptionsByGroup(true).catch(() => null),
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+      setSubcategories(subcategoriesData);
+      if (dynamicFilterOptions && Object.keys(dynamicFilterOptions).length > 0) {
+        setFilterOptions(prev => ({ ...prev, ...dynamicFilterOptions }));
+      }
+      setLoading(false);
+    };
+    
+    loadData();
+  }, []);
+
+  useEffect(() => {
     const category = searchParams.get("category");
+    const subcategory = searchParams.get("subcategory");
     setSelectedCategory(category || "All");
+    setSelectedSubcategory(subcategory || null);
     
     const query = searchParams.get("q");
     setSearchQuery(query || "");
@@ -62,16 +103,70 @@ function ShopContent() {
     });
   };
 
-  const filteredProducts = FEATURED_PRODUCTS.filter((p) => {
-    const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+  const resetFilters = () => {
+    setSelectedFilters({
+      Type: [],
+      Colour: [],
+      Discount: [],
+      Materials: [],
+      Shape: [],
+      UsePurpose: [],
+      Occasions: [],
+      PriceMin: 250,
+      PriceMax: 10000,
+    });
+  };
+
+  const getDiscountValue = (discountStr: string): number => {
+    const match = discountStr.match(/(\d+)%/);
+    return match ? parseInt(match[1]) : 0;
+  };
+
+  const filteredProducts = products.filter((p) => {
+    const category = categories.find(c => c.id === p.categoryId);
+    const categoryName = category?.name || "";
+    const subcategory = subcategories.find(s => s.id === p.subcategoryId);
+    const subcategoryName = subcategory?.name || "";
+    
+    const matchesCategory = selectedCategory === "All" || categoryName === selectedCategory;
+    const matchesSubcategory = !selectedSubcategory || subcategoryName === selectedSubcategory;
     const matchesSearch = searchQuery === "" ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase());
+      categoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      subcategoryName.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Type filter
-    const matchesType = selectedFilters.Type.length === 0 || selectedFilters.Type.includes(p.category); // Simple mapping for now
+    const matchesType = selectedFilters.Type.length === 0 || selectedFilters.Type.includes(p.type || "");
     
-    return matchesCategory && matchesSearch && matchesType;
+    // Colour filter
+    const matchesColour = selectedFilters.Colour.length === 0 || selectedFilters.Colour.includes(p.colour || "");
+    
+    // Materials filter
+    const matchesMaterials = selectedFilters.Materials.length === 0 || selectedFilters.Materials.includes(p.materials || "");
+    
+    // Shape filter
+    const matchesShape = selectedFilters.Shape.length === 0 || selectedFilters.Shape.includes(p.shape || "");
+    
+    // Use/Purpose filter
+    const matchesUsePurpose = selectedFilters.UsePurpose.length === 0 || selectedFilters.UsePurpose.includes(p.usePurpose || "");
+    
+    // Occasions filter
+    const matchesOccasions = selectedFilters.Occasions.length === 0 || selectedFilters.Occasions.includes(p.occasions || "");
+    
+    // Discount filter
+    const matchesDiscount = selectedFilters.Discount.length === 0 || 
+      selectedFilters.Discount.some(discountStr => {
+        const minDiscount = getDiscountValue(discountStr);
+        return (p.discount || 0) >= minDiscount;
+      });
+    
+    // Price filter
+    const matchesPrice = p.price >= selectedFilters.PriceMin && p.price <= selectedFilters.PriceMax;
+    
+    return matchesCategory && matchesSubcategory && matchesSearch && 
+           matchesType && matchesColour && matchesMaterials && 
+           matchesShape && matchesUsePurpose && matchesOccasions && 
+           matchesDiscount && matchesPrice;
   });
 
   const updateCategory = (category: string) => {
@@ -146,71 +241,277 @@ function ShopContent() {
               <h2 className="text-sm font-black ">
                 Refine Sanctuary
               </h2>
-              <button className="text-[10px] text-gold font-bold hover:text-primary transition-colors">Reset</button>
+              <button 
+                onClick={resetFilters}
+                className="text-[10px] text-gold font-bold hover:text-primary transition-colors"
+              >
+                Reset
+              </button>
             </div>
 
-            <div className="space-y-10">
-              {[
-                { title: "Type", options: ["Wooden", "Metal", "Ceramic", "Glass"] },
-                { title: "Colour", options: ["Royal Brown", "Beige", "Black", "Gold"] },
-                { title: "Materials", options: ["Teak Wood", "Mango Wood", "Brass", "Steel"] },
-              ].map((filter) => (
-                <div key={filter.title} className="space-y-4">
-                  <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                    {filter.title} <ChevronDown className="h-3 w-3 text-gold" />
-                  </button>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {filter.options.map((opt) => (
-                      <label 
-                        key={opt} 
-                        className="flex items-center gap-3 cursor-pointer group"
-                        onClick={() => toggleFilter(filter.title as any, opt)}
-                      >
-                        <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                            ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                            : "border-primary/10 group-hover:border-gold"
-                        }`}>
-                          <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
-                            (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                              ? "scale-100" 
-                              : "scale-0"
-                          }`} />
-                        </div>
-                        <span className={`text-xs transition-colors duration-300 ${
-                          (selectedFilters[filter.title as keyof typeof selectedFilters] as string[]).includes(opt) 
-                            ? "text-primary font-bold" 
-                            : "text-primary/50 group-hover:text-primary"
-                        }`}>{opt}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
-              <div className="space-y-6">
+            <div className="space-y-8">
+              {/* Type Filter */}
+              <div className="space-y-4">
                 <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
-                  Price range <ChevronDown className="h-3 w-3 text-gold" />
+                  Type <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
-                <div className="space-y-3">
-                  {["Under ₹500", "₹500 - ₹2000", "₹2000 - ₹5000", "Above ₹5000"].map((range) => (
-                    <label key={range} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="w-5 h-5 border-2 border-primary/10 rounded-lg group-hover:border-gold transition-colors" />
-                      <span className="text-xs text-primary/50 group-hover:text-primary transition-colors">{range}</span>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Type.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Type", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Type.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Type.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Type.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
                     </label>
                   ))}
                 </div>
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
-                    <input type="text" placeholder="Min" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
+              </div>
+
+              {/* Colour Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Colour <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Colour.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Colour", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Colour.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Colour.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Colour.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Discount Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Discount <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Discount.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Discount", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Discount.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Discount.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Discount.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Materials Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Materials <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Materials.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Materials", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Materials.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Materials.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Materials.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Shape Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Shape <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Shape.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Shape", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Shape.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Shape.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Shape.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Price <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
+                      <input 
+                        type="number" 
+                        min="250"
+                        value={selectedFilters.PriceMin}
+                        onChange={(e) => setSelectedFilters(prev => ({ ...prev, PriceMin: Math.max(250, Number(e.target.value) || 250) }))}
+                        className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
+                    <div className="flex-1 relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
+                      <input 
+                        type="number" 
+                        value={selectedFilters.PriceMax}
+                        onChange={(e) => setSelectedFilters(prev => ({ ...prev, PriceMax: Number(e.target.value) || 10000 }))}
+                        className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
-                    <input type="text" placeholder="Max" className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors" />
+                  <div className="text-[10px] text-primary/40 font-medium">
+                    Min: ₹250
                   </div>
                 </div>
-                <button className="w-full bg-primary text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest hover:bg-gold transition-all shadow-lg shadow-primary/5">Apply filter</button>
+              </div>
+
+              {/* Use/Purpose Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Use / Purpose <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.UsePurpose.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("UsePurpose", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.UsePurpose.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.UsePurpose.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.UsePurpose.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Occasions Filter */}
+              <div className="space-y-4">
+                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                  Occasions <ChevronDown className="h-3 w-3 text-gold" />
+                </button>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filterOptions.Occasions.map((opt) => (
+                    <label 
+                      key={opt} 
+                      className="flex items-center gap-3 cursor-pointer group"
+                      onClick={() => toggleFilter("Occasions", opt)}
+                    >
+                      <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        selectedFilters.Occasions.includes(opt) 
+                          ? "bg-primary border-primary shadow-lg shadow-primary/10" 
+                          : "border-primary/10 group-hover:border-gold"
+                      }`}>
+                        <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
+                          selectedFilters.Occasions.includes(opt) 
+                            ? "scale-100" 
+                            : "scale-0"
+                        }`} />
+                      </div>
+                      <span className={`text-xs transition-colors duration-300 ${
+                        selectedFilters.Occasions.includes(opt) 
+                          ? "text-primary font-bold" 
+                          : "text-primary/50 group-hover:text-primary"
+                      }`}>{opt}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>
