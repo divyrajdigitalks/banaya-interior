@@ -22,10 +22,12 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
-import { AdminFormInput } from "@/components/admin/form-input";
-import { AdminSelect } from "@/components/admin/admin-select";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
+import { AdminSelectEnhanced } from "@/components/admin/admin-select-enhanced";
 import { AdminCard } from "@/components/admin/admin-card";
 import { filterService, type FilterOption } from "@/lib/api";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 const filterGroups = [
   { value: "Type", label: "Type" },
@@ -38,6 +40,7 @@ const filterGroups = [
 
 export default function AdminFilterOptionsPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useAdminToast();
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -47,6 +50,7 @@ export default function AdminFilterOptionsPage() {
   const [selectedGroup, setSelectedGroup] = useState<string>("All");
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     loadFilterOptions();
@@ -54,9 +58,14 @@ export default function AdminFilterOptionsPage() {
 
   const loadFilterOptions = async () => {
     setLoading(true);
-    const data = await filterService.getFilterOptionList(true);
-    setFilterOptions(data);
-    setLoading(false);
+    try {
+      const data = await filterService.getFilterOptionList(true);
+      setFilterOptions(data);
+    } catch (error) {
+      showError("Failed to load filter options");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -104,6 +113,17 @@ export default function AdminFilterOptionsPage() {
     }
   ];
 
+  const validateForm = () => {
+    const formState = {
+      name: { value: formData.name, rules: ValidationRules.name },
+      filterGroup: { value: formData.filterGroup, rules: ValidationRules.required }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleOpenDialog = (filterOption: FilterOption | null = null) => {
     if (filterOption) {
       setEditingFilterOption(filterOption);
@@ -115,28 +135,45 @@ export default function AdminFilterOptionsPage() {
       setEditingFilterOption(null);
       setFormData({ name: "", filterGroup: "Type" });
     }
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.filterGroup) return;
-    setSaving(true);
-    
-    if (editingFilterOption) {
-      await filterService.updateFilterOption(editingFilterOption.id, formData);
-    } else {
-      await filterService.createFilterOption(formData as FilterOption);
+    if (!validateForm()) {
+      showError("Please fix the validation errors");
+      return;
     }
     
-    await loadFilterOptions();
-    setIsDialogOpen(false);
-    setSaving(false);
+    setSaving(true);
+    try {
+      if (editingFilterOption) {
+        await filterService.updateFilterOption(editingFilterOption.id, formData);
+        showSuccess("Filter option updated successfully!");
+      } else {
+        await filterService.createFilterOption(formData as FilterOption);
+        showSuccess("Filter option created successfully!");
+      }
+      
+      await loadFilterOptions();
+      setIsDialogOpen(false);
+    } catch (error) {
+      showError(editingFilterOption ? "Failed to update filter option" : "Failed to create filter option");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await filterService.deleteFilterOption?.(id);
-    await loadFilterOptions();
-    setDeleteId(null);
+    try {
+      await filterService.deleteFilterOption?.(id);
+      showSuccess("Filter option deleted successfully!");
+      await loadFilterOptions();
+    } catch (error) {
+      showError("Failed to delete filter option");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const filteredFilterOptions = filterOptions.filter(opt => {
@@ -184,12 +221,16 @@ export default function AdminFilterOptionsPage() {
               />
             </div>
             <div className="w-full sm:w-48">
-              <AdminSelect 
+              <select 
                 value={selectedGroup}
-                onChange={setSelectedGroup}
-                options={[{ value: "All", label: "All Groups" }, ...filterGroups]}
-                placeholder="Filter by group"
-              />
+                onChange={(e) => setSelectedGroup(e.target.value)}
+                className="w-full h-10 px-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
+              >
+                <option value="All">All Groups</option>
+                {filterGroups.map(group => (
+                  <option key={group.value} value={group.value}>{group.label}</option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -215,20 +256,22 @@ export default function AdminFilterOptionsPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminSelect 
+            <AdminSelectEnhanced 
               label="Filter Group"
               value={formData.filterGroup || ""}
               onChange={(val) => setFormData({ ...formData, filterGroup: val })}
               options={filterGroups}
               placeholder="Select filter group"
               required
+              error={formErrors.filterGroup}
             />
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Option Name"
               value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
               placeholder="e.g. Trays, Round, Teak Wood"
               required
+              error={formErrors.name}
             />
           </div>
           <DialogFooter className="flex gap-3">

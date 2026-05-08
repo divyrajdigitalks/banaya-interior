@@ -6,21 +6,26 @@ import { ArrowLeft, Save, Package, Info, Image as ImageIcon, LayoutGrid, Plus, T
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
-  AdminFormInput, 
-  AdminSelect, 
-  AdminFormTextarea, 
+  AdminFormInputEnhanced, 
+  AdminSelectEnhanced, 
+  AdminFormTextareaEnhanced, 
   AdminCard, 
   AdminLabel, 
   ImageUpload, 
-  MultiImageUpload 
+  MultiImageUpload, 
+  AdminSelect,
+  AdminFormTextarea
 } from "@/components/admin";
 import { categoryService, type Category, type Subcategory } from "@/lib/api";
 import { productService, type Product } from "@/lib/api";
 import { filterService, type FilterOption } from "@/lib/api";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 export default function ProductFormPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { showSuccess, showError } = useAdminToast();
   const isEditMode = id !== 'add';
   
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,6 +33,7 @@ export default function ProductFormPage() {
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
   const [selectedFiles, setSelectedFiles] = useState<{
     image?: File;
     subImages?: File[];
@@ -115,6 +121,7 @@ export default function ProductFormPage() {
         }
       } catch (error) {
         console.error('Error loading data:', error);
+        showError('Failed to load data');
       } finally {
         setLoading(false);
       }
@@ -122,6 +129,19 @@ export default function ProductFormPage() {
     
     loadData();
   }, [id, isEditMode]);
+
+  const validateForm = () => {
+    const formState = {
+      name: { value: formData.name, rules: ValidationRules.name },
+      categoryId: { value: formData.categoryId, rules: ValidationRules.required },
+      subcategoryId: { value: formData.subcategoryId, rules: ValidationRules.required },
+      price: { value: formData.price, rules: ValidationRules.price }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
+  };
 
   const filteredSubcategories = useMemo(() => {
     if (!formData.categoryId) return [];
@@ -165,8 +185,8 @@ export default function ProductFormPage() {
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.categoryId || !formData.subcategoryId) {
-      alert("Please fill all required fields (Name, Category, Subcategory)");
+    if (!validateForm()) {
+      showError("Please fix the validation errors before saving");
       return;
     }
 
@@ -201,19 +221,20 @@ export default function ProductFormPage() {
       let result;
       if (isEditMode && id) {
         result = await productService.updateProduct(id, productData);
+        showSuccess("Product updated successfully!");
       } else {
         result = await productService.createProduct(productData, selectedFiles);
+        showSuccess("Product created successfully!");
       }
       
       if (result) {
-        alert(`Product ${isEditMode ? 'updated' : 'created'} successfully!`);
         router.push("/admin/products");
       } else {
-        alert(`Failed to ${isEditMode ? 'update' : 'create'} product. Please try again.`);
+        showError(`Failed to ${isEditMode ? 'update' : 'create'} product. Please try again.`);
       }
     } catch (error) {
       console.error(`Error ${isEditMode ? 'updating' : 'creating'} product:`, error);
-      alert(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the product.`);
+      showError(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the product.`);
     } finally {
       setSaving(false);
     }
@@ -271,14 +292,15 @@ export default function ProductFormPage() {
         <div className="lg:col-span-2 space-y-6">
           <AdminCard title="Basic Information" icon={<Package size={18} />}>
             <div className="space-y-4">
-              <AdminFormInput 
+              <AdminFormInputEnhanced 
                 label="Product Name"
                 value={formData.name}
                 onChange={(val) => setFormData({ ...formData, name: val })}
                 placeholder="Enter product name"
                 required
+                error={formErrors.name}
               />
-              <AdminFormTextarea 
+              <AdminFormTextareaEnhanced 
                 label="Description"
                 value={formData.description}
                 onChange={(val) => setFormData({ ...formData, description: val })}
@@ -291,15 +313,16 @@ export default function ProductFormPage() {
           <AdminCard title="Pricing & Inventory" icon={<Sparkles size={18} />}>
             <div className="grid grid-cols-1 gap-4">
               <div className="grid grid-cols-2 gap-3">
-                <AdminFormInput 
+                <AdminFormInputEnhanced 
                   label="Price (₹)"
                   type="number"
                   value={formData.price}
                   onChange={(val) => setFormData({ ...formData, price: val })}
                   placeholder="0"
                   required
+                  error={formErrors.price}
                 />
-                <AdminFormInput 
+                <AdminFormInputEnhanced 
                   label="Original Price (₹)"
                   type="number"
                   value={formData.originalPrice}
@@ -308,13 +331,13 @@ export default function ProductFormPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <AdminFormInput 
+                <AdminFormInputEnhanced 
                   label="SKU"
                   value={formData.sku}
                   onChange={(val) => setFormData({ ...formData, sku: val })}
                   placeholder="e.g. PROD-001"
                 />
-                <AdminFormInput 
+                <AdminFormInputEnhanced 
                   label="Stock"
                   type="number"
                   value={formData.stock}
@@ -322,7 +345,7 @@ export default function ProductFormPage() {
                   placeholder="0"
                 />
               </div>
-              <AdminFormInput 
+              <AdminFormInputEnhanced 
                 label="Discount (%)"
                 type="number"
                 value={formData.discount}
@@ -334,7 +357,7 @@ export default function ProductFormPage() {
 
           <AdminCard title="Filters & Attributes" icon={<Filter size={18} />}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AdminSelect 
+              <AdminSelect
                 label="Type"
                 value={formData.type}
                 onChange={(val) => setFormData({ ...formData, type: val })}
@@ -457,7 +480,7 @@ export default function ProductFormPage() {
 
           <AdminCard title="Care & Shipping" icon={<Info size={18} />}>
             <div className="space-y-4">
-              <AdminFormTextarea 
+              <AdminFormTextarea
                 label="Care Instructions"
                 value={formData.careInstructions}
                 onChange={(val) => setFormData({ ...formData, careInstructions: val })}
@@ -478,7 +501,7 @@ export default function ProductFormPage() {
         <div className="space-y-4">
           <AdminCard title="Organization" icon={<LayoutGrid size={18} />}>
             <div className="space-y-3">
-              <AdminSelect 
+              <AdminSelectEnhanced 
                 label="Category"
                 value={formData.categoryId}
                 onChange={(val) => setFormData({...formData, categoryId: val, subcategoryId: ""})}
@@ -486,8 +509,9 @@ export default function ProductFormPage() {
                 placeholder={loading ? "Loading categories..." : "Select category"}
                 disabled={loading}
                 required
+                error={formErrors.categoryId}
               />
-              <AdminSelect 
+              <AdminSelectEnhanced 
                 label="Subcategory"
                 value={formData.subcategoryId}
                 onChange={(val) => setFormData({...formData, subcategoryId: val})}
@@ -495,6 +519,7 @@ export default function ProductFormPage() {
                 placeholder="Select subcategory"
                 disabled={!formData.categoryId}
                 required
+                error={formErrors.subcategoryId}
               />
             </div>
           </AdminCard>

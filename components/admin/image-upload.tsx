@@ -11,9 +11,10 @@ interface ImageUploadProps {
   onFileSelect?: (file: File) => void;
   label?: string;
   className?: string;
+  error?: string;
 }
 
-export function ImageUpload({ value, onChange, onFileSelect, label, className }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onFileSelect, label, className, error }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(value || null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -53,7 +54,7 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className }:
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative aspect-[4/3] w-full rounded-2xl border-2 border-dashed border-charcoal/10 hover:border-gold/40 hover:bg-gold/5 transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center group ${preview ? 'border-solid' : ''}`}
+        className={`relative aspect-[3/2] w-full rounded-2xl border-2 border-dashed ${error ? 'border-red-300 bg-red-50' : 'border-charcoal/10'} hover:border-gold/40 hover:bg-gold/5 transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center group ${preview ? 'border-solid' : ''}`}
       >
         <input 
           type="file" 
@@ -79,15 +80,19 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className }:
           </>
         ) : (
           <div className="flex flex-col items-center gap-2 text-charcoal/30 group-hover:text-gold transition-colors">
-            <div className="p-4 rounded-full bg-charcoal/5 group-hover:bg-gold/10">
-              <Upload size={24} />
+            <div className="p-3 rounded-full bg-charcoal/5 group-hover:bg-gold/10">
+              <Upload size={20} />
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest">
+            <span className="text-[10px] font-bold uppercase tracking-widest">
               Upload Image
             </span>
           </div>
         )}
       </div>
+      
+      {error && (
+        <p className="text-xs text-red-500 mt-1">{error}</p>
+      )}
     </div>
   );
 }

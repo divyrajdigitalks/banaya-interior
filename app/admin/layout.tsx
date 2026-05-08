@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/toaster";
 import { AdminProvider, useAdmin } from "@/context/AdminContext";
 
 const sidebarLinks = [
@@ -267,6 +268,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AdminProvider>
       <AdminLayoutContent>{children}</AdminLayoutContent>
+      <Toaster />
     </AdminProvider>
   );
 }

@@ -22,15 +22,18 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
-import { AdminFormInput } from "@/components/admin/form-input";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminLabel } from "@/components/admin/admin-label";
 import { galleryService, type GalleryImage } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 export default function InteriorGalleryPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useAdminToast();
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,6 +42,8 @@ export default function InteriorGalleryPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     loadGallery();
@@ -46,9 +51,14 @@ export default function InteriorGalleryPage() {
 
   const loadGallery = async () => {
     setLoading(true);
-    const data = await galleryService.getGalleryList(true);
-    setGallery(data);
-    setLoading(false);
+    try {
+      const data = await galleryService.getGalleryList(true);
+      setGallery(data);
+    } catch (error) {
+      showError("Failed to load gallery items");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -98,6 +108,20 @@ export default function InteriorGalleryPage() {
     }
   ];
 
+  const validateForm = () => {
+    const formState = {
+      title: { value: formData.title, rules: ValidationRules.name },
+      src: { 
+        value: formData.src || (selectedFile ? 'file' : ''), 
+        rules: ValidationRules.required 
+      }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleOpenDialog = (item: GalleryImage | null = null) => {
     if (item) {
       setEditingItem(item);
@@ -112,26 +136,45 @@ export default function InteriorGalleryPage() {
       setFormData({ title: "", subtitle: "", src: "" });
       setSelectedFile(null);
     }
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.title || (!formData.src && !selectedFile)) return;
-    
-    if (editingItem) {
-      await galleryService.updateGalleryImage(editingItem.id, formData, selectedFile || undefined);
-    } else {
-      await galleryService.createGalleryImage(formData as GalleryImage, selectedFile || undefined);
+    if (!validateForm()) {
+      showError("Please fix the validation errors");
+      return;
     }
     
-    await loadGallery();
-    setIsDialogOpen(false);
+    setSaving(true);
+    try {
+      if (editingItem) {
+        await galleryService.updateGalleryImage(editingItem.id, formData, selectedFile || undefined);
+        showSuccess("Gallery item updated successfully!");
+      } else {
+        await galleryService.createGalleryImage(formData as GalleryImage, selectedFile || undefined);
+        showSuccess("Gallery item created successfully!");
+      }
+      
+      await loadGallery();
+      setIsDialogOpen(false);
+    } catch (error) {
+      showError(editingItem ? "Failed to update gallery item" : "Failed to create gallery item");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await galleryService.deleteGalleryImage(id);
-    await loadGallery();
-    setDeleteId(null);
+    try {
+      await galleryService.deleteGalleryImage(id);
+      showSuccess("Gallery item deleted successfully!");
+      await loadGallery();
+    } catch (error) {
+      showError("Failed to delete gallery item");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const filteredGallery = gallery.filter(item => 
@@ -199,33 +242,37 @@ export default function InteriorGalleryPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Title"
               value={formData.title || ""}
               onChange={(val) => setFormData({ ...formData, title: val })}
               placeholder="e.g. Elegant Living Space"
               required
+              error={formErrors.title}
             />
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Subtitle"
               value={formData.subtitle || ""}
               onChange={(val) => setFormData({ ...formData, subtitle: val })}
               placeholder="e.g. Modern luxury interior design"
             />
-            <ImageUpload 
-              label="Gallery Image"
-              value={formData.src}
-              onChange={(val, file) => {
-                setFormData({ ...formData, src: val });
-                if (file) setSelectedFile(file);
-              }}
-            />
+            <div className="h-32">
+              <ImageUpload 
+                label="Gallery Image"
+                value={formData.src}
+                onChange={(val, file) => {
+                  setFormData({ ...formData, src: val });
+                  if (file) setSelectedFile(file);
+                }}
+                error={formErrors.src}
+              />
+            </div>
           </div>
           <DialogFooter className="flex gap-3">
             <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
               <Save size={16} className="mr-2" />
-              Save
+              {saving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>

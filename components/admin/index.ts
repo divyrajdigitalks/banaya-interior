@@ -1,6 +1,9 @@
 export { AdminFormInput } from "./form-input";
+export { AdminFormInputEnhanced } from "./form-input-enhanced";
 export { AdminSelect } from "./admin-select";
+export { AdminSelectEnhanced } from "./admin-select-enhanced";
 export { AdminFormTextarea } from "./form-textarea";
+export { AdminFormTextareaEnhanced } from "./form-textarea-enhanced";
 export { AdminCard } from "./admin-card";
 export { AdminLabel } from "./admin-label";
 export { AdminTable } from "./admin-table";

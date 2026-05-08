@@ -23,13 +23,16 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AdminTable } from "@/components/admin/admin-table";
-import { AdminFormInput } from "@/components/admin/form-input";
-import { AdminSelect } from "@/components/admin/admin-select";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
+import { AdminSelectEnhanced } from "@/components/admin/admin-select-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { categoryService, type Category, type Subcategory } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 export default function AdminSubcategoriesPage() {
+  const { showSuccess, showError } = useAdminToast();
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,17 +43,38 @@ export default function AdminSubcategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = () => {
+    const formState = {
+      name: { value: formData.name, rules: ValidationRules.name },
+      categoryId: { value: formData.categoryId, rules: ValidationRules.required }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
+  };
 
   const loadSubcategories = async () => {
     setLoading(true);
-    const data = await categoryService.getSubcategoryList(true);
-    setSubcategories(data);
-    setLoading(false);
+    try {
+      const data = await categoryService.getSubcategoryList(true);
+      setSubcategories(data);
+    } catch (error) {
+      showError("Failed to load subcategories");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadCategories = async () => {
-    const data = await categoryService.getCategoryList();
-    setCategories(data);
+    try {
+      const data = await categoryService.getCategoryList();
+      setCategories(data);
+    } catch (error) {
+      showError("Failed to load categories");
+    }
   };
 
   useEffect(() => { 
@@ -127,28 +151,45 @@ export default function AdminSubcategoriesPage() {
       setFormData({ name: "", image: "", categoryId: "" });
       setSelectedFile(null);
     }
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.categoryId) return;
-    setSaving(true);
-    
-    if (editingSubcategory) {
-      await categoryService.updateSubcategory(editingSubcategory.id, formData, selectedFile || undefined);
-    } else {
-      await categoryService.createSubcategory(formData as Subcategory, selectedFile || undefined);
+    if (!validateForm()) {
+      showError("Please fix the validation errors");
+      return;
     }
     
-    await loadSubcategories();
-    setIsDialogOpen(false);
-    setSaving(false);
+    setSaving(true);
+    try {
+      if (editingSubcategory) {
+        await categoryService.updateSubcategory(editingSubcategory.id, formData, selectedFile || undefined);
+        showSuccess("Subcategory updated successfully!");
+      } else {
+        await categoryService.createSubcategory(formData as Subcategory, selectedFile || undefined);
+        showSuccess("Subcategory created successfully!");
+      }
+      
+      await loadSubcategories();
+      setIsDialogOpen(false);
+    } catch (error) {
+      showError(editingSubcategory ? "Failed to update subcategory" : "Failed to create subcategory");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await categoryService.deleteSubcategory(id);
-    await loadSubcategories();
-    setDeleteId(null);
+    try {
+      await categoryService.deleteSubcategory(id);
+      showSuccess("Subcategory deleted successfully!");
+      await loadSubcategories();
+    } catch (error) {
+      showError("Failed to delete subcategory");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const filteredSubcategories = subcategories.filter(c => {
@@ -202,19 +243,22 @@ export default function AdminSubcategoriesPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-8">
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Subcategory Name"
               value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
               placeholder="e.g. Sofas"
+              required
+              error={formErrors.name}
             />
-            <AdminSelect
+            <AdminSelectEnhanced
               label="Parent Category"
               value={formData.categoryId || ""}
               onChange={(val) => setFormData({ ...formData, categoryId: val })}
               options={categoryOptions}
               placeholder="Select Category"
               required
+              error={formErrors.categoryId}
             />
             <ImageUpload 
               label="Subcategory Image"

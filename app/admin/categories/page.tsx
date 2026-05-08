@@ -22,15 +22,18 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
-import { AdminFormInput } from "@/components/admin/form-input";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminLabel } from "@/components/admin/admin-label";
 import { categoryService, type Category } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 export default function AdminCategoriesPage() {
   const router = useRouter();
+  const { showSuccess, showError } = useAdminToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,6 +43,7 @@ export default function AdminCategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     loadCategories();
@@ -47,9 +51,24 @@ export default function AdminCategoriesPage() {
 
   const loadCategories = async () => {
     setLoading(true);
-    const data = await categoryService.getCategoryList(true);
-    setCategories(data);
-    setLoading(false);
+    try {
+      const data = await categoryService.getCategoryList(true);
+      setCategories(data);
+    } catch (error) {
+      showError("Failed to load categories");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateForm = () => {
+    const formState = {
+      name: { value: formData.name, rules: ValidationRules.name }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
   };
 
   const columns = [
@@ -115,28 +134,51 @@ export default function AdminCategoriesPage() {
       setFormData({ name: "", image: "" });
       setSelectedFile(null);
     }
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.name) return;
-    setSaving(true);
-    
-    if (editingCategory) {
-      await categoryService.updateCategory(editingCategory.id, formData, selectedFile || undefined);
-    } else {
-      await categoryService.createCategory(formData as Category, selectedFile || undefined);
+    if (!validateForm()) {
+      showError("Please fix the validation errors");
+      return;
     }
     
-    await loadCategories();
-    setIsDialogOpen(false);
-    setSaving(false);
+    setSaving(true);
+    try {
+      if (editingCategory) {
+        await categoryService.updateCategory(editingCategory.id, formData, selectedFile || undefined);
+        showSuccess("Category updated successfully!");
+      } else {
+        await categoryService.createCategory(formData as Category, selectedFile || undefined);
+        showSuccess("Category created successfully!");
+      }
+      
+      setIsDialogOpen(false);
+      // Add a small delay before reloading to ensure the operation is complete
+      setTimeout(() => {
+        loadCategories();
+      }, 500);
+    } catch (error) {
+      showError(editingCategory ? "Failed to update category" : "Failed to create category");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await categoryService.deleteCategory?.(id);
-    await loadCategories();
-    setDeleteId(null);
+    try {
+      await categoryService.deleteCategory?.(id);
+      showSuccess("Category deleted successfully!");
+      // Add a small delay before reloading to ensure the operation is complete
+      setTimeout(() => {
+        loadCategories();
+      }, 500);
+    } catch (error) {
+      showError("Failed to delete category");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const filteredCategories = categories.filter(c => 
@@ -203,12 +245,13 @@ export default function AdminCategoriesPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Category Name"
               value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
               placeholder="e.g. Living Room"
               required
+              error={formErrors.name}
             />
             <ImageUpload 
               label="Category Image"

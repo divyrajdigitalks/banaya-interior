@@ -58,8 +58,8 @@ function ShopContent() {
     Shape: [] as string[],
     UsePurpose: [] as string[],
     Occasions: [] as string[],
-    PriceMin: 250,
-    PriceMax: 10000,
+    PriceMin: 0,
+    PriceMax: 50000,
   });
 
   useEffect(() => {
@@ -70,6 +70,7 @@ function ShopContent() {
         categoryService.getSubcategoryList(true),
         filterService.getFilterOptionsByGroup(true).catch(() => null),
       ]);
+      
       setProducts(productsData);
       setCategories(categoriesData);
       setSubcategories(subcategoriesData);
@@ -85,10 +86,10 @@ function ShopContent() {
   useEffect(() => {
     const category = searchParams.get("category");
     const subcategory = searchParams.get("subcategory");
+    const query = searchParams.get("q");
+    
     setSelectedCategory(category || "All");
     setSelectedSubcategory(subcategory || null);
-    
-    const query = searchParams.get("q");
     setSearchQuery(query || "");
   }, [searchParams]);
 
@@ -112,8 +113,8 @@ function ShopContent() {
       Shape: [],
       UsePurpose: [],
       Occasions: [],
-      PriceMin: 250,
-      PriceMax: 10000,
+      PriceMin: 0,
+      PriceMax: 50000,
     });
   };
 
@@ -135,25 +136,25 @@ function ShopContent() {
       categoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       subcategoryName.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Type filter
+    // Type filter - Empty array means show all
     const matchesType = selectedFilters.Type.length === 0 || selectedFilters.Type.includes(p.type || "");
     
-    // Colour filter
+    // Colour filter - Empty array means show all
     const matchesColour = selectedFilters.Colour.length === 0 || selectedFilters.Colour.includes(p.colour || "");
     
-    // Materials filter
+    // Materials filter - Empty array means show all
     const matchesMaterials = selectedFilters.Materials.length === 0 || selectedFilters.Materials.includes(p.materials || "");
     
-    // Shape filter
+    // Shape filter - Empty array means show all
     const matchesShape = selectedFilters.Shape.length === 0 || selectedFilters.Shape.includes(p.shape || "");
     
-    // Use/Purpose filter
+    // Use/Purpose filter - Empty array means show all
     const matchesUsePurpose = selectedFilters.UsePurpose.length === 0 || selectedFilters.UsePurpose.includes(p.usePurpose || "");
     
-    // Occasions filter
+    // Occasions filter - Empty array means show all
     const matchesOccasions = selectedFilters.Occasions.length === 0 || selectedFilters.Occasions.includes(p.occasions || "");
     
-    // Discount filter
+    // Discount filter - Empty array means show all
     const matchesDiscount = selectedFilters.Discount.length === 0 || 
       selectedFilters.Discount.some(discountStr => {
         const minDiscount = getDiscountValue(discountStr);
@@ -426,9 +427,9 @@ function ShopContent() {
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-primary/40">₹</span>
                       <input 
                         type="number" 
-                        min="250"
+                        min="0"
                         value={selectedFilters.PriceMin}
-                        onChange={(e) => setSelectedFilters(prev => ({ ...prev, PriceMin: Math.max(250, Number(e.target.value) || 250) }))}
+                        onChange={(e) => setSelectedFilters(prev => ({ ...prev, PriceMin: Math.max(0, Number(e.target.value) || 0) }))}
                         className="w-full bg-white border border-primary/5 rounded-lg py-2 pl-6 pr-2 text-xs font-bold outline-none focus:border-gold transition-colors"
                       />
                     </div>
@@ -443,7 +444,7 @@ function ShopContent() {
                     </div>
                   </div>
                   <div className="text-[10px] text-primary/40 font-medium">
-                    Min: ₹250
+                    Min: ₹0
                   </div>
                 </div>
               </div>

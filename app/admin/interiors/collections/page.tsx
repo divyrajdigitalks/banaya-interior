@@ -23,12 +23,15 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AdminTable } from "@/components/admin/admin-table";
-import { AdminFormInput } from "@/components/admin/form-input";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { collectionService, type Collection } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 export default function InteriorCollectionsPage() {
+  const { showSuccess, showError } = useAdminToast();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,12 +41,18 @@ export default function InteriorCollectionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const loadCollections = async () => {
     setLoading(true);
-    const data = await collectionService.getCollectionList(true);
-    setCollections(data);
-    setLoading(false);
+    try {
+      const data = await collectionService.getCollectionList(true);
+      setCollections(data);
+    } catch (error) {
+      showError("Failed to load collections");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { loadCollections(); }, []);
@@ -100,6 +109,16 @@ export default function InteriorCollectionsPage() {
     }
   ];
 
+  const validateForm = () => {
+    const formState = {
+      name: { value: formData.name, rules: ValidationRules.name }
+    };
+    
+    const { isValid, errors } = FormValidator.validateForm(formState);
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleOpenDialog = (collection: Collection | null = null) => {
     if (collection) {
       setEditingCollection(collection);
@@ -114,28 +133,45 @@ export default function InteriorCollectionsPage() {
       setFormData({ name: "", description: "", image: "" });
       setSelectedFile(null);
     }
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!formData.name) return;
-    setSaving(true);
-    
-    if (editingCollection) {
-      await collectionService.updateCollection(editingCollection.id, formData, selectedFile || undefined);
-    } else {
-      await collectionService.createCollection(formData as Collection, selectedFile || undefined);
+    if (!validateForm()) {
+      showError("Please fix the validation errors");
+      return;
     }
     
-    await loadCollections();
-    setIsDialogOpen(false);
-    setSaving(false);
+    setSaving(true);
+    try {
+      if (editingCollection) {
+        await collectionService.updateCollection(editingCollection.id, formData, selectedFile || undefined);
+        showSuccess("Collection updated successfully!");
+      } else {
+        await collectionService.createCollection(formData as Collection, selectedFile || undefined);
+        showSuccess("Collection created successfully!");
+      }
+      
+      await loadCollections();
+      setIsDialogOpen(false);
+    } catch (error) {
+      showError(editingCollection ? "Failed to update collection" : "Failed to create collection");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await collectionService.deleteCollection(id);
-    await loadCollections();
-    setDeleteId(null);
+    try {
+      await collectionService.deleteCollection(id);
+      showSuccess("Collection deleted successfully!");
+      await loadCollections();
+    } catch (error) {
+      showError("Failed to delete collection");
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const filteredCollections = collections.filter(c => 
@@ -193,11 +229,13 @@ export default function InteriorCollectionsPage() {
           </DialogHeader>
           
           <div className="space-y-8 py-10">
-            <AdminFormInput 
+            <AdminFormInputEnhanced 
               label="Collection Name"
               value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
               placeholder="e.g. The Heritage Interiors"
+              required
+              error={formErrors.name}
             />
 
             <div className="space-y-3">
@@ -210,14 +248,16 @@ export default function InteriorCollectionsPage() {
               />
             </div>
 
-            <ImageUpload 
-              label="Collection Cover Image"
-              value={formData.image}
-              onChange={(val, file) => {
-                setFormData({ ...formData, image: val });
-                if (file) setSelectedFile(file);
-              }}
-            />
+            <div className="h-40">
+              <ImageUpload 
+                label="Collection Cover Image"
+                value={formData.image}
+                onChange={(val, file) => {
+                  setFormData({ ...formData, image: val });
+                  if (file) setSelectedFile(file);
+                }}
+              />
+            </div>
           </div>
 
           <DialogFooter className="pt-8 border-t border-charcoal/5 flex gap-4">
