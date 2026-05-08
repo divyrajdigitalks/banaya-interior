@@ -16,8 +16,8 @@ export function Logo({ variant = "dark", className = "", asChild = false }: Logo
     <Image
       src="/logo.png"
       alt="Banayaa Logo"
-      width={120}
-      height={120}
+      width={80}
+      height={80}
       style={{
         filter: isWhite ? "brightness(0) invert(1)" : "none",
       }}
