@@ -39,6 +39,24 @@ export interface EndPointApi {
   adminFilterOptionUpdate: string;
   adminFilterOptionDelete: string;
 
+  // Projects
+  adminProjects: string;
+  adminProjectCreate: string;
+  adminProjectUpdate: string;
+  adminProjectDelete: string;
+
+  // Process Steps
+  adminProcessSteps: string;
+  adminProcessStepCreate: string;
+  adminProcessStepUpdate: string;
+  adminProcessStepDelete: string;
+
+  // Testimonials
+  adminTestimonials: string;
+  adminTestimonialCreate: string;
+  adminTestimonialUpdate: string;
+  adminTestimonialDelete: string;
+
   // Upload
   adminUpload: string;
 }
@@ -83,6 +101,24 @@ const endPointApi: EndPointApi = {
   adminFilterOptionCreate: 'filter-options',
   adminFilterOptionUpdate: 'filter-options',
   adminFilterOptionDelete: 'filter-options',
+
+  // Projects
+  adminProjects: 'projects',
+  adminProjectCreate: 'projects',
+  adminProjectUpdate: 'projects',
+  adminProjectDelete: 'projects',
+
+  // Process Steps
+  adminProcessSteps: 'process-steps',
+  adminProcessStepCreate: 'process-steps',
+  adminProcessStepUpdate: 'process-steps',
+  adminProcessStepDelete: 'process-steps',
+
+  // Testimonials
+  adminTestimonials: 'testimonials',
+  adminTestimonialCreate: 'testimonials',
+  adminTestimonialUpdate: 'testimonials',
+  adminTestimonialDelete: 'testimonials',
 
   // Upload
   adminUpload: 'upload',

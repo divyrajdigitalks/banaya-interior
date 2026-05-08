@@ -235,7 +235,7 @@ export default function InteriorGalleryPage() {
       </AdminCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-charcoal">
               {editingItem ? "Edit Gallery Item" : "Add Gallery Item"}
@@ -256,7 +256,7 @@ export default function InteriorGalleryPage() {
               onChange={(val) => setFormData({ ...formData, subtitle: val })}
               placeholder="e.g. Modern luxury interior design"
             />
-            <div className="h-32">
+            <div className="min-h-[120px]">
               <ImageUpload 
                 label="Gallery Image"
                 value={formData.src}

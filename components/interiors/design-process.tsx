@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -14,6 +14,8 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { processService, testimonialService, type ProcessStep, type Testimonial } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 const ICONS: Record<string, LucideIcon> = {
   Search,
@@ -23,32 +25,37 @@ const ICONS: Record<string, LucideIcon> = {
   Heart,
 };
 
-const PROCESS = [
+const DEFAULT_PROCESS = [
   {
+    id: "1",
     iconId: "Search",
     step: "01",
     title: "Consultation",
     desc: "Understanding your needs & lifestyle",
   },
   {
+    id: "2",
     iconId: "PenTool",
     step: "02",
     title: "Design & Planning",
     desc: "Concept, 3D designs & planning",
   },
   {
+    id: "3",
     iconId: "Hammer",
     step: "03",
     title: "Execution",
     desc: "Quality execution with precision",
   },
   {
+    id: "4",
     iconId: "PackageCheck",
     step: "04",
     title: "Handover",
     desc: "Timely handover with perfection",
   },
   {
+    id: "5",
     iconId: "Heart",
     step: "05",
     title: "After Sales Service",
@@ -56,8 +63,9 @@ const PROCESS = [
   },
 ];
 
-const TESTIMONIALS = [
+const DEFAULT_TESTIMONIALS = [
   {
+    id: "1",
     name: "Neha & Rohit Sharma",
     location: "Bangalore",
     text: "Banaya Interiors transformed our house into a dream home. The team was professional, creative and delivered beyond our expectations.",
@@ -65,12 +73,14 @@ const TESTIMONIALS = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
   },
   {
+    id: "2",
     name: "Vikram Malhotra",
     location: "Mumbai",
     text: "The attention to detail and the quality of finish is exceptional. They truly understood my vision for a modern minimalist apartment.",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
   },
   {
+    id: "3",
     name: "Ananya Iyer",
     location: "Pune",
     text: "From concept to completion, the process was seamless. Their ability to blend functionality with luxury is what sets them apart.",
@@ -79,17 +89,44 @@ const TESTIMONIALS = [
 ];
 
 export function DesignProcessSection() {
+  const [process, setProcess] = useState<ProcessStep[]>(DEFAULT_PROCESS);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [processData, testimonialsData] = await Promise.all([
+          processService.getProcessStepList(true),
+          testimonialService.getTestimonialList(true),
+        ]);
+        
+        setProcess(processData.length > 0 ? processData : DEFAULT_PROCESS);
+        setTestimonials(testimonialsData.length > 0 ? testimonialsData : DEFAULT_TESTIMONIALS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
   const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    if (testimonials.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   };
 
   const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+    if (testimonials.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  const current = TESTIMONIALS[currentIndex];
+  if (loading) {
+    return null;
+  }
+
+  const current = testimonials[currentIndex];
 
   return (
     <section className="py-24 bg-[#faf7f2] relative">
@@ -112,11 +149,11 @@ export function DesignProcessSection() {
             </div>
 
             <div className="space-y-10">
-              {PROCESS.map((item, idx) => {
+              {process.map((item, idx) => {
                 const Icon = ICONS[item.iconId] || Search;
                 return (
                   <motion.div
-                    key={item.title}
+                    key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.1 }}
@@ -127,7 +164,7 @@ export function DesignProcessSection() {
                         <Icon size={22} strokeWidth={1.8} />
                       </div>
 
-                      {idx !== PROCESS.length - 1 && (
+                      {idx !== process.length - 1 && (
                         <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[1px] h-10 bg-gradient-to-b from-gold/30 to-transparent" />
                       )}
                     </div>
@@ -200,7 +237,7 @@ export function DesignProcessSection() {
                       <div className="flex items-center gap-4 pt-8 border-t border-primary/10">
                         <div className="relative w-14 h-14 rounded-xl overflow-hidden ring-2 ring-white shadow-md shrink-0">
                           <Image
-                            src={current.image}
+                            src={buildImageUrl(current.image) || current.image}
                             alt={current.name}
                             fill
                             className="object-cover"
@@ -222,7 +259,7 @@ export function DesignProcessSection() {
                 </div>
 
                 <div className="flex gap-2 justify-center pt-8">
-                  {TESTIMONIALS.map((_, idx) => (
+                  {testimonials.map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentIndex(idx)}

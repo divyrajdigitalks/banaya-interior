@@ -1,54 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, MapPin, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-
-const projects = [
-  {
-    id: 1,
-    title: "Niseko Dining House",
-    location: "Hokkaido, Japan",
-    image: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80",
-    description: "A harmonious blend of traditional Japanese aesthetics and modern luxury, featuring bespoke walnut furniture."
-  },
-  {
-    id: 2,
-    title: "Urban Loft Studio",
-    location: "Mumbai, India",
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80",
-    description: "Industrial chic meets royal comfort in this expansive open-plan sanctuary overlooking the Arabian Sea."
-  },
-  {
-    id: 3,
-    title: "Coastal Retreat",
-    location: "Goa, India",
-    image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=80",
-    description: "Airy, light-filled spaces designed for ultimate relaxation, with hand-carved teak accents."
-  },
-  {
-    id: 4,
-    title: "Mountain Villa",
-    location: "Shimla, India",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
-    description: "Cozy grandeur in the Himalayas, where reclaimed wood and local stone create a majestic retreat."
-  },
-];
+import { projectService, type Project } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 export function ProjectsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await projectService.getProjectList(true);
+        setProjects(data.length > 0 ? data : [
+          {
+            id: "1",
+            name: "Niseko Dining House",
+            location: "Hokkaido, Japan",
+            image: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80",
+            description: "A harmonious blend of traditional Japanese aesthetics and modern luxury, featuring bespoke walnut furniture."
+          },
+          {
+            id: "2",
+            name: "Urban Loft Studio",
+            location: "Mumbai, India",
+            image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80",
+            description: "Industrial chic meets royal comfort in this expansive open-plan sanctuary overlooking the Arabian Sea."
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const nextSlide = () => {
+    if (projects.length === 0) return;
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % projects.length);
   };
 
   const prevSlide = () => {
+    if (projects.length === 0) return;
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
   };
+
+  if (loading || projects.length === 0) {
+    return null;
+  }
 
   const currentProject = projects[currentIndex];
 
@@ -116,8 +123,8 @@ export function ProjectsSection() {
                   className="absolute inset-0"
                 >
                   <Image
-                    src={currentProject.image}
-                    alt={currentProject.title}
+                    src={buildImageUrl(currentProject.image) || currentProject.image}
+                    alt={currentProject.name}
                     fill
                     className="object-cover"
                   />
@@ -168,7 +175,7 @@ export function ProjectsSection() {
                   className="space-y-4"
                 >
                   <h3 className="font-serif text-3xl text-primary font-black leading-tight">
-                    {currentProject.title}
+                    {currentProject.name}
                   </h3>
                   <p className="text-primary/60 text-base font-light leading-relaxed">
                     {currentProject.description}

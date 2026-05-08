@@ -1,68 +1,39 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { galleryService, type GalleryImage } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
-const galleryImages = [
+const DEFAULT_GALLERY = [
   {
-    id: 1,
+    id: "1",
     src: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800&q=80",
-    category: "Living Room",
     title: "The Royal Lounge",
+    subtitle: "Living Room",
   },
   {
-    id: 2,
+    id: "2",
     src: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80",
-    category: "Bedroom",
     title: "Velvet Dreams",
+    subtitle: "Bedroom",
   },
   {
-    id: 3,
+    id: "3",
     src: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
-    category: "Courtyards",
     title: "Zen Oasis",
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-    category: "Kitchen",
-    title: "Culinary Studio",
-  },
-  {
-    id: 5,
-    src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-    category: "Wardrobe",
-    title: "The Style Vault",
-  },
-  {
-    id: 6,
-    src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-    category: "Dining",
-    title: "Grand Banquet",
-  },
-  {
-    id: 7,
-    src: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&q=80",
-    category: "Study",
-    title: "The Thinker's Den",
+    subtitle: "Courtyards",
   },
 ];
 
 export function GallerySection() {
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [dragX, setDragX] = useState(0);
-  const totalItems = galleryImages.length;
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isAutoPlaying) {
-      interval = setInterval(() => {
-        handleNext();
-      }, 5000);
-    }
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, currentIndex]);
+  const totalItems = galleryImages.length;
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % totalItems);
@@ -71,6 +42,31 @@ export function GallerySection() {
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + totalItems) % totalItems);
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await galleryService.getGalleryList(true);
+        setGalleryImages(data.length > 0 ? data : DEFAULT_GALLERY);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isAutoPlaying && totalItems > 0) {
+      interval = setInterval(() => {
+        handleNext();
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, currentIndex, totalItems]);
+
+  if (loading) return null;
 
   const handleDragEnd = (event: any, info: any) => {
     const threshold = 100;
@@ -106,7 +102,7 @@ export function GallerySection() {
             <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
               A Glimpse of <br />
               <span className="italic font-light text-gold transition-all duration-700">
-                {galleryImages[currentIndex].category}.
+                {galleryImages[currentIndex].subtitle || "Gallery"}.
               </span>
             </h2>
           </motion.div>
@@ -161,8 +157,8 @@ export function GallerySection() {
                 >
                   <div className="relative w-full h-full group overflow-hidden rounded-3xl shadow-2xl border border-charcoal/10 bg-charcoal/5">
                     <img
-                      src={image.src}
-                      alt={image.category}
+                      src={buildImageUrl(image.src) || image.src}
+                      alt={image.title}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 pointer-events-none"
                     />
                     
@@ -175,13 +171,15 @@ export function GallerySection() {
                           exit={{ opacity: 0, y: 30 }}
                           className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/20 to-transparent flex flex-col justify-end p-10"
                         >
-                          <motion.span 
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="text-[11px] font-bold tracking-tight text-gold mb-3 block italic"
-                          >
-                            {image.category}
-                          </motion.span>
+                          {image.subtitle && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="text-[11px] font-bold tracking-tight text-gold mb-3 block italic"
+                            >
+                              {image.subtitle}
+                            </motion.span>
+                          )}
                           <motion.h3 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}

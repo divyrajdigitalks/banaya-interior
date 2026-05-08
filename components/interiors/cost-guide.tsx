@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Sofa,
@@ -12,6 +13,8 @@ import {
   LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { costGuideService, type CostGuideItem } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 const ICONS: Record<string, LucideIcon> = {
   Layout,
@@ -22,16 +25,47 @@ const ICONS: Record<string, LucideIcon> = {
   Building2,
 };
 
-const COSTS = [
-  { iconId: "Layout", title: "Modular Kitchen", range: "₹2.5L - ₹5L" },
-  { iconId: "Sofa", title: "Living Room", range: "₹1.5L - ₹3.5L" },
-  { iconId: "Bed", title: "Master Bedroom", range: "₹1.5L - ₹3L" },
-  { iconId: "Baby", title: "Children's Bedroom", range: "₹1L - ₹2.5L" },
-  { iconId: "Home", title: "Full Home (2 BHK)", range: "₹8L - ₹15L" },
-  { iconId: "Building2", title: "Full Home (3 BHK)", range: "₹12L - ₹20L+" },
+const DEFAULT_COSTS = [
+  { id: "1", iconId: "Layout", title: "Modular Kitchen", range: "₹2.5L - ₹5L", isActive: true, sortOrder: 0, createdAt: "", updatedAt: "" },
+  { id: "2", iconId: "Sofa", title: "Living Room", range: "₹1.5L - ₹3.5L", isActive: true, sortOrder: 1, createdAt: "", updatedAt: "" },
+  { id: "3", iconId: "Bed", title: "Master Bedroom", range: "₹1.5L - ₹3L", isActive: true, sortOrder: 2, createdAt: "", updatedAt: "" },
+  { id: "4", iconId: "Baby", title: "Children's Bedroom", range: "₹1L - ₹2.5L", isActive: true, sortOrder: 3, createdAt: "", updatedAt: "" },
+  { id: "5", iconId: "Home", title: "Full Home (2 BHK)", range: "₹8L - ₹15L", isActive: true, sortOrder: 4, createdAt: "", updatedAt: "" },
+  { id: "6", iconId: "Building2", title: "Full Home (3 BHK)", range: "₹12L - ₹20L+", isActive: true, sortOrder: 5, createdAt: "", updatedAt: "" },
 ];
 
 export function CostGuideSection() {
+  const [costGuideItems, setCostGuideItems] = useState<CostGuideItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCostGuideItems = async () => {
+      try {
+        const data = await costGuideService.getCostGuideList();
+        setCostGuideItems(data.length > 0 ? data : DEFAULT_COSTS);
+      } catch (error) {
+        console.error('Error loading cost guide items:', error);
+        setCostGuideItems(DEFAULT_COSTS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCostGuideItems();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-[#faf7f2] relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-12 relative z-10">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-primary/40">Loading cost guide...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24 bg-[#faf7f2] relative overflow-hidden">
       
@@ -63,19 +97,31 @@ export function CostGuideSection() {
           
           {/* Cost Cards */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {COSTS.map((item, idx) => {
+            {costGuideItems.map((item, idx) => {
               const Icon = ICONS[item.iconId] || Layout;
               return (
                 <motion.div
-                  key={item.title}
+                  key={item.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.08 }}
-                  className="flex flex-col p-6 rounded-2xl bg-white border border-primary/10 hover:border-gold/40 hover:shadow-xl transition-all duration-300 group"
+                  className="flex flex-col p-6 rounded-2xl bg-white border border-primary/10 hover:border-gold/40 hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-[#faf7f2] flex items-center justify-center text-primary/60 group-hover:text-gold transition mb-6">
-                    <Icon size={22} strokeWidth={1.8} />
-                  </div>
+                  {/* Custom Image or Icon */}
+                  {item.image ? (
+                    <div className="w-11 h-11 rounded-xl overflow-hidden mb-6 relative">
+                      <Image
+                        src={buildImageUrl(item.image) || item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-11 h-11 rounded-xl bg-[#faf7f2] flex items-center justify-center text-primary/60 group-hover:text-gold transition mb-6">
+                      <Icon size={22} strokeWidth={1.8} />
+                    </div>
+                  )}
 
                   <div className="space-y-1 mt-auto">
                     <h4 className="text-[11px] font-semibold text-primary/60 uppercase tracking-wide">
@@ -85,6 +131,12 @@ export function CostGuideSection() {
                     <p className="text-xl font-semibold text-primary group-hover:text-gold transition">
                       {item.range}
                     </p>
+
+                    {item.description && (
+                      <p className="text-xs text-primary/50 mt-2 leading-relaxed">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               );

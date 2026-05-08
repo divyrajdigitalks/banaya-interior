@@ -70,7 +70,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
             {/* Left: Logo Only */}
             <div className="flex-shrink-0">
               <Link href="/">
-                <Logo variant="dark" className="scale-90 md:scale-100 cursor-pointer" />
+                <Logo variant="dark" className="scale-90 md:scale-100 cursor-pointer" asChild />
               </Link>
             </div>
 
