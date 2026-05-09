@@ -5,15 +5,44 @@ import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
+import { heroService, type InteriorHeroData } from "@/lib/api/services/hero.service";
+import { buildImageUrl } from "@/lib/api";
+
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
+  const [heroData, setHeroData] = useState<InteriorHeroData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
+    loadHeroData();
   }, []);
+
+  const loadHeroData = async () => {
+    try {
+      const response = await heroService.getInteriorHero();
+      if (response.success) {
+        setHeroData(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load interior hero data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openCalculator = () => {
     window.dispatchEvent(new CustomEvent("open-calculator", { detail: { type: "homes" } }));
+  };
+
+  const hero = heroData || {
+    backgroundImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80",
+    topLabel: "The Royal Interior Experience",
+    headingLine1: "Spaces that",
+    headingLine2: "Speak Softly.",
+    description: "Crafting timeless residential and commercial environments where every corner reflects a royal legacy and modern sophistication.",
+    cta1Text: "Book Free Consultation",
+    cta2Text: "Explore Collections"
   };
 
   return (
@@ -26,7 +55,7 @@ export function HeroSection() {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="w-full h-full bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80')`,
+            backgroundImage: `url('${hero.backgroundImage.startsWith('http') ? hero.backgroundImage : buildImageUrl(hero.backgroundImage)}')`,
           }}
         />
       </div>
@@ -50,7 +79,7 @@ export function HeroSection() {
                 className="flex items-center gap-4 mb-6"
               >
                 <div className="h-px w-8 bg-gold" />
-                <p className="text-sm text-gold font-semibold tracking-widest uppercase">The Royal Interior Experience</p>
+                <p className="text-sm text-gold font-semibold tracking-widest uppercase">{hero.topLabel}</p>
               </motion.div>
 
               {/* Main Heading */}
@@ -64,8 +93,8 @@ export function HeroSection() {
                   Architectural Excellence & Heritage Design
                 </p>
                 <h1 className="text-3xl md:text-5xl lg:text-6xl text-white leading-[1.1] font-black tracking-tight drop-shadow-2xl">
-                  Spaces that <br />
-                  <span className="font-bold text-gold">Speak Softly.</span>
+                  {hero.headingLine1} <br />
+                  <span className="font-bold text-gold">{hero.headingLine2}</span>
                 </h1>
               </motion.div>
 
@@ -76,7 +105,7 @@ export function HeroSection() {
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="text-white/80 text-lg font-light mt-8 max-w-xl leading-relaxed drop-shadow-lg"
               >
-                Crafting timeless residential and commercial environments where every corner reflects a royal legacy and modern sophistication.
+                {hero.description}
               </motion.p>
             </div>
 
@@ -91,11 +120,11 @@ export function HeroSection() {
                 onClick={openCalculator}
                 className="px-10 py-5 bg-gold text-primary font-black text-xs rounded-full hover:bg-white transition-all duration-700 shadow-2xl hover:scale-105 active:scale-95 uppercase tracking-[0.2em]"
               >
-                Book Free Consultation
+                {hero.cta1Text}
               </button>
               <Link href="/collections">
                 <button className="px-10 py-5 border border-white/20 text-white font-black text-xs rounded-full hover:bg-white hover:text-primary transition-all duration-700 shadow-xl hover:scale-105 active:scale-95 uppercase tracking-[0.2em]">
-                  Explore Collections
+                  {hero.cta2Text}
                 </button>
               </Link>
             </motion.div>

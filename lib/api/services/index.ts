@@ -7,3 +7,5 @@ export { filterService, type FilterOption, type FilterOptionsByGroup } from './f
 export { projectService, type Project } from './project.service';
 export { processService, type ProcessStep } from './process.service';
 export { testimonialService, type Testimonial } from './testimonial.service';
+export { heroService, type DecorHeroData, type InteriorHeroData } from './hero.service';
+export { featuresService, type DecorFeaturesData, type QuickFeature, type Badge } from './features.service';

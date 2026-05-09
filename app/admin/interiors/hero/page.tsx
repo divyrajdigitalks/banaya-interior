@@ -1,29 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Layout, Image as ImageIcon, Sparkles, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { AdminFormInput } from "@/components/admin/form-input";
 import { motion } from "framer-motion";
+import { heroService, type InteriorHeroData } from "@/lib/api/services/hero.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 
 export default function InteriorHeroAdmin() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    backgroundImage: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80",
-    topLabel: "The Royal Interior Experience",
-    headingLine1: "Spaces that",
-    headingLine2: "Speak Softly.",
-    description: "Crafting timeless residential and commercial environments where every corner reflects a royal legacy and modern sophistication.",
-    cta1Text: "Book Free Consultation",
-    cta2Text: "Explore Collections"
+  const { showSuccess, showError } = useAdminToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<Partial<InteriorHeroData>>({
+    backgroundImage: "",
+    topLabel: "",
+    headingLine1: "",
+    headingLine2: "",
+    description: "",
+    cta1Text: "",
+    cta2Text: ""
   });
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
-  const handleSave = () => {
-    console.log("Saving Interior Hero:", formData);
-    // In a real app, this would be an API call
-    alert("Interior Hero Section updated successfully!");
+  useEffect(() => {
+    loadHeroData();
+  }, []);
+
+  const loadHeroData = async () => {
+    setLoading(true);
+    try {
+      const response = await heroService.getInteriorHero();
+      if (response.success) {
+        setFormData(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load hero data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const response = await heroService.updateInteriorHero(formData, selectedFile);
+      if (response.success) {
+        showSuccess("Interior Hero Section updated successfully!");
+        setFormData(response.data);
+        setSelectedFile(undefined);
+      } else {
+        showError(response.error || "Failed to update hero section");
+      }
+    } catch (error) {
+      showError("An unexpected error occurred");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -47,37 +84,28 @@ export default function InteriorHeroAdmin() {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Top Label</Label>
-                <input 
-                  value={formData.topLabel}
-                  onChange={(e) => setFormData({ ...formData, topLabel: e.target.value })}
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 focus:ring-8 focus:ring-gold/5 transition-all outline-none text-sm font-bold"
-                />
-              </div>
+              <AdminFormInput
+                label="Top Label"
+                value={formData.topLabel || ""}
+                onChange={(val) => setFormData({ ...formData, topLabel: val })}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 1</Label>
-                  <input 
-                    value={formData.headingLine1}
-                    onChange={(e) => setFormData({ ...formData, headingLine1: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-base font-bold"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 2 (Gold)</Label>
-                  <input 
-                    value={formData.headingLine2}
-                    onChange={(e) => setFormData({ ...formData, headingLine2: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-base font-bold text-gold"
-                  />
-                </div>
+                <AdminFormInput
+                  label="Heading Line 1"
+                  value={formData.headingLine1 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine1: val })}
+                />
+                <AdminFormInput
+                  label="Heading Line 2 (Gold)"
+                  value={formData.headingLine2 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine2: val })}
+                />
               </div>
 
               <div className="space-y-3">
                 <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Main Description</Label>
-                <textarea 
+                <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full h-40 p-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-medium leading-relaxed resize-none"
@@ -85,22 +113,16 @@ export default function InteriorHeroAdmin() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Primary CTA Button</Label>
-                  <input 
-                    value={formData.cta1Text}
-                    onChange={(e) => setFormData({ ...formData, cta1Text: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Secondary CTA Button</Label>
-                  <input 
-                    value={formData.cta2Text}
-                    onChange={(e) => setFormData({ ...formData, cta2Text: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                  />
-                </div>
+                <AdminFormInput
+                  label="Primary CTA Button"
+                  value={formData.cta1Text || ""}
+                  onChange={(val) => setFormData({ ...formData, cta1Text: val })}
+                />
+                <AdminFormInput
+                  label="Secondary CTA Button"
+                  value={formData.cta2Text || ""}
+                  onChange={(val) => setFormData({ ...formData, cta2Text: val })}
+                />
               </div>
             </div>
           </motion.div>
@@ -124,7 +146,17 @@ export default function InteriorHeroAdmin() {
               <ImageUpload 
                 label="Hero Background Image"
                 value={formData.backgroundImage}
-                onChange={(val) => setFormData({ ...formData, backgroundImage: val })}
+                onChange={(val, file) => {
+                  if (file) {
+                    setSelectedFile(file);
+                  } else {
+                    setFormData({ ...formData, backgroundImage: val });
+                  }
+                }}
+                onRemove={() => {
+                  setFormData({ ...formData, backgroundImage: "" });
+                  setSelectedFile(undefined);
+                }}
               />
               
               <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100 flex gap-4">
@@ -137,7 +169,7 @@ export default function InteriorHeroAdmin() {
           </motion.div>
 
           {/* Live Preview Hint */}
-          <motion.div 
+          {/* <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -152,7 +184,7 @@ export default function InteriorHeroAdmin() {
             <p className="text-sm text-slate-400 leading-relaxed font-medium relative z-10">
               Keep your headings short and punchy for maximum impact. Heading line 2 will be highlighted in <span className="text-gold font-bold">Banaya Gold</span>.
             </p>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
 

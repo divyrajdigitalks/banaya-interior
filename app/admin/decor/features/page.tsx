@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Sparkles, ShieldCheck, Heart, Info, Layout, Phone, ListChecks, ImageIcon } from "lucide-react";
+import { Save, Sparkles, ShieldCheck, Layout, Phone, ListChecks, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { AdminFormInput } from "@/components/admin/form-input";
 import { motion } from "framer-motion";
+import { featuresService, type DecorFeaturesData } from "@/lib/api/services/features.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 
 export default function DecorFeaturesAdmin() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const { showSuccess, showError } = useAdminToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+  const [formData, setFormData] = useState<Partial<DecorFeaturesData>>({
     backgroundText: "CRAFTSMANSHIP",
     mainImage: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80",
     badge1: { icon: "Sparkles", title: "Artisanal Craft", subtitle: "Hand-carved items" },
@@ -28,9 +35,40 @@ export default function DecorFeaturesAdmin() {
     phone: "+91 88558 17434"
   });
 
-  const handleSave = () => {
-    console.log("Saving Decor Features:", formData);
-    alert("Decor Features Section updated successfully!");
+  useEffect(() => {
+    loadFeaturesData();
+  }, []);
+
+  const loadFeaturesData = async () => {
+    setLoading(true);
+    try {
+      const response = await featuresService.getDecorFeatures();
+      if (response.success) {
+        setFormData(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load features data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const response = await featuresService.updateDecorFeatures(formData, selectedFile);
+      if (response.success) {
+        showSuccess("Decor Features Section updated successfully!");
+        setFormData(response.data);
+        setSelectedFile(undefined);
+      } else {
+        showError(response.error || "Failed to update features section");
+      }
+    } catch (error) {
+      showError("An unexpected error occurred");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateQuickFeature = (index: number, field: 'label' | 'value', val: string) => {
@@ -60,54 +98,39 @@ export default function DecorFeaturesAdmin() {
             </div>
 
             <div className="space-y-8">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Section Top Label</Label>
-                <input 
-                  value={formData.topLabel}
-                  onChange={(e) => setFormData({ ...formData, topLabel: e.target.value })}
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                />
-              </div>
+              <AdminFormInput
+                label="Section Top Label"
+                value={formData.topLabel || ""}
+                onChange={(val) => setFormData({ ...formData, topLabel: val })}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 1</Label>
-                  <input 
-                    value={formData.headingLine1}
-                    onChange={(e) => setFormData({ ...formData, headingLine1: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xl font-black"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 2 (Gold)</Label>
-                  <input 
-                    value={formData.headingLine2}
-                    onChange={(e) => setFormData({ ...formData, headingLine2: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xl font-black text-gold"
-                  />
-                </div>
+                <AdminFormInput
+                  label="Heading Line 1"
+                  value={formData.headingLine1 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine1: val })}
+                />
+                <AdminFormInput
+                  label="Heading Line 2 (Gold)"
+                  value={formData.headingLine2 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine2: val })}
+                />
               </div>
 
               <div className="space-y-3">
                 <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Main Description</Label>
-                <textarea 
+                <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full h-32 p-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-base font-medium leading-relaxed resize-none"
                 />
               </div>
 
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Contact Phone Number</Label>
-                <div className="relative group">
-                  <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-gold transition-colors" size={18} />
-                  <input 
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full h-14 pl-14 pr-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                  />
-                </div>
-              </div>
+              <AdminFormInput
+                label="Contact Phone Number"
+                value={formData.phone || ""}
+                onChange={(val) => setFormData({ ...formData, phone: val })}
+              />
             </div>
           </motion.div>
 
@@ -130,22 +153,16 @@ export default function DecorFeaturesAdmin() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {formData.quickFeatures.map((item, i) => (
                 <div key={i} className="space-y-4 p-6 bg-slate-50/50 rounded-[2rem] border border-slate-100">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Label</Label>
-                    <input 
-                      value={item.label}
-                      onChange={(e) => updateQuickFeature(i, 'label', e.target.value)}
-                      className="w-full h-12 px-4 rounded-xl border-2 border-slate-100 bg-white focus:border-gold/50 transition-all outline-none text-xs font-bold"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Value</Label>
-                    <input 
-                      value={item.value}
-                      onChange={(e) => updateQuickFeature(i, 'value', e.target.value)}
-                      className="w-full h-12 px-4 rounded-xl border-2 border-slate-100 bg-white focus:border-gold/50 transition-all outline-none text-xs font-bold"
-                    />
-                  </div>
+                  <AdminFormInput
+                    label="Label"
+                    value={item.label}
+                    onChange={(val) => updateQuickFeature(i, 'label', val)}
+                  />
+                  <AdminFormInput
+                    label="Value"
+                    value={item.value}
+                    onChange={(val) => updateQuickFeature(i, 'value', val)}
+                  />
                 </div>
               ))}
             </div>
@@ -167,19 +184,22 @@ export default function DecorFeaturesAdmin() {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Background Decorative Text</Label>
-                <input 
-                  value={formData.backgroundText}
-                  onChange={(e) => setFormData({ ...formData, backgroundText: e.target.value })}
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold uppercase tracking-widest"
-                />
-              </div>
+              <AdminFormInput
+                label="Background Decorative Text"
+                value={formData.backgroundText || ""}
+                onChange={(val) => setFormData({ ...formData, backgroundText: val })}
+              />
 
               <ImageUpload 
                 label="Main Product Showcase"
                 value={formData.mainImage}
-                onChange={(val) => setFormData({ ...formData, mainImage: val })}
+                onChange={(val, file) => {
+                  if (file) {
+                    setSelectedFile(file);
+                  } else {
+                    setFormData({ ...formData, mainImage: val });
+                  }
+                }}
               />
             </div>
           </motion.div>
@@ -202,17 +222,15 @@ export default function DecorFeaturesAdmin() {
               <div className="space-y-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Badge 1 (Top Left)</p>
                 <div className="space-y-3">
-                  <input 
-                    value={formData.badge1.title}
-                    onChange={(e) => setFormData({ ...formData, badge1: { ...formData.badge1, title: e.target.value } })}
-                    placeholder="Title"
-                    className="w-full h-12 px-5 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xs font-bold"
+                  <AdminFormInput
+                    label="Title"
+                    value={formData.badge1?.title || ""}
+                    onChange={(val) => setFormData({ ...formData, badge1: { ...formData.badge1, title: val } })}
                   />
-                  <input 
-                    value={formData.badge1.subtitle}
-                    onChange={(e) => setFormData({ ...formData, badge1: { ...formData.badge1, subtitle: e.target.value } })}
-                    placeholder="Subtitle"
-                    className="w-full h-12 px-5 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xs font-medium"
+                  <AdminFormInput
+                    label="Subtitle"
+                    value={formData.badge1?.subtitle || ""}
+                    onChange={(val) => setFormData({ ...formData, badge1: { ...formData.badge1, subtitle: val } })}
                   />
                 </div>
               </div>
@@ -220,17 +238,15 @@ export default function DecorFeaturesAdmin() {
               <div className="space-y-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Badge 2 (Bottom Right)</p>
                 <div className="space-y-3">
-                  <input 
-                    value={formData.badge2.title}
-                    onChange={(e) => setFormData({ ...formData, badge2: { ...formData.badge2, title: e.target.value } })}
-                    placeholder="Title"
-                    className="w-full h-12 px-5 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xs font-bold"
+                  <AdminFormInput
+                    label="Title"
+                    value={formData.badge2?.title || ""}
+                    onChange={(val) => setFormData({ ...formData, badge2: { ...formData.badge2, title: val } })}
                   />
-                  <input 
-                    value={formData.badge2.subtitle}
-                    onChange={(e) => setFormData({ ...formData, badge2: { ...formData.badge2, subtitle: e.target.value } })}
-                    placeholder="Subtitle"
-                    className="w-full h-12 px-5 rounded-xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xs font-medium"
+                  <AdminFormInput
+                    label="Subtitle"
+                    value={formData.badge2?.subtitle || ""}
+                    onChange={(val) => setFormData({ ...formData, badge2: { ...formData.badge2, subtitle: val } })}
                   />
                 </div>
               </div>

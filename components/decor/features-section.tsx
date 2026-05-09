@@ -1,10 +1,32 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Phone, ArrowRight, Sparkles, ShieldCheck, Heart } from "lucide-react";
 import Image from "next/image";
+import { featuresService, type DecorFeaturesData } from "@/lib/api/services/features.service";
 
 export function FeaturesSection() {
+  const [data, setData] = useState<DecorFeaturesData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadFeaturesData();
+  }, []);
+
+  const loadFeaturesData = async () => {
+    try {
+      const response = await featuresService.getDecorFeatures();
+      if (response.success) {
+        setData(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load features data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="relative py-32 bg-background overflow-hidden">
       {/* Large Background Text Decoration */}
@@ -15,7 +37,7 @@ export function FeaturesSection() {
           transition={{ duration: 2, ease: "easeOut" }}
           className="font-serif text-[25vw] text-primary tracking-[0.1em] whitespace-nowrap"
         >
-          CRAFTSMANSHIP
+          {data?.backgroundText || "CRAFTSMANSHIP"}
         </motion.h2>
       </div>
 
@@ -32,7 +54,7 @@ export function FeaturesSection() {
               className="relative aspect-square max-w-lg mx-auto rounded-[3rem] overflow-hidden shadow-2xl"
             >
               <Image
-                src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"
+                src={data?.mainImage || "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80"}
                 alt="Wooden serving plate"
                 fill
                 className="object-cover transition-transform duration-[2s] group-hover:scale-110"
@@ -52,8 +74,8 @@ export function FeaturesSection() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-primary">Artisanal Craft</p>
-                <p className="text-xs text-primary/40 font-light">Hand-carved items</p>
+                <p className="text-xs font-semibold text-primary">{data?.badge1?.title || "Artisanal Craft"}</p>
+                <p className="text-xs text-primary/40 font-light">{data?.badge1?.subtitle || "Hand-carved items"}</p>
               </div>
             </motion.div>
 
@@ -68,8 +90,8 @@ export function FeaturesSection() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-primary">Food Safe</p>
-                <p className="text-xs text-primary/40 font-light">Natural Finish</p>
+                <p className="text-xs font-semibold text-primary">{data?.badge2?.title || "Food Safe"}</p>
+                <p className="text-xs text-primary/40 font-light">{data?.badge2?.subtitle || "Natural Finish"}</p>
               </div>
             </motion.div>
           </div>
@@ -83,7 +105,7 @@ export function FeaturesSection() {
                 viewport={{ once: true }}
                 className="text-xs text-gold font-semibold block"
               >
-                The Art of Living
+                {data?.topLabel || "The Art of Living"}
               </motion.span>
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
@@ -91,8 +113,8 @@ export function FeaturesSection() {
                 viewport={{ once: true }}
                 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight"
               >
-                Handcrafted <br />
-                <span className="font-bold text-gold">Soulful</span> Pieces.
+                {data?.headingLine1 || "Handcrafted"} <br />
+                <span className="font-bold text-gold">{data?.headingLine2 || "Soulful"}</span> Pieces.
               </motion.h2>
               <motion.p 
                 initial={{ opacity: 0 }}
@@ -101,18 +123,18 @@ export function FeaturesSection() {
                 transition={{ delay: 0.2 }}
                 className="text-primary/50 text-lg font-light leading-relaxed max-w-xl"
               >
-                Discover objects that transcend utility, each carved by master artisans to bring warmth and heritage into your home. 100% natural, scratch-proof, and designed to last generations.
+                {data?.description || "Discover objects that transcend utility, each carved by master artisans to bring warmth and heritage into your home. 100% natural, scratch-proof, and designed to last generations."}
               </motion.p>
             </div>
 
             {/* Quick Features Grid */}
             <div className="grid grid-cols-2 gap-8">
-              {[
+              {(data?.quickFeatures || [
                 { label: "Material", value: "Premium Teak" },
                 { label: "Finish", value: "Organic Oil" },
                 { label: "Durability", value: "Lifetime" },
                 { label: "Safe", value: "100% Food Safe" },
-              ].map((item, idx) => (
+              ]).map((item, idx) => (
                 <div key={idx} className="space-y-1 border-l-2 border-gold/20 pl-4">
                   <p className="text-xs font-semibold text-gold">{item.label}</p>
                   <p className="text-primary text-sm font-medium">{item.value}</p>
@@ -129,7 +151,7 @@ export function FeaturesSection() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-primary/40">Bespoke Inquiry</p>
-                  <p className="text-primary font-bold tracking-widest">+91 88558 17434</p>
+                  <p className="text-primary font-bold tracking-widest">{data?.phone || "+91 88558 17434"}</p>
                 </div>
               </div>
             </div>

@@ -1,36 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Layout, Video, Sparkles, ListChecks, Info } from "lucide-react";
+import { ArrowLeft, Save, Layout, Sparkles, ListChecks } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { motion } from "framer-motion";
+import { heroService, type DecorHeroData } from "@/lib/api/services/hero.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 
 export default function DecorHeroAdmin() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    videoSrc: "/loop.mp4",
-    topLabel: "Est. Since 2020",
-    headingLine1: "Banaya",
-    headingLine2: "Decor",
-    description: "Masterfully handcrafted wooden serving treasures designed for the most distinguished dining experiences.",
-    cta1Text: "Shop Collection",
-    cta2Text: "View Lookbook",
-    rightHeading: "Uncompromising quality and detail",
-    rightQuote: "Elevate every culinary ritual with our signature heritage-fit tray collection.",
-    features: [
-      "100% Sustainable Acacia Wood",
-      "Heritage Artisan Craftsmanship",
-      "Food-Safe Royal Finish",
-      "Modular Interlock Design"
-    ]
+  const { showSuccess, showError } = useAdminToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<Partial<DecorHeroData>>({
+    topLabel: "",
+    headingLine1: "",
+    headingLine2: "",
+    description: "",
+    cta1Text: "",
+    cta1Link: "",
+    cta2Text: "",
+    cta2Link: "",
+    rightHeading: "",
+    rightQuote: "",
+    features: ["", "", "", ""]
   });
 
-  const handleSave = () => {
-    console.log("Saving Decor Hero:", formData);
-    alert("Decor Hero Section updated successfully!");
+  useEffect(() => {
+    loadHeroData();
+  }, []);
+
+  const loadHeroData = async () => {
+    setLoading(true);
+    try {
+      const response = await heroService.getDecorHero();
+      if (response.success) {
+        setFormData(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load hero data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const response = await heroService.updateDecorHero(formData);
+      if (response.success) {
+        showSuccess("Decor Hero Section updated successfully!");
+        setFormData(response.data);
+      } else {
+        showError(response.error || "Failed to update hero section");
+      }
+    } catch (error) {
+      showError("An unexpected error occurred");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateFeature = (index: number, value: string) => {
@@ -60,37 +91,28 @@ export default function DecorHeroAdmin() {
             </div>
 
             <div className="space-y-8">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Est. Label</Label>
-                <input 
-                  value={formData.topLabel}
-                  onChange={(e) => setFormData({ ...formData, topLabel: e.target.value })}
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                />
-              </div>
+              <AdminFormInput
+                label="Est. Label"
+                value={formData.topLabel || ""}
+                onChange={(val) => setFormData({ ...formData, topLabel: val })}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 1</Label>
-                  <input 
-                    value={formData.headingLine1}
-                    onChange={(e) => setFormData({ ...formData, headingLine1: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xl font-black"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Heading Line 2 (Gold)</Label>
-                  <input 
-                    value={formData.headingLine2}
-                    onChange={(e) => setFormData({ ...formData, headingLine2: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-xl font-black text-gold"
-                  />
-                </div>
+                <AdminFormInput
+                  label="Heading Line 1"
+                  value={formData.headingLine1 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine1: val })}
+                />
+                <AdminFormInput
+                  label="Heading Line 2 (Gold)"
+                  value={formData.headingLine2 || ""}
+                  onChange={(val) => setFormData({ ...formData, headingLine2: val })}
+                />
               </div>
 
               <div className="space-y-3">
                 <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Hero Description</Label>
-                <textarea 
+                <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full h-32 p-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-base font-medium leading-relaxed resize-none"
@@ -98,22 +120,16 @@ export default function DecorHeroAdmin() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">CTA 1 Button</Label>
-                  <input 
-                    value={formData.cta1Text}
-                    onChange={(e) => setFormData({ ...formData, cta1Text: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">CTA 2 Button</Label>
-                  <input 
-                    value={formData.cta2Text}
-                    onChange={(e) => setFormData({ ...formData, cta2Text: e.target.value })}
-                    className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-gold/50 transition-all outline-none text-sm font-bold"
-                  />
-                </div>
+                <AdminFormInput
+                  label="CTA 1 Button"
+                  value={formData.cta1Text || ""}
+                  onChange={(val) => setFormData({ ...formData, cta1Text: val })}
+                />
+                <AdminFormInput
+                  label="CTA 2 Button"
+                  value={formData.cta2Text || ""}
+                  onChange={(val) => setFormData({ ...formData, cta2Text: val })}
+                />
               </div>
             </div>
           </motion.div>
@@ -135,14 +151,11 @@ export default function DecorHeroAdmin() {
             </div>
 
             <div className="space-y-8">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Right Heading</Label>
-                <input 
-                  value={formData.rightHeading}
-                  onChange={(e) => setFormData({ ...formData, rightHeading: e.target.value })}
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-orange-500/50 transition-all outline-none text-sm font-bold"
-                />
-              </div>
+              <AdminFormInput
+                label="Right Heading"
+                value={formData.rightHeading || ""}
+                onChange={(val) => setFormData({ ...formData, rightHeading: val })}
+              />
 
               <div className="space-y-3">
                 <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Quote Text</Label>
@@ -156,12 +169,12 @@ export default function DecorHeroAdmin() {
               <div className="space-y-4">
                 <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Feature List (4 Items)</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {formData.features.map((feature, i) => (
-                    <input 
+                  {formData.features?.map((feature, i) => (
+                    <AdminFormInput
                       key={i}
+                      label={`Feature ${i + 1}`}
                       value={feature}
-                      onChange={(e) => updateFeature(i, e.target.value)}
-                      className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-blue-500/50 transition-all outline-none text-sm font-bold"
+                      onChange={(val) => updateFeature(i, val)}
                     />
                   ))}
                 </div>
@@ -170,7 +183,7 @@ export default function DecorHeroAdmin() {
           </motion.div>
         </div>
 
-        {/* Right Column: Media */}
+        {/* Right Column: CTA Links */}
         <div className="lg:col-span-4 space-y-10">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -179,28 +192,24 @@ export default function DecorHeroAdmin() {
           >
             <div className="flex items-center gap-4 pb-2 border-b border-slate-50">
               <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-                <Video size={20} />
+                <Layout size={20} />
               </div>
-              <h3 className="text-lg font-black text-slate-900">Background Video</h3>
+              <h3 className="text-lg font-black text-slate-900">CTA Links</h3>
             </div>
             
             <div className="space-y-6">
-              <div className="space-y-3">
-                <Label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Video Source Path</Label>
-                <input 
-                  value={formData.videoSrc}
-                  onChange={(e) => setFormData({ ...formData, videoSrc: e.target.value })}
-                  placeholder="/loop.mp4"
-                  className="w-full h-14 px-6 rounded-2xl border-2 border-slate-100 bg-slate-50/30 focus:bg-white focus:border-purple-500/50 transition-all outline-none text-sm font-bold"
-                />
-              </div>
-              
-              <div className="p-6 bg-purple-50 rounded-2xl border border-purple-100 flex gap-4">
-                <Info size={20} className="text-purple-500 shrink-0" />
-                <p className="text-[13px] text-purple-700 font-medium leading-relaxed">
-                  Provide the local path or URL to the MP4 video. Recommended format: H.264, muted, looping.
-                </p>
-              </div>
+              <AdminFormInput
+                label="CTA 1 Link"
+                value={formData.cta1Link || ""}
+                onChange={(val) => setFormData({ ...formData, cta1Link: val })}
+                placeholder="/shop"
+              />
+              <AdminFormInput
+                label="CTA 2 Link"
+                value={formData.cta2Link || ""}
+                onChange={(val) => setFormData({ ...formData, cta2Link: val })}
+                placeholder="/decor"
+              />
             </div>
           </motion.div>
 
@@ -217,7 +226,7 @@ export default function DecorHeroAdmin() {
               <h3 className="text-xs font-black uppercase tracking-[0.25em]">Live Preview</h3>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed font-medium relative z-10">
-              Changes will take effect globally across the Decor section of the site. Ensure the video path is correct to avoid a black screen.
+              Changes will take effect globally across the Decor section of the site.
             </p>
           </motion.div>
         </div>
