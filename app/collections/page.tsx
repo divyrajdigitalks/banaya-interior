@@ -112,7 +112,7 @@ export default function CollectionsPage() {
             </div>
             <div className="flex flex-col justify-center gap-6">
               {[
-                { icon: Sparkles, title: "Artisanal Mastery", desc: "Hand-finished by master craftsmen" },
+                { icon: Sparkles, title: "Artisanal Mastery", desc: "Handdsds-finished by master craftsmen" },
                 { icon: ShieldCheck, title: "Legacy Quality", desc: "25-year structural guarantee" },
                 { icon: Truck, title: "White Glove", desc: "Complimentary premium delivery" }
               ].map((item, idx) => (

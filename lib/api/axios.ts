@@ -8,7 +8,11 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+    // Try to get token from different possible keys
+    const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+    const userToken = typeof window !== 'undefined' ? localStorage.getItem('banaya-token') : null;
+    const token = adminToken || userToken;
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +34,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('adminToken');
-        window.location.href = '/admin/login';
+        localStorage.removeItem('banaya-token');
+        localStorage.removeItem('banaya-user');
+        // Redirect based on current path
+        if (window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/admin/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

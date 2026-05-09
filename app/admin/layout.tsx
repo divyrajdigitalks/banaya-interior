@@ -53,6 +53,8 @@ const sidebarLinks = [
   { name: "Interior Testimonials", icon: Users, href: "/admin/interiors/testimonials" },
   { name: "Interior Process", icon: PenTool, href: "/admin/interiors/process" },
   { name: "Interior Cost Guide", icon: IndianRupee, href: "/admin/interiors/cost-guide" },
+  { name: "Why Choose Us", icon: Sparkles, href: "/admin/interiors/why-choose" },
+  { name: "About Sections", icon: Users, href: "/admin/interiors/about" },
   { type: "label", name: "Promotions" },
   { name: "Offers", icon: Sparkles, href: "/admin/offers" },
   { name: "Coupons", icon: ShoppingBag, href: "/admin/coupons" },

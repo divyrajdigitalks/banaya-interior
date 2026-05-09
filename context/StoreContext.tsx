@@ -3,6 +3,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info, X, ShoppingBag } from "lucide-react";
+import { cartService, type CartItem } from "@/lib/api/services/cart.service";
+import { wishlistService, type WishlistItem } from "@/lib/api/services/wishlist.service";
+import { useUser } from "./UserContext";
 
 interface Product {
   id: string;
@@ -10,10 +13,6 @@ interface Product {
   price: number;
   image: string;
   category: string;
-}
-
-interface CartItem extends Product {
-  quantity: number;
 }
 
 interface Toast {
@@ -24,34 +23,39 @@ interface Toast {
 
 interface StoreContextType {
   cart: CartItem[];
-  addToCart: (product: Product) => void;
-  updateQuantity: (productId: string, delta: number) => void;
-  removeFromCart: (productId: string) => void;
-  clearCart: () => void;
+  wishlist: WishlistItem[];
+  loading: boolean;
+  addToCart: (product: Product) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  clearCart: () => Promise<void>;
+  addToWishlist: (product: Product) => Promise<void>;
+  removeFromWishlist: (productId: string) => Promise<void>;
+  isInWishlist: (productId: string) => boolean;
+  refreshCart: () => Promise<void>;
+  refreshWishlist: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const { user } = useUser();
 
-  // Load state from localStorage
+  // Load data from API when user is logged in
   useEffect(() => {
-    const savedCart = localStorage.getItem("banaya-cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart", e);
-      }
+    if (user) {
+      refreshCart();
+      refreshWishlist();
+    } else {
+      // Clear data when user logs out
+      setCart([]);
+      setWishlist([]);
     }
-  }, []);
-
-  // Save state to localStorage
-  useEffect(() => {
-    localStorage.setItem("banaya-cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [user]);
 
   const addToast = (message: string, type: Toast["type"] = "success") => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -61,51 +65,177 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, 3000);
   };
 
-  const addToCart = (product: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        addToast(`Increased quantity of ${product.name}`, "success");
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+  const refreshCart = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const response = await cartService.getCart();
+      if (response.success) {
+        setCart(response.data.items);
       }
-      addToast(`${product.name} added to cart`, "success");
-      return [...prev, { ...product, quantity: 1 }];
-    });
+    } catch (error) {
+      console.error('Failed to refresh cart:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) => 
-      prev.map((item) => {
-        if (item.id === productId) {
-          const newQuantity = Math.max(1, item.quantity + delta);
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      })
-    );
+  const refreshWishlist = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const response = await wishlistService.getWishlist();
+      if (response.success) {
+        setWishlist(response.data.items);
+      }
+    } catch (error) {
+      console.error('Failed to refresh wishlist:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
-    addToast("Removed from cart", "info");
+  const addToCart = async (product: Product) => {
+    if (!user) {
+      addToast("Please login to add items to cart", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await cartService.addToCart(product.id);
+      if (response.success) {
+        setCart(response.data.items);
+        addToast(response.message || `${product.name} added to cart`, "success");
+      } else {
+        addToast(response.message || "Failed to add to cart", "error");
+      }
+    } catch (error) {
+      addToast("Failed to add to cart", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearCart = () => {
-    setCart([]);
+  const updateQuantity = async (productId: string, quantity: number) => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const response = await cartService.updateCartItem(productId, quantity);
+      if (response.success) {
+        setCart(response.data.items);
+      } else {
+        addToast(response.message || "Failed to update cart", "error");
+      }
+    } catch (error) {
+      addToast("Failed to update cart", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeFromCart = async (productId: string) => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const response = await cartService.removeFromCart(productId);
+      if (response.success) {
+        setCart(response.data.items);
+        addToast("Removed from cart", "info");
+      } else {
+        addToast(response.message || "Failed to remove from cart", "error");
+      }
+    } catch (error) {
+      addToast("Failed to remove from cart", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearCart = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const response = await cartService.clearCart();
+      if (response.success) {
+        setCart([]);
+        addToast("Cart cleared", "info");
+      } else {
+        addToast(response.message || "Failed to clear cart", "error");
+      }
+    } catch (error) {
+      addToast("Failed to clear cart", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToWishlist = async (product: Product) => {
+    if (!user) {
+      addToast("Please login to add items to wishlist", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await wishlistService.addToWishlist(product.id);
+      if (response.success) {
+        setWishlist(response.data.items);
+        addToast(response.message || `${product.name} added to wishlist`, "success");
+      } else {
+        addToast(response.message || "Failed to add to wishlist", "error");
+      }
+    } catch (error) {
+      addToast("Failed to add to wishlist", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeFromWishlist = async (productId: string) => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const response = await wishlistService.removeFromWishlist(productId);
+      if (response.success) {
+        setWishlist(response.data.items);
+        addToast("Removed from wishlist", "info");
+      } else {
+        addToast(response.message || "Failed to remove from wishlist", "error");
+      }
+    } catch (error) {
+      addToast("Failed to remove from wishlist", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isInWishlist = (productId: string) => {
+    return wishlist.some((item) => item.product._id === productId);
   };
 
   return (
     <StoreContext.Provider
       value={{
         cart,
+        wishlist,
+        loading,
         addToCart,
         updateQuantity,
         removeFromCart,
         clearCart,
+        addToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        refreshCart,
+        refreshWishlist,
       }}
     >
+
       {children}
       
       {/* Global Toasts */}

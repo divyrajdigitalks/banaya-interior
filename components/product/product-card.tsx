@@ -6,6 +6,7 @@ import { Heart, ShoppingBag, Check, ArrowRight, Star } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/context/StoreContext";
+import { buildImageUrl } from "@/lib/api";
 
 interface ProductCardProps {
   id: string;
@@ -34,7 +35,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const { addToCart } = useStore();
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore();
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,6 +51,22 @@ export function ProductCard({
     });
     
     setTimeout(() => setIsAdding(false), 2000);
+  };
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist(id)) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist({
+        id,
+        name,
+        price,
+        image,
+        category
+      });
+    }
   };
 
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : null;
@@ -69,10 +86,20 @@ export function ProductCard({
               </span>
             </div>
           )}
+
+          <button 
+            onClick={toggleWishlist}
+            className={`absolute top-2 right-2 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+              isInWishlist(id) ? "bg-red-500 text-white" : "bg-white/80 backdrop-blur-md text-primary/40 hover:text-red-500"
+            } shadow-lg`}
+          >
+            <Heart size={14} className={isInWishlist(id) ? "fill-white" : ""} />
+          </button>
+
           
           <div className="relative w-full h-full overflow-hidden">
             <Image
-              src={isHovered && hoverImage ? hoverImage : image}
+              src={isHovered && hoverImage ? (hoverImage.startsWith('http') ? hoverImage : buildImageUrl(hoverImage)) : (image.startsWith('http') ? image : buildImageUrl(image))}
               alt={name}
               fill
               className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"

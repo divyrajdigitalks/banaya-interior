@@ -4,9 +4,10 @@ import { Logo } from "./logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShoppingBag, Heart, Search, User } from "lucide-react";
+import { ShoppingBag, Heart, Search, User, LogOut } from "lucide-react";
 import { MegaMenu } from "./mega-menu";
 import { useStore } from "@/context/StoreContext";
+import { useUser } from "@/context/UserContext";
 
 interface HeaderProps {
   variant?: "dark" | "light" | "transparent";
@@ -14,7 +15,8 @@ interface HeaderProps {
 
 export function Header({ variant = "dark" }: HeaderProps) {
   const pathname = usePathname();
-  const { cart } = useStore();
+  const { cart, wishlist } = useStore();
+  const { user, logout } = useUser();
   
   const bgClass = variant === "transparent" 
     ? "bg-transparent" 
@@ -102,19 +104,44 @@ export function Header({ variant = "dark" }: HeaderProps) {
 
               {!isInteriorsPage && (
               <div className="flex items-center gap-8 text-primary">
-                  <Link 
-                    href="/account" 
-                    className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
-                  >
-                    <User size={22} strokeWidth={1.5} />
-                    <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Account</span>
-                  </Link>
+                  {user ? (
+                    <div className="flex items-center gap-6">
+                      <div className="relative group flex flex-col items-center gap-1.5 cursor-default">
+                        <div className="w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center text-gold text-[10px] font-black border border-gold/20 uppercase">
+                          {user.name?.charAt(0) || user.username?.charAt(0) || 'U'}
+                        </div>
+                        <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase max-w-[60px] truncate">{user.name || user.username || 'User'}</span>
+                      </div>
+                      <button 
+                        onClick={logout}
+                        className="relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5"
+                      >
+                        <LogOut size={20} strokeWidth={1.5} />
+                        <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Logout</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <Link 
+                      href="/login" 
+                      className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
+                    >
+                      <User size={22} strokeWidth={1.5} />
+                      <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Login</span>
+                    </Link>
+                  )}
 
                   <Link 
                     href="/wishlist" 
                     className={`relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5`}
                   >
-                    <Heart size={22} strokeWidth={1.5} />
+                    <div className="relative">
+                      <Heart size={22} strokeWidth={1.5} />
+                      {wishlist.length > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-primary text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-[#fdf9f3]">
+                          {wishlist.length}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Wishlist</span>
                   </Link>
                   
@@ -134,6 +161,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
                   </Link>
                 </div>
               )}
+
             </div>
           </div>
         </div>

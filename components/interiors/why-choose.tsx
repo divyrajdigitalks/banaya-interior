@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
@@ -8,37 +9,140 @@ import {
   ShieldCheck,
   Headphones,
   Clock,
+  Award,
+  Users,
+  Shield,
+  Palette,
+  Home,
+  Star,
+  Heart,
+  CheckCircle,
+  Zap,
+  Sparkles,
+  Truck,
+  LucideIcon,
 } from "lucide-react";
+import { whyChooseService, type WhyChooseItem, type WhyChooseSectionSettings } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
-const FEATURES = [
+const ICONS: Record<string, LucideIcon> = {
+  Award,
+  Users,
+  Clock,
+  Shield,
+  Palette,
+  Home,
+  Star,
+  Heart,
+  CheckCircle,
+  Zap,
+  User,
+  Wallet,
+  ShieldCheck,
+  Headphones,
+  Sparkles,
+  Truck,
+};
+
+const DEFAULT_FEATURES = [
   {
-    icon: User,
+    id: "1",
+    iconId: "User",
     title: "Personalized Designs",
-    desc: "Designed around your lifestyle & needs",
+    description: "Designed around your lifestyle & needs",
+    isActive: true,
+    sortOrder: 0,
+    createdAt: "",
+    updatedAt: ""
   },
   {
-    icon: Wallet,
+    id: "2",
+    iconId: "Wallet",
     title: "Transparent Pricing",
-    desc: "No hidden costs, complete clarity",
+    description: "No hidden costs, complete clarity",
+    isActive: true,
+    sortOrder: 1,
+    createdAt: "",
+    updatedAt: ""
   },
   {
-    icon: ShieldCheck,
+    id: "3",
+    iconId: "ShieldCheck",
     title: "Premium Quality",
-    desc: "High-quality materials & craftsmanship",
+    description: "High-quality materials & craftsmanship",
+    isActive: true,
+    sortOrder: 2,
+    createdAt: "",
+    updatedAt: ""
   },
   {
-    icon: Headphones,
+    id: "4",
+    iconId: "Headphones",
     title: "End-to-End Support",
-    desc: "From design to installation",
+    description: "From design to installation",
+    isActive: true,
+    sortOrder: 3,
+    createdAt: "",
+    updatedAt: ""
   },
   {
-    icon: Clock,
+    id: "5",
+    iconId: "Clock",
     title: "Timely Delivery",
-    desc: "On-time project completion",
+    description: "On-time project completion",
+    isActive: true,
+    sortOrder: 4,
+    createdAt: "",
+    updatedAt: ""
   },
 ];
 
 export function WhyChooseSection() {
+  const [whyChooseItems, setWhyChooseItems] = useState<WhyChooseItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sectionSettings, setSectionSettings] = useState<WhyChooseSectionSettings>({
+    title: "Why Choose Banaya Interiors?",
+    subtitle: "The Banaya Advantage",
+    sectionImage: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=958&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    isActive: true
+  });
+  const [imageKey, setImageKey] = useState(0); // Force image refresh
+
+  useEffect(() => {
+    const loadWhyChooseItems = async () => {
+      try {
+        const [itemsData, settingsData] = await Promise.all([
+          whyChooseService.getWhyChooseList(),
+          whyChooseService.getSectionSettings()
+        ]);
+        
+        console.log('Loaded section settings in component:', settingsData);
+        setWhyChooseItems(itemsData.length > 0 ? itemsData : DEFAULT_FEATURES);
+        setSectionSettings(settingsData);
+        setImageKey(prev => prev + 1); // Force image refresh
+      } catch (error) {
+        console.error('Error loading why choose data:', error);
+        setWhyChooseItems(DEFAULT_FEATURES);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWhyChooseItems();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-18 bg-[#faf7f2] overflow-hidden relative">
+        <div className="container mx-auto px-4 md:px-12 relative z-10">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-primary/40">Loading...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-18 bg-[#faf7f2] overflow-hidden relative">
       
@@ -60,7 +164,7 @@ export function WhyChooseSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 className="text-gold font-semibold text-[11px] uppercase tracking-[0.25em] block"
               >
-                The Banaya Advantage
+                {sectionSettings.subtitle}
               </motion.span>
 
               <motion.h2
@@ -68,38 +172,53 @@ export function WhyChooseSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 className="text-3xl md:text-4xl font-serif font-medium text-primary leading-tight"
               >
-                Why Choose <br />
+                {sectionSettings.title.split(' ').slice(0, 2).join(' ')} <br />
                 <span className="text-gold font-semibold">
-                  Banaya Interiors?
+                  {sectionSettings.title.split(' ').slice(2).join(' ')}
                 </span>
               </motion.h2>
             </div>
 
             {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-              {FEATURES.map((feature, idx) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
-                  className="flex gap-4 group"
-                >
-                  <div className="shrink-0 w-11 h-11 rounded-lg bg-white flex items-center justify-center text-gold border border-gold/30 shadow-sm group-hover:bg-gold group-hover:text-white transition duration-300">
-                    <feature.icon size={20} strokeWidth={1.8} />
-                  </div>
+              {whyChooseItems.map((feature, idx) => {
+                const Icon = ICONS[feature.iconId] || User;
+                return (
+                  <motion.div
+                    key={feature.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.08 }}
+                    className="flex gap-4 group"
+                  >
+                    {feature.image ? (
+                      <div className="shrink-0 w-11 h-11 rounded-lg overflow-hidden border border-gold/30 shadow-sm group-hover:shadow-md transition duration-300">
+                        <Image
+                          src={buildImageUrl(feature.image) || feature.image}
+                          alt={feature.title}
+                          width={44}
+                          height={44}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="shrink-0 w-11 h-11 rounded-lg bg-white flex items-center justify-center text-gold border border-gold/30 shadow-sm group-hover:bg-gold group-hover:text-white transition duration-300">
+                        <Icon size={20} strokeWidth={1.8} />
+                      </div>
+                    )}
 
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
-                      {feature.title}
-                    </h4>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
+                        {feature.title}
+                      </h4>
 
-                    <p className="text-sm text-primary/70 font-normal leading-relaxed max-w-[240px]">
-                      {feature.desc}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+                      <p className="text-sm text-primary/70 font-normal leading-relaxed max-w-[240px]">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
@@ -116,10 +235,11 @@ export function WhyChooseSection() {
             <div className="relative aspect-[4/5] rounded-[1.8rem] overflow-hidden shadow-xl">
               
               <Image
-                src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=958&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src={sectionSettings.sectionImage}
                 alt="Interiors Showcase"
                 fill
                 className="object-cover transition-transform duration-[2.5s] hover:scale-105"
+                key={`section-image-${imageKey}`} // Force re-render when image changes
               />
 
               {/* Overlay */}

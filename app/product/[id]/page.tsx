@@ -42,17 +42,53 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { productService, type Product } from "@/lib/api";
 
+import { useStore } from "@/context/StoreContext";
+import { useUser } from "@/context/UserContext";
+
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore();
+  const { user } = useUser();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [selectedSize, setSelectedImageSize] = useState("Medium (16 x 10 in)");
   const [activeTab, setActiveTab] = useState("Description");
+  
+  const isWishlisted = product ? isInWishlist(product.id) : false;
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setIsAdding(true);
+    await addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category?.name || "Decor"
+    }, quantity);
+    setIsAdding(false);
+  };
+
+  const toggleWishlist = async () => {
+    if (!product) return;
+    if (isWishlisted) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category?.name || "Decor"
+      });
+    }
+  };
+
   
   // Personalisation State
   const [isPersonaliseOpen, setIsPersonaliseOpen] = useState(false);
@@ -149,10 +185,12 @@ export default function ProductDetailPage() {
                 </span>
               </div>
               <button 
-                onClick={() => setIsWishlisted(!isWishlisted)}
-                className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/90 text-primary hover:bg-gold hover:text-white transition-all shadow-xl"
+                onClick={toggleWishlist}
+                className={`absolute top-4 right-4 z-10 p-2.5 rounded-full transition-all shadow-xl ${
+                  isWishlisted ? "bg-red-500 text-white" : "bg-white/90 text-primary hover:bg-gold hover:text-white"
+                }`}
               >
-                <Heart size={20} className={isWishlisted ? "fill-primary" : ""} />
+                <Heart size={20} className={isWishlisted ? "fill-white" : ""} />
               </button>
 
               <div className="relative aspect-[4/3] w-full">
@@ -542,8 +580,13 @@ export default function ProductDetailPage() {
                   <span className="w-10 text-center font-black text-primary">{quantity}</span>
                   <button onClick={() => setQuantity(quantity + 1)} className="p-3 text-primary/40 hover:text-primary transition-colors"><Plus size={16} /></button>
                 </div>
-                <Button className="flex-1 bg-primary hover:bg-gold text-white font-black uppercase tracking-[0.2em] text-[10px] py-7 rounded-xl transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3">
-                  <ShoppingBag size={18} /> Add to Cart
+                <Button 
+                  onClick={handleAddToCart}
+                  disabled={isAdding}
+                  className="flex-1 bg-primary hover:bg-gold text-white font-black uppercase tracking-[0.2em] text-[10px] py-7 rounded-xl transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  {isAdding ? <Check size={18} /> : <ShoppingBag size={18} />}
+                  {isAdding ? "Added to Cart" : "Add to Cart"}
                 </Button>
               </div>
 
@@ -610,10 +653,10 @@ export default function ProductDetailPage() {
                 key={p.id} 
                 id={p.id}
                 name={p.name}
-                category={p.categoryId}
+                category={p.category?.name || "Decor"}
                 price={p.price}
                 image={p.image}
-                tag={p.tags?.[0]}
+                rating={p.rating || 4.5}
               />
             ))}
           </div>

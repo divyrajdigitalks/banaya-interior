@@ -1,7 +1,22 @@
 export interface EndPointApi {
   // Auth
   adminLogin: string;
+  register: string;
   logout: string;
+
+  // Cart
+  cart: string;
+  cartAdd: string;
+  cartUpdate: string;
+  cartRemove: string;
+  cartClear: string;
+
+  // Wishlist
+  wishlist: string;
+  wishlistAdd: string;
+  wishlistRemove: string;
+  wishlistClear: string;
+  wishlistCheck: string;
 
   // Categories
   adminCategories: string;
@@ -64,7 +79,22 @@ export interface EndPointApi {
 const endPointApi: EndPointApi = {
   // Auth
   adminLogin: 'auth/login',
+  register: 'auth/register',
   logout: 'auth/logout',
+
+  // Cart
+  cart: 'cart',
+  cartAdd: 'cart/add',
+  cartUpdate: 'cart/update',
+  cartRemove: 'cart/remove',
+  cartClear: 'cart/clear',
+
+  // Wishlist
+  wishlist: 'wishlist',
+  wishlistAdd: 'wishlist/add',
+  wishlistRemove: 'wishlist/remove',
+  wishlistClear: 'wishlist/clear',
+  wishlistCheck: 'wishlist/check',
 
   // Categories
   adminCategories: 'categories',

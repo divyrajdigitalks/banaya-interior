@@ -7,11 +7,12 @@ import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { useStore } from "@/context/StoreContext";
+import { buildImageUrl } from "@/lib/api";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useStore();
 
-  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((acc, item) => acc + (item.product?.price || 0) * item.quantity, 0);
   const shipping = subtotal > 0 ? 500 : 0;
   const total = subtotal + shipping;
 
@@ -39,7 +40,7 @@ export default function CartPage() {
                   {cart.length > 0 ? (
                     cart.map((item) => (
                       <motion.div
-                        key={item.id}
+                        key={item._id}
                         layout
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -49,8 +50,8 @@ export default function CartPage() {
                         {/* Image */}
                         <div className="relative w-full sm:w-40 aspect-square rounded-2xl overflow-hidden bg-[#fdf9f3] shrink-0">
                           <Image
-                            src={item.image}
-                            alt={item.name}
+                            src={item.product?.image ? (item.product.image.startsWith('http') ? item.product.image : buildImageUrl(item.product.image)) : ""}
+                            alt={item.product?.name || "Product"}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                           />
@@ -60,22 +61,22 @@ export default function CartPage() {
                         <div className="flex-1 space-y-4 text-center sm:text-left">
                           <div className="space-y-1">
                             <span className="text-[11px] font-bold text-gold tracking-tight">
-                              {item.category}
+                              {typeof item.product?.category === 'object' ? (item.product.category as any).name : (item.product?.category || "Decor")}
                             </span>
-                            <h3 className="text-xl font-bold text-primary">{item.name}</h3>
+                            <h3 className="text-xl font-bold text-primary">{item.product?.name}</h3>
                           </div>
                           
                           <div className="flex items-center justify-center sm:justify-start gap-6">
                             <div className="flex items-center gap-4 bg-[#fdf9f3] rounded-full p-1 border border-primary/5">
                               <button
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => updateQuantity(item.product?._id, item.quantity - 1)}
                                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-primary/40 hover:text-primary transition-all shadow-sm"
                               >
                                 <Minus size={14} />
                               </button>
                               <span className="text-sm font-black w-4 text-center">{item.quantity}</span>
                               <button
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => updateQuantity(item.product?._id, item.quantity + 1)}
                                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-primary/40 hover:text-primary transition-all shadow-sm"
                               >
                                 <Plus size={14} />
@@ -83,14 +84,14 @@ export default function CartPage() {
                             </div>
                             
                             <span className="text-lg font-black text-primary">
-                              ₹{(item.price * item.quantity).toLocaleString()}
+                              ₹{((item.product?.price || 0) * item.quantity).toLocaleString()}
                             </span>
                           </div>
                         </div>
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeFromCart(item.product?._id)}
                           className="sm:absolute top-6 right-6 p-4 text-primary/20 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300"
                         >
                           <Trash2 size={20} strokeWidth={1.5} />

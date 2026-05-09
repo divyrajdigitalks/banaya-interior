@@ -33,8 +33,6 @@ function ShopContent() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("Popularity");
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -528,22 +526,6 @@ function ShopContent() {
                 <p className="text-xs font-bold text-primary/60">Showing {filteredProducts.length} masterpieces</p>
               </div>
               
-              <div className="flex items-center gap-8">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-black text-primary/40 uppercase tracking-widest">Sort:</span>
-                  <button className="flex items-center gap-3 text-xs font-bold text-primary bg-white border border-primary/5 rounded-xl px-5 py-2.5 hover:border-gold transition-all">
-                    {sortBy} <ChevronDown className="h-3 w-3 text-gold" />
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-black text-primary/40 uppercase tracking-widest">View:</span>
-                  <div className="flex items-center p-1 bg-white border border-primary/5 rounded-xl shadow-sm">
-                    <button className="p-2 bg-primary text-white rounded-lg shadow-lg"><Grid className="h-4 w-4" /></button>
-                    <button className="p-2 text-primary/30 hover:text-primary transition-colors"><List className="h-4 w-4" /></button>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Grid */}

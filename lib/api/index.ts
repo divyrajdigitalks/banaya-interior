@@ -5,3 +5,5 @@ export { projectService, type Project } from './services/project.service';
 export { processService, type ProcessStep } from './services/process.service';
 export { testimonialService, type Testimonial } from './services/testimonial.service';
 export { costGuideService, type CostGuideItem } from './services/cost-guide.service';
+export { whyChooseService, type WhyChooseItem, type WhyChooseSectionSettings } from './services/why-choose.service';
+export { aboutService, type AboutSection, type AboutSectionSettings } from './services/about.service';
