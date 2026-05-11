@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Save, Sparkles, Image as ImageIcon, Calendar, Clock, Info, Tag, Layout, Loader2 } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft, Save, Sparkles, Image as ImageIcon, Calendar, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
@@ -12,18 +12,15 @@ import {
   AdminCard, 
   AdminLabel, 
   ImageUpload, 
-  MultiImageUpload, 
-  AdminSelect,
   AdminFormTextarea
 } from "@/components/admin";
 import { offerService } from "@/lib/api";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
-export default function AddOfferPage() {
+export default function OfferFormPage() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const offerId = searchParams.get('id');
   const { showSuccess, showError } = useAdminToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,13 +40,44 @@ export default function AddOfferPage() {
   });
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
+  const isEditMode = id !== 'add';
+
   useEffect(() => {
-    if (offerId) {
+    if (isEditMode && id) {
       loadOffer();
     } else {
       setLoading(false);
     }
-  }, [offerId]);
+  }, [id, isEditMode]);
+
+  const loadOffer = async () => {
+    setLoading(true);
+    try {
+      const response = await offerService.getOffers();
+      if (response.success) {
+        const offer = response.data.find((o: any) => o._id === id);
+        if (offer) {
+          setFormData({
+            title: offer.title,
+            description: offer.description,
+            discountText: offer.discountText,
+            startDate: offer.startDate ? offer.startDate.split('T')[0] : "",
+            endDate: offer.endDate ? offer.endDate.split('T')[0] : "",
+            image: offer.image,
+            isActive: offer.isActive,
+            type: offer.type || "banner",
+            terms: offer.terms || "",
+            link: offer.link || "/shop"
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading offer:', error);
+      showError("Failed to load offer");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const formState = {
@@ -62,34 +90,6 @@ export default function AddOfferPage() {
     const { isValid, errors } = FormValidator.validateForm(formState);
     setFormErrors(errors);
     return isValid;
-  };
-
-  const loadOffer = async () => {
-    setLoading(true);
-    try {
-      const response = await offerService.getOffers();
-      if (response.success) {
-        const offer = response.data.find((o: any) => o._id === offerId);
-        if (offer) {
-          setFormData({
-            title: offer.title,
-            description: offer.description,
-            discountText: offer.discountText,
-            startDate: offer.startDate ? offer.startDate.split('T')[0] : "",
-            endDate: offer.endDate ? offer.endDate.split('T')[0] : "",
-            image: offer.image,
-            isActive: offer.isActive,
-              type: offer.type || "banner",
-              terms: offer.terms || "",
-              link: offer.link || "/shop"
-            });
-        }
-      }
-    } catch (error) {
-      showError("Failed to load offer");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSave = async () => {
@@ -113,21 +113,21 @@ export default function AddOfferPage() {
       };
 
       let result;
-      if (offerId) {
-        result = await offerService.updateOffer(offerId, offerData, selectedFile);
+      if (isEditMode && id) {
+        result = await offerService.updateOffer(id, offerData, selectedFile);
       } else {
         result = await offerService.createOffer(offerData, selectedFile);
       }
 
       if (result.success) {
-        showSuccess(offerId ? "Offer updated successfully!" : "Offer created successfully!");
+        showSuccess(isEditMode ? "Offer updated successfully!" : "Offer created successfully!");
         router.push("/admin/offers");
       } else {
         showError(result.error || "Save failed");
       }
     } catch (error) {
-      console.error(`Error ${offerId ? 'updating' : 'creating'} offer:`, error);
-      showError(`An error occurred while ${offerId ? 'updating' : 'creating'} the offer.`);
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} offer:`, error);
+      showError(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the offer.`);
     } finally {
       setSaving(false);
     }
@@ -154,7 +154,7 @@ export default function AddOfferPage() {
           </Button>
           <div>
             <h1 className="text-xl font-semibold text-charcoal">
-              {offerId ? 'Edit Offer' : 'Add New Offer'}
+              {isEditMode ? 'Edit Offer' : 'Add New Offer'}
             </h1>
             <p className="text-xs text-charcoal/40 mt-0.5">
               Fill in the offer details below

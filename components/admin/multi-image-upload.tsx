@@ -16,6 +16,14 @@ interface MultiImageUploadProps {
 
 export function MultiImageUpload({ value, onChange, onFilesSelect, label }: MultiImageUploadProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Initialize selectedFiles array to match value length when value changes (edit mode)
+  useState(() => {
+    if (value && value.length > 0) {
+      setSelectedFiles(new Array(value.length).fill(null));
+    }
+  });
+
   const handleAdd = () => {
     onChange([...value, ""]);
     setSelectedFiles([...selectedFiles, null as any]);

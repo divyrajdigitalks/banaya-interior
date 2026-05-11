@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
@@ -17,7 +17,8 @@ import {
   Clock,
   MoreVertical,
   Image as ImageIcon,
-  Tag
+  Tag,
+  Loader2
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,56 +40,50 @@ import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 
-const INITIAL_OFFERS = [
-  { 
-    id: "1", 
-    name: "Summer Sale 2024", 
-    description: "Get up to 40% off on all luxury furniture items this summer season.", 
-    discount: "Up to 40% OFF", 
-    startDate: "2024-05-01", 
-    endDate: "2024-06-30", 
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
-    isActive: true 
-  },
-  { 
-    id: "2", 
-    name: "New Home Bundle", 
-    description: "Special bundle offer for new homeowners. Save ₹50,000 on full home interiors.", 
-    discount: "Flat ₹50,000 OFF", 
-    startDate: "2024-01-01", 
-    endDate: "2024-12-31", 
-    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800",
-    isActive: true 
-  },
-];
+import { offerService } from "@/lib/api/services/offer.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { buildImageUrl } from "@/lib/api/axios";
 
 export default function OffersManagementPage() {
   const router = useRouter();
-  const [offers, setOffers] = useState(INITIAL_OFFERS);
+  const { showSuccess, showError } = useAdminToast();
+  const [offers, setOffers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingOffer, setEditingOffer] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({
-    name: "",
-    description: "",
-    discount: "",
-    startDate: "",
-    endDate: "",
-    image: "",
-    isActive: true
-  });
+
+  useEffect(() => {
+    loadOffers();
+  }, []);
+
+  const loadOffers = async () => {
+    setLoading(true);
+    try {
+      const response = await offerService.getOffers();
+      if (response.success) {
+        setOffers(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load offers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
       header: "Offer Details",
-      accessorKey: "name",
+      accessorKey: "title",
       cell: (item: any) => (
         <div className="flex items-center gap-4 max-w-md">
           <div className="w-16 h-12 rounded-xl overflow-hidden shadow-md border border-charcoal/5 flex-shrink-0">
-            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            <img 
+              src={item.image ? (item.image.startsWith('http') ? item.image : buildImageUrl(item.image)) : "/placeholder-offer.jpg"} 
+              alt={item.title} 
+              className="w-full h-full object-cover" 
+            />
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-charcoal truncate">{item.name}</p>
+            <p className="font-bold text-charcoal truncate">{item.title}</p>
             <p className="text-[10px] text-charcoal/40 font-medium line-clamp-1 italic">"{item.description}"</p>
           </div>
         </div>
@@ -96,11 +91,11 @@ export default function OffersManagementPage() {
     },
     {
       header: "Benefit",
-      accessorKey: "discount",
+      accessorKey: "discountText",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
           <Tag size={14} className="text-gold" />
-          <span className="font-black text-charcoal">{item.discount}</span>
+          <span className="font-black text-charcoal">{item.discountText}</span>
         </div>
       )
     },
@@ -111,11 +106,11 @@ export default function OffersManagementPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">
             <Calendar size={12} className="text-gold" />
-            {item.startDate}
+            {new Date(item.startDate).toLocaleDateString()}
           </div>
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">
             <Clock size={12} className="text-gold" />
-            {item.endDate}
+            {new Date(item.endDate).toLocaleDateString()}
           </div>
         </div>
       )
@@ -133,11 +128,11 @@ export default function OffersManagementPage() {
     },
     {
       header: "Action",
-      accessorKey: "id",
+      accessorKey: "_id",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
           <button 
-            onClick={(e) => { e.stopPropagation(); toggleStatus(item.id); }}
+            onClick={(e) => { e.stopPropagation(); toggleStatus(item); }}
             className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all shadow-sm ${
               item.isActive 
                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white' 
@@ -148,13 +143,13 @@ export default function OffersManagementPage() {
             {item.isActive ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); router.push(`/admin/offers/add?id=${item.id}`); }}
+            onClick={(e) => { e.stopPropagation(); router.push(`/admin/offers/${item._id}`); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
           >
             <Edit3 size={14} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+            onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100/50"
           >
             <Trash2 size={14} />
@@ -168,18 +163,37 @@ export default function OffersManagementPage() {
     router.push("/admin/offers/add");
   };
 
-  const handleDelete = (id: string) => {
-    setOffers(offers.filter(o => o.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      const response = await offerService.deleteOffer(id);
+      if (response.success) {
+        showSuccess("Offer deleted");
+        loadOffers();
+      }
+    } catch (error) {
+      showError("Delete failed");
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setOffers(offers.map(o => o.id === id ? { ...o, isActive: !o.isActive } : o));
+  const toggleStatus = async (item: any) => {
+    try {
+      const response = await offerService.updateOffer(item._id, { isActive: !item.isActive });
+      if (response.success) {
+        showSuccess(`Offer ${item.isActive ? 'paused' : 'launched'}`);
+        loadOffers();
+      }
+    } catch (error) {
+      showError("Update failed");
+    }
   };
 
   const filteredOffers = offers.filter(o => 
-    o.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     o.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-gold" /></div>;
 
   return (
     <div className="space-y-12 pb-12">

@@ -55,33 +55,34 @@ export default function AdminProductsPage() {
             <img src={buildImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-sm font-medium text-charcoal">{item.name}</p>
-            <p className="text-[11px] text-charcoal/40 uppercase tracking-wide">
-              {categories.find(c => c.id === item.categoryId)?.name} • {subcategories.find(s => s.id === item.subcategoryId)?.name}
-            </p>
+            <p className="text-sm font-bold text-charcoal">{item.name}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gold bg-gold/5 px-2 py-0.5 rounded-full border border-gold/10">
+                {categories.find(c => c.id === item.categoryId)?.name || 'N/A'}
+              </span>
+              <span className="text-[10px] font-bold text-charcoal/30 uppercase tracking-widest">
+                {subcategories.find(s => s.id === item.subcategoryId)?.name || 'N/A'}
+              </span>
+            </div>
           </div>
         </div>
       )
     },
     {
-      header: "Pricing",
+      header: "Price & Inventory",
       accessorKey: "price",
       cell: (item: Product) => (
-        <div className="space-y-0.5">
-          <p className="text-sm font-semibold text-charcoal">₹{item.price}</p>
-          {item.originalPrice && (
-            <p className="text-[11px] text-charcoal/30 line-through">₹{item.originalPrice}</p>
-          )}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-black text-charcoal">₹{item.price}</p>
+            {item.originalPrice && (
+              <p className="text-[11px] text-charcoal/30 line-through">₹{item.originalPrice}</p>
+            )}
+          </div>
+          <p className={`text-[10px] font-bold uppercase tracking-widest ${item.stock && item.stock > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+            {item.stock && item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}
+          </p>
         </div>
-      )
-    },
-    {
-      header: "Stock",
-      accessorKey: "stock",
-      cell: (item: Product) => (
-        <span className={`text-sm font-medium ${item.stock && item.stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-          {item.stock || 0}
-        </span>
       )
     },
     {

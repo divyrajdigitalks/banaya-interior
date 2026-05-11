@@ -121,6 +121,31 @@ class ProductService {
     return fetchPromise;
   }
 
+  async getRelatedProducts(id: string): Promise<{ manual: Product[], automatic: Product[] }> {
+    try {
+      const res = await api.get(`/products/${id}/related`);
+      const payload = res.data;
+      
+      const mapItem = (item: any) => ({
+        id: item.id || item._id,
+        name: item.name,
+        description: item.description,
+        price: Number(item.price) || 0,
+        originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
+        image: buildImageUrl(item.image),
+        category: item.category
+      });
+
+      const manual = Array.isArray(payload?.data?.manual) ? payload.data.manual.map(mapItem) : [];
+      const automatic = Array.isArray(payload?.data?.automatic) ? payload.data.automatic.map(mapItem) : [];
+
+      return { manual, automatic };
+    } catch (error) {
+      console.error('Failed to fetch related products', error);
+      return { manual: [], automatic: [] };
+    }
+  }
+
   async getProduct(id: string): Promise<Product | null> {
     try {
       const res = await api.get(`${endPointApi.adminProducts}/${id}`);
@@ -135,8 +160,8 @@ class ProductService {
       return {
         id: item.id || item._id,
         name: item.name,
-        categoryId: item.categoryId,
-        subcategoryId: item.subcategoryId,
+        categoryId: item.category?._id || item.category || item.categoryId,
+        subcategoryId: item.subcategory?._id || item.subcategory || item.subcategoryId,
         price: Number(item.price) || 0,
         originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
         image: buildImageUrl(item.image),
@@ -160,7 +185,8 @@ class ProductService {
         usePurpose: item.usePurpose,
         occasions: item.occasions,
         discount: item.discount ? Number(item.discount) : undefined,
-      };
+        relatedProducts: item.relatedProducts?.map((rp: any) => rp.id || rp._id || rp) || [],
+      } as any;
     } catch (error) {
       return null;
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,6 +41,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { productService, type Product } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 import { useStore } from "@/context/StoreContext";
 import { useUser } from "@/context/UserContext";
@@ -51,7 +52,8 @@ export default function ProductDetailPage() {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore();
   const { user } = useUser();
   const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [manualRelated, setManualRelated] = useState<Product[]>([]);
+  const [autoRelated, setAutoRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -60,6 +62,51 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState("Description");
   
   const isWishlisted = product ? isInWishlist(product.id) : false;
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (id) {
+        setLoading(true);
+        try {
+          const foundProduct = await productService.getProduct(id);
+          
+          if (foundProduct) {
+            setProduct(foundProduct);
+            if (foundProduct.sizes?.length > 0) {
+              setSelectedImageSize(foundProduct.sizes[0]);
+            }
+            
+            // Get related products from API
+            const related = await productService.getRelatedProducts(id);
+            setManualRelated(related.manual);
+            setAutoRelated(related.automatic);
+          }
+        } catch (error) {
+          console.error("Failed to load product details", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadData();
+  }, [id]);
+
+  const handleAddAllToCart = async () => {
+    if (manualRelated.length === 0) return;
+    setIsAdding(true);
+    for (const item of manualRelated) {
+      await addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        category: (item as any).category?.name || "Decor"
+      }, 1);
+    }
+    setIsAdding(false);
+  };
+
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -108,31 +155,6 @@ export default function ProductDetailPage() {
       reader.readAsDataURL(file);
     }
   };
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (id) {
-        const [foundProduct, allProducts] = await Promise.all([
-          productService.getProduct(id),
-          productService.getProductList(true),
-        ]);
-        
-        if (foundProduct) {
-          setProduct(foundProduct);
-          if (foundProduct.sizes?.length > 0) {
-            setSelectedImageSize(foundProduct.sizes[0]);
-          }
-          
-          // Get related products (excluding current product)
-          setRelatedProducts(allProducts.filter(p => p.id !== id).slice(0, 4));
-        }
-      }
-      
-      setLoading(false);
-    };
-    
-    loadData();
-  }, [id]);
 
   if (loading) {
     return (
@@ -352,53 +374,73 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* COMBO SECTION - People Also Shopped For */}
-                <div className="mt-16 space-y-8">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-black text-primary/40 uppercase tracking-[0.3em]">People Also Shopped For</h3>
-                  </div>
-                  
-                  <div className="p-8 bg-white border border-primary/5 rounded-3xl shadow-sm">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                      <div className="flex-1 grid grid-cols-3 gap-6 items-center">
-                        <div className="space-y-3 text-center">
-                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
-                            <Image src="https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400&q=80" alt="Item 1" fill className="object-cover" />
-                          </div>
-                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Wooden Tray With Handles</p>
-                          <p className="text-[10px] font-black text-primary">₹1,390 <span className="text-[8px] text-primary/20 line-through">₹2,150</span></p>
-                        </div>
-                        <div className="text-2xl text-primary/20 font-light">+</div>
-                        <div className="space-y-3 text-center">
-                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
-                            <Image src="https://images.unsplash.com/photo-1581428982868-e410dd047a90?w=400&q=80" alt="Item 2" fill className="object-cover" />
-                          </div>
-                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Snack Platter With Bowls</p>
-                          <p className="text-[10px] font-black text-primary">₹1,550 <span className="text-[8px] text-primary/20 line-through">₹2,340</span></p>
-                        </div>
-                        <div className="text-2xl text-primary/20 font-light">+</div>
-                        <div className="space-y-3 text-center">
-                          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
-                            <Image src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80" alt="Item 3" fill className="object-cover" />
-                          </div>
-                          <p className="text-[9px] font-bold text-primary/60 leading-tight">Acacia Wood Cake Stand</p>
-                          <p className="text-[10px] font-black text-primary">₹1,550 <span className="text-[8px] text-primary/20 line-through">₹2,340</span></p>
-                        </div>
-                      </div>
+                {/* People Also Shopped For - Manual Selections Only */}
+                {manualRelated.length > 0 && (
+                  <div className="mt-16 space-y-8">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-black text-primary/40 uppercase tracking-[0.3em]">People Also Shopped For</h3>
+                    </div>
+                    
+                    <div className="p-8 bg-white border border-primary/5 rounded-3xl shadow-sm">
+                      <div className="flex flex-col md:flex-row items-center gap-8">
+                        <div className="flex-1 flex items-center justify-center md:justify-start gap-4 overflow-x-auto scrollbar-hide">
+  {manualRelated.map((item, idx) => (
+    <React.Fragment key={item.id}>
+      <div className="min-w-[110px] max-w-[110px] space-y-3 text-center group flex-shrink-0">
+        <Link href={`/product/${item.id || item._id}`}>
+          <div className="relative aspect-square rounded-2xl overflow-hidden border border-primary/5">
+            <Image
+              src={
+                item.image.startsWith("http")
+                  ? item.image
+                  : buildImageUrl(item.image)
+              }
+              alt={item.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          </div>
+        </Link>
 
-                      <div className="w-px h-24 bg-primary/5 hidden md:block" />
+        <p className="text-[9px] font-bold text-primary/60 leading-tight line-clamp-1">
+          {item.name}
+        </p>
 
-                      <div className="w-full md:w-56 space-y-4 text-center">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Total Price</p>
-                          <p className="text-xl font-black text-primary">₹4,490</p>
+        <p className="text-[10px] font-black text-primary">
+          ₹{item.price.toLocaleString()}
+        </p>
+      </div>
+
+      {idx < manualRelated.length - 1 && (
+        <div className="text-2xl text-primary/20 font-light flex-shrink-0">
+          +
+        </div>
+      )}
+    </React.Fragment>
+  ))}
+</div>
+
+                        <div className="w-px h-24 bg-primary/5 hidden md:block" />
+
+                        <div className="w-full md:w-56 space-y-4 text-center">
+                          <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Bundle Price</p>
+                            <p className="text-xl font-black text-primary">
+                              ₹{manualRelated.reduce((sum, item) => sum + item.price, 0).toLocaleString()}
+                            </p>
+                          </div>
+                          <button 
+                            onClick={handleAddAllToCart}
+                            disabled={isAdding}
+                            className="w-full py-4 bg-[#4F3D31] hover:bg-gold text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-primary/5 disabled:opacity-50"
+                          >
+                            {isAdding ? "Adding..." : `Add All ${manualRelated.length} To Cart`}
+                          </button>
                         </div>
-                        <button className="w-full py-4 bg-[#4F3D31] hover:bg-gold text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-primary/5">
-                          Add All 3 To Cart
-                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -644,11 +686,13 @@ export default function ProductDetailPage() {
         {/* ── Related Products ── */}
         <section className="mt-24 pt-24 border-t border-primary/5">
           <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-serif font-black text-primary uppercase tracking-tight">You may also like</h2>
+            <h2 className="text-3xl font-serif font-black text-primary uppercase tracking-tight">
+              You may also like
+            </h2>
             <Link href="/shop" className="text-[10px] font-black uppercase tracking-widest text-gold hover:text-primary transition-colors border-b-2 border-gold pb-1">View Collection</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {relatedProducts.map((p) => (
+            {autoRelated.map((p) => (
               <ProductCard 
                 key={p.id} 
                 id={p.id}

@@ -12,6 +12,7 @@ interface AdminFormInputProps {
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  hideLabel?: boolean;
 }
 
 export function AdminFormInput({ 
@@ -22,13 +23,16 @@ export function AdminFormInput({
   type = "text", 
   required = false,
   disabled = false,
-  className = ""
+  className = "",
+  hideLabel = false
 }: AdminFormInputProps) {
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-semibold tracking-wide text-charcoal/60 uppercase">
-        {label} {required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
+      {!hideLabel && (
+        <Label className="text-xs font-semibold tracking-wide text-charcoal/60 uppercase">
+          {label} {required && <span className="text-red-500 ml-1">*</span>}
+        </Label>
+      )}
       <Input 
         type={type}
         value={value}

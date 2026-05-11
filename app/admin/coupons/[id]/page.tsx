@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Save, Ticket, RefreshCw, Calendar, Info, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -17,7 +17,8 @@ import { couponService } from "@/lib/api";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
-export default function AddCouponPage() {
+export default function CouponFormPage() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { showSuccess, showError } = useAdminToast();
   const [loading, setLoading] = useState(true);
@@ -38,9 +39,45 @@ export default function AddCouponPage() {
     userType: "All"
   });
 
+  const isEditMode = id !== 'add';
+
   useEffect(() => {
-    setLoading(false);
-  }, []);
+    if (isEditMode && id) {
+      loadCoupon();
+    } else {
+      setLoading(false);
+    }
+  }, [id, isEditMode]);
+
+  const loadCoupon = async () => {
+    setLoading(true);
+    try {
+      const response = await couponService.getCoupons();
+      if (response.success) {
+        const coupon = response.data.find((c: any) => c._id === id);
+        if (coupon) {
+          setFormData({
+            code: coupon.code,
+            discountType: coupon.discountType,
+            discountAmount: coupon.discountAmount.toString(),
+            minPurchase: coupon.minPurchase?.toString() || "",
+            maxDiscount: coupon.maxDiscount?.toString() || "",
+            startDate: coupon.startDate ? coupon.startDate.split('T')[0] : "",
+            endDate: coupon.endDate ? coupon.endDate.split('T')[0] : "",
+            isActive: coupon.isActive,
+            usageLimit: coupon.usageLimit?.toString() || "100",
+            description: coupon.description || "",
+            userType: coupon.userType || "All"
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading coupon:', error);
+      showError("Failed to load coupon");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const formState = {
@@ -85,17 +122,22 @@ export default function AddCouponPage() {
         userType: formData.userType
       };
 
-      const result = await couponService.createCoupon(couponData);
+      let result;
+      if (isEditMode && id) {
+        result = await couponService.updateCoupon(id, couponData);
+      } else {
+        result = await couponService.createCoupon(couponData);
+      }
 
       if (result.success) {
-        showSuccess("Coupon created successfully!");
+        showSuccess(isEditMode ? "Coupon updated successfully!" : "Coupon created successfully!");
         router.push("/admin/coupons");
       } else {
         showError(result.error || "Save failed");
       }
     } catch (error) {
-      console.error("Error creating coupon:", error);
-      showError("An error occurred while creating the coupon.");
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} coupon:`, error);
+      showError(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the coupon.`);
     } finally {
       setSaving(false);
     }
@@ -122,7 +164,7 @@ export default function AddCouponPage() {
           </Button>
           <div>
             <h1 className="text-xl font-semibold text-charcoal">
-              Add New Coupon
+              {isEditMode ? 'Edit Coupon' : 'Add New Coupon'}
             </h1>
             <p className="text-xs text-charcoal/40 mt-0.5">
               Fill in the coupon details below

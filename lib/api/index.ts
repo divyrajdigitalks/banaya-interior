@@ -7,3 +7,5 @@ export { testimonialService, type Testimonial } from './services/testimonial.ser
 export { costGuideService, type CostGuideItem } from './services/cost-guide.service';
 export { whyChooseService, type WhyChooseItem, type WhyChooseSectionSettings } from './services/why-choose.service';
 export { aboutService, type AboutSection, type AboutSectionSettings } from './services/about.service';
+export { offerService, type OfferData } from './services/offer.service';
+export { couponService, type CouponData } from './services/coupon.service';

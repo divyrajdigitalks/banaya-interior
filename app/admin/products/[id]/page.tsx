@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Save, Package, Info, Image as ImageIcon, LayoutGrid, Plus, Trash2, ListChecks, Settings2, Sparkles, Filter } from "lucide-react";
+import { ArrowLeft, Save, Package, Info, Image as ImageIcon, LayoutGrid, Plus, Trash2, ListChecks, Settings2, Sparkles, Filter, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
@@ -19,6 +19,7 @@ import {
 import { categoryService, type Category, type Subcategory } from "@/lib/api";
 import { productService, type Product } from "@/lib/api";
 import { filterService, type FilterOption } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
@@ -31,6 +32,7 @@ export default function ProductFormPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
@@ -67,6 +69,7 @@ export default function ProductFormPage() {
     usePurpose: "",
     occasions: "",
     discount: "",
+    relatedProducts: [],
   });
 
   const [newSize, setNewSize] = useState("");
@@ -76,13 +79,15 @@ export default function ProductFormPage() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [categoriesData, subcategoriesData] = await Promise.all([
+        const [categoriesData, subcategoriesData, productsData] = await Promise.all([
           categoryService.getCategoryList(),
           categoryService.getSubcategoryList(),
+          productService.getProductList(true),
           filterService.getFilterOptionList()
         ]);
         setCategories(categoriesData);
         setSubcategories(subcategoriesData);
+        setAllProducts(productsData);
         setFilterOptions(await filterService.getFilterOptionList());
         
         if (isEditMode && id) {
@@ -116,6 +121,7 @@ export default function ProductFormPage() {
               usePurpose: product.usePurpose || "",
               occasions: product.occasions || "",
               discount: product.discount?.toString() || "",
+              relatedProducts: (product as any).relatedProducts || [],
             });
           }
         }
@@ -215,6 +221,7 @@ export default function ProductFormPage() {
         usePurpose: formData.usePurpose,
         occasions: formData.occasions,
         discount: formData.discount ? Number(formData.discount) : undefined,
+        relatedProducts: formData.relatedProducts,
         isActive: true
       };
 
@@ -494,6 +501,57 @@ export default function ProductFormPage() {
                 placeholder="Shipping and return policy..."
                 rows={3}
               />
+            </div>
+          </AdminCard>
+
+          <AdminCard title="People Also Shopped For" icon={<Sparkles size={18} />}>
+            <div className="space-y-4">
+              <p className="text-[11px] text-charcoal/40 uppercase tracking-widest font-black mb-2">Select Recommended Products</p>
+              <div className="max-h-64 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                {allProducts
+                  .filter(p => p.id !== id)
+                  .map((product) => (
+                    <div 
+                      key={product.id} 
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                        formData.relatedProducts.includes(product.id) 
+                          ? 'bg-gold/5 border-gold shadow-sm' 
+                          : 'bg-white border-charcoal/5 hover:border-charcoal/20'
+                      }`}
+                      onClick={() => {
+                        const isSelected = formData.relatedProducts.includes(product.id);
+                        if (!isSelected && formData.relatedProducts.length >= 3) {
+                          showError("You can only select up to 3 products");
+                          return;
+                        }
+                        const newRelated = isSelected
+                          ? formData.relatedProducts.filter((rid: string) => rid !== product.id)
+                          : [...formData.relatedProducts, product.id];
+                        setFormData({ ...formData, relatedProducts: newRelated });
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-charcoal/5">
+                          <img src={buildImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-charcoal">{product.name}</p>
+                          <p className="text-[10px] text-charcoal/40">₹{product.price}</p>
+                        </div>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        formData.relatedProducts.includes(product.id)
+                          ? 'bg-gold border-gold text-white'
+                          : 'border-charcoal/10'
+                      }`}>
+                        {formData.relatedProducts.includes(product.id) && <Check size={12} strokeWidth={4} />}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              <p className="text-[10px] text-charcoal/30 italic">
+                {formData.relatedProducts.length} products selected. These will be shown as manual recommendations.
+              </p>
             </div>
           </AdminCard>
         </div>

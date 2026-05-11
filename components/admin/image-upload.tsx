@@ -19,6 +19,13 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className, e
   const [preview, setPreview] = useState<string | null>(value || null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // Update preview when value prop changes (for edit mode)
+  React.useEffect(() => {
+    if (value && value !== preview) {
+      setPreview(value);
+    }
+  }, [value]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { 
   Search, 
   Ticket, 
@@ -15,7 +16,8 @@ import {
   Clock,
   MoreVertical,
   Percent,
-  Banknote
+  Banknote,
+  Loader2
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,41 +37,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
-
-const INITIAL_COUPONS = [
-  { 
-    id: "1", 
-    code: "WELCOME10", 
-    discountType: "Percentage", 
-    value: 10, 
-    expiryDate: "2024-12-31", 
-    minOrder: 500, 
-    isActive: true 
-  },
-  { 
-    id: "2", 
-    code: "FESTIVE500", 
-    discountType: "Flat", 
-    value: 500, 
-    expiryDate: "2024-06-30", 
-    minOrder: 5000, 
-    isActive: false 
-  },
-];
+import { couponService } from "@/lib/api/services/coupon.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 
 export default function CouponsManagementPage() {
-  const [coupons, setCoupons] = useState(INITIAL_COUPONS);
+  const router = useRouter();
+  const { showSuccess, showError } = useAdminToast();
+  const [coupons, setCoupons] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCoupon, setEditingCoupon] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({
-    code: "",
-    discountType: "Percentage",
-    value: "",
-    expiryDate: "",
-    minOrder: "",
-    isActive: true
-  });
+
+  useEffect(() => {
+    loadCoupons();
+  }, []);
+
+  const loadCoupons = async () => {
+    setLoading(true);
+    try {
+      const response = await couponService.getCoupons();
+      if (response.success) {
+        setCoupons(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load coupons");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -82,36 +76,36 @@ export default function CouponsManagementPage() {
           </div>
           <div>
             <p className="font-bold text-charcoal">{item.code}</p>
-            <p className="text-[10px] text-charcoal/40 uppercase tracking-widest font-black">ID: #{item.id}</p>
+            <p className="text-[10px] text-charcoal/40 uppercase tracking-widest font-black">ID: #{item._id.substring(0, 6)}</p>
           </div>
         </div>
       )
     },
     {
       header: "Discount",
-      accessorKey: "value",
+      accessorKey: "discountAmount",
       cell: (item: any) => (
         <div className="flex items-center gap-2 font-bold text-charcoal">
-          {item.discountType === "Percentage" ? (
-            <><Percent size={14} className="text-gold" /> {item.value}%</>
+          {item.discountType === "percentage" ? (
+            <><Percent size={14} className="text-gold" /> {item.discountAmount}%</>
           ) : (
-            <><Banknote size={14} className="text-gold" /> ₹{item.value}</>
+            <><Banknote size={14} className="text-gold" /> ₹{item.discountAmount}</>
           )}
         </div>
       )
     },
     {
       header: "Requirements",
-      accessorKey: "minOrder",
+      accessorKey: "minPurchase",
       cell: (item: any) => (
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">
             <Clock size={12} className="text-gold" />
-            Min: ₹{item.minOrder}
+            Min: ₹{item.minPurchase}
           </div>
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">
             <Calendar size={12} className="text-gold" />
-            Ends: {item.expiryDate}
+            Ends: {new Date(item.endDate).toLocaleDateString()}
           </div>
         </div>
       )
@@ -129,11 +123,11 @@ export default function CouponsManagementPage() {
     },
     {
       header: "Action",
-      accessorKey: "id",
+      accessorKey: "_id",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
           <button 
-            onClick={(e) => { e.stopPropagation(); toggleStatus(item.id); }}
+            onClick={(e) => { e.stopPropagation(); toggleStatus(item); }}
             className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all shadow-sm ${
               item.isActive 
                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white' 
@@ -144,13 +138,13 @@ export default function CouponsManagementPage() {
             {item.isActive ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); router.push(`/admin/coupons/add?id=${item.id}`); }}
+            onClick={(e) => { e.stopPropagation(); router.push(`/admin/coupons/${item._id}`); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-100/50"
           >
             <Edit3 size={14} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+            onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100/50"
           >
             <Trash2 size={14} />
@@ -164,17 +158,36 @@ export default function CouponsManagementPage() {
     router.push("/admin/coupons/add");
   };
 
-  const handleDelete = (id: string) => {
-    setCoupons(coupons.filter(c => c.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      const response = await couponService.deleteCoupon(id);
+      if (response.success) {
+        showSuccess("Coupon deleted");
+        loadCoupons();
+      }
+    } catch (error) {
+      showError("Delete failed");
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setCoupons(coupons.map(c => c.id === id ? { ...c, isActive: !c.isActive } : c));
+  const toggleStatus = async (item: any) => {
+    try {
+      const response = await couponService.updateCoupon(item._id, { isActive: !item.isActive });
+      if (response.success) {
+        showSuccess(`Coupon ${item.isActive ? 'deactivated' : 'activated'}`);
+        loadCoupons();
+      }
+    } catch (error) {
+      showError("Update failed");
+    }
   };
 
   const filteredCoupons = coupons.filter(c => 
     c.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-gold" /></div>;
 
   return (
     <div className="space-y-12 pb-12">
