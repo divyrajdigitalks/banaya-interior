@@ -93,10 +93,16 @@ export default function AdminCategoriesPage() {
       )
     },
     {
-      header: "ID",
-      accessorKey: "id",
+      header: "Created Date",
+      accessorKey: "createdAt",
       cell: (item: Category) => (
-        <span className="text-[11px] font-mono text-charcoal/40">#{item.id.substring(0, 6)}</span>
+        <span className="text-[12px] text-charcoal/60">
+          {item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) : "—"}
+        </span>
       )
     },
     {
@@ -238,35 +244,40 @@ export default function AdminCategoriesPage() {
       </AdminCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-charcoal">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="p-8 border-b border-charcoal/5 bg-warm-cream/20">
+            <DialogTitle className="text-xl font-serif font-black text-charcoal">
               {editingCategory ? "Edit Category" : "Add Category"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <AdminFormInputEnhanced 
-              label="Category Name"
-              value={formData.name || ""}
-              onChange={(val) => setFormData({ ...formData, name: val })}
-              placeholder="e.g. Living Room"
-              required
-              error={formErrors.name}
-            />
-            <ImageUpload 
-              label="Category Image"
-              value={formData.image}
-              onChange={(val, file) => {
-                setFormData({ ...formData, image: val });
-                if (file) setSelectedFile(file);
-              }}
-            />
+          
+          <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+            <div className="space-y-8">
+              <AdminFormInputEnhanced 
+                label="Category Name"
+                value={formData.name || ""}
+                onChange={(val) => setFormData({ ...formData, name: val })}
+                placeholder="e.g. Living Room"
+                required
+                error={formErrors.name}
+              />
+              <ImageUpload 
+                label="Category Image"
+                value={formData.image}
+                onChange={(val, file) => {
+                  setFormData({ ...formData, image: val });
+                  if (file) setSelectedFile(file);
+                }}
+                className="bg-white rounded-2xl"
+              />
+            </div>
           </div>
-          <DialogFooter className="flex gap-3">
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+
+          <DialogFooter className="p-8 bg-white border-t border-charcoal/5 gap-4">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-12 rounded-xl border border-charcoal/10 font-bold uppercase tracking-widest text-[10px]">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-12 bg-charcoal hover:bg-gold hover:text-charcoal text-white rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-xl transition-all duration-500">
               <Save size={16} className="mr-2" />
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save Category"}
             </Button>
           </DialogFooter>
         </DialogContent>

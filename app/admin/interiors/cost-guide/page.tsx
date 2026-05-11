@@ -267,88 +267,94 @@ export default function InteriorCostGuidePage() {
       </AdminCard>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-charcoal">
+        <DialogContent className="sm:max-w-[550px] w-[95vw] rounded-[2rem] max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="p-8 border-b border-charcoal/5 bg-warm-cream/20">
+            <DialogTitle className="text-xl font-serif font-black text-charcoal">
               {editingItem ? "Edit Cost Guide Item" : "Add Cost Guide Item"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <AdminFormInputEnhanced 
-              label="Title"
-              value={formData.title || ""}
-              onChange={(val) => setFormData({ ...formData, title: val })}
-              placeholder="e.g. Modular Kitchen"
-              required
-              error={formErrors.title}
-            />
-            <AdminFormInputEnhanced 
-              label="Price Range"
-              value={formData.range || ""}
-              onChange={(val) => setFormData({ ...formData, range: val })}
-              placeholder="e.g. ₹2.5L - ₹5L"
-              required
-              error={formErrors.range}
-            />
-            <AdminFormInputEnhanced 
-              label="Description (Optional)"
-              value={formData.description || ""}
-              onChange={(val) => setFormData({ ...formData, description: val })}
-              placeholder="Brief description of the service"
-            />
-            
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-charcoal">Icon</Label>
-              <div className="grid grid-cols-3 gap-3">
-                {ICON_OPTIONS.map((opt) => {
-                  const IconComponent = opt.icon;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, iconId: opt.id })}
-                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                        formData.iconId === opt.id 
-                          ? 'bg-gold/10 border-gold text-gold' 
-                          : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <IconComponent size={20} />
-                      <span className="text-xs font-medium">{opt.label}</span>
-                    </button>
-                  );
-                })}
+          
+          <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+            <div className="space-y-8">
+              <AdminFormInputEnhanced 
+                label="Title"
+                value={formData.title || ""}
+                onChange={(val) => setFormData({ ...formData, title: val })}
+                placeholder="e.g. Modular Kitchen"
+                required
+                error={formErrors.title}
+              />
+              <AdminFormInputEnhanced 
+                label="Price Range"
+                value={formData.range || ""}
+                onChange={(val) => setFormData({ ...formData, range: val })}
+                placeholder="e.g. ₹2.5L - ₹5L"
+                required
+                error={formErrors.range}
+              />
+              <AdminFormInputEnhanced 
+                label="Description (Optional)"
+                value={formData.description || ""}
+                onChange={(val) => setFormData({ ...formData, description: val })}
+                placeholder="Brief description of the service"
+              />
+              
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40">Icon Selection</Label>
+                <div className="grid grid-cols-3 gap-4">
+                  {ICON_OPTIONS.map((opt) => {
+                    const IconComponent = opt.icon;
+                    const isActive = formData.iconId === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, iconId: opt.id })}
+                        className={`flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-300 ${
+                          isActive 
+                            ? 'bg-gold/10 border-gold text-gold shadow-lg shadow-gold/5' 
+                            : 'bg-white border-charcoal/5 text-charcoal/40 hover:border-gold/30 hover:text-gold'
+                        }`}
+                      >
+                        <IconComponent size={22} className={isActive ? 'scale-110' : ''} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <ImageUpload 
+                  label="Custom Icon Image (Optional)"
+                  value={editingItem?.image}
+                  onChange={(val, file) => {
+                    if (file) setSelectedFile(file);
+                  }}
+                  className="bg-white rounded-2xl"
+                />
+              </div>
+
+              <div className="flex items-center space-x-3 p-4 bg-charcoal/5 rounded-2xl">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="w-5 h-5 rounded border-charcoal/10 text-gold focus:ring-gold accent-gold"
+                />
+                <Label htmlFor="isActive" className="text-xs font-bold text-charcoal cursor-pointer">
+                  Active (visible on website)
+                </Label>
               </div>
             </div>
-
-            <div className="min-h-[120px]">
-              <ImageUpload 
-                label="Custom Icon Image (Optional)"
-                value={editingItem?.image}
-                onChange={(val, file) => {
-                  if (file) setSelectedFile(file);
-                }}
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="rounded border-gray-300 text-gold focus:ring-gold"
-              />
-              <Label htmlFor="isActive" className="text-sm font-medium text-charcoal">
-                Active (visible on website)
-              </Label>
-            </div>
           </div>
-          <DialogFooter className="flex gap-3">
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+
+          <DialogFooter className="p-8 bg-white border-t border-charcoal/5 gap-4">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-12 rounded-xl border border-charcoal/10 font-bold uppercase tracking-widest text-[10px]">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-12 bg-charcoal hover:bg-gold hover:text-charcoal text-white rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-xl transition-all duration-500">
               <Save size={16} className="mr-2" />
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save Item"}
             </Button>
           </DialogFooter>
         </DialogContent>

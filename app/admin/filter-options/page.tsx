@@ -85,10 +85,16 @@ export default function AdminFilterOptionsPage() {
       )
     },
     {
-      header: "ID",
-      accessorKey: "id",
+      header: "Created Date",
+      accessorKey: "createdAt",
       cell: (item: FilterOption) => (
-        <span className="text-[11px] font-mono text-charcoal/40">#{item.id.substring(0, 6)}</span>
+        <span className="text-[12px] text-charcoal/60">
+          {item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) : "—"}
+        </span>
       )
     },
     {

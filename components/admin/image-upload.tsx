@@ -73,14 +73,21 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className, e
 
         {preview ? (
           <>
-            <Image src={preview} alt="Preview" fill className="object-cover" />
-            <div className="absolute inset-0 bg-charcoal/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Upload className="text-white h-8 w-8" />
+            <Image 
+              src={preview} 
+              alt="Preview" 
+              fill 
+              className="object-contain p-2" 
+            />
+            <div className="absolute inset-0 bg-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+              <div className="bg-white/90 p-3 rounded-full shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                <Upload className="text-charcoal h-5 w-5" />
+              </div>
             </div>
             <Button
               size="icon"
               onClick={handleRemove}
-              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg"
+              className="absolute top-3 right-3 h-7 w-7 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg z-10 border-2 border-white"
             >
               <X size={14} />
             </Button>

@@ -161,7 +161,6 @@ export default function InquiriesManagementPage() {
                               {inq.status}
                             </span>
                           </div>
-                          <p className="text-[10px] uppercase tracking-widest font-black text-charcoal/30 mt-1">ID: #{inq.id}</p>
                         </div>
                       </div>
 

@@ -410,7 +410,7 @@ export default function ProductFormPage() {
           </AdminCard>
 
           <AdminCard title="Product Gallery" icon={<ImageIcon size={18} />}>
-            <div className="h-40">
+            <div className="min-h-[160px]">
               <MultiImageUpload 
                 label="Upload Images (2 max)"
                 value={formData.subImages.slice(0, 2)}
@@ -583,7 +583,7 @@ export default function ProductFormPage() {
           </AdminCard>
 
           <AdminCard title="Hero Image" icon={<ImageIcon size={18} />}>
-            <div className="h-44">
+            <div className="min-h-[180px]">
               <ImageUpload 
                 label="Primary Image"
                 value={formData.image}

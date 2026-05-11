@@ -116,6 +116,19 @@ export default function AdminSubcategoriesPage() {
       }
     },
     {
+      header: "Created Date",
+      accessorKey: "createdAt",
+      cell: (item: Subcategory) => (
+        <span className="text-[12px] text-charcoal/60">
+          {item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) : "—"}
+        </span>
+      )
+    },
+    {
       header: "Action",
       accessorKey: "id",
       cell: (item: Subcategory) => (
@@ -236,42 +249,47 @@ export default function AdminSubcategoriesPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2.5rem] p-10 mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-serif font-black text-charcoal">
-              {editingSubcategory ? "Edit" : "Add"} <span className="text-gold font-bold">Subcategory</span>
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="p-8 border-b border-charcoal/5 bg-warm-cream/20">
+            <DialogTitle className="text-xl font-serif font-black text-charcoal">
+              {editingSubcategory ? "Edit" : "Add"} <span className="text-gold font-light italic">Subcategory</span>
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-8">
-            <AdminFormInputEnhanced 
-              label="Subcategory Name"
-              value={formData.name || ""}
-              onChange={(val) => setFormData({ ...formData, name: val })}
-              placeholder="e.g. Sofas"
-              required
-              error={formErrors.name}
-            />
-            <AdminSelectEnhanced
-              label="Parent Category"
-              value={formData.categoryId || ""}
-              onChange={(val) => setFormData({ ...formData, categoryId: val })}
-              options={categoryOptions}
-              placeholder="Select Category"
-              required
-              error={formErrors.categoryId}
-            />
-            <ImageUpload 
-              label="Subcategory Image"
-              value={formData.image}
-              onChange={(val, file) => {
-                setFormData({ ...formData, image: val });
-                if (file) setSelectedFile(file);
-              }}
-            />
+
+          <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+            <div className="space-y-8">
+              <AdminFormInputEnhanced 
+                label="Subcategory Name"
+                value={formData.name || ""}
+                onChange={(val) => setFormData({ ...formData, name: val })}
+                placeholder="e.g. Sofas"
+                required
+                error={formErrors.name}
+              />
+              <AdminSelectEnhanced
+                label="Parent Category"
+                value={formData.categoryId || ""}
+                onChange={(val) => setFormData({ ...formData, categoryId: val })}
+                options={categoryOptions}
+                placeholder="Select Category"
+                required
+                error={formErrors.categoryId}
+              />
+              <ImageUpload 
+                label="Subcategory Image"
+                value={formData.image}
+                onChange={(val, file) => {
+                  setFormData({ ...formData, image: val });
+                  if (file) setSelectedFile(file);
+                }}
+                className="bg-white rounded-2xl"
+              />
+            </div>
           </div>
-          <DialogFooter className="flex gap-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1 h-14 rounded-2xl border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-14 bg-gold hover:bg-gold/90 text-charcoal font-bold rounded-2xl">
+
+          <DialogFooter className="p-8 bg-white border-t border-charcoal/5 gap-4">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-12 rounded-xl border border-charcoal/10 font-bold uppercase tracking-widest text-[10px]">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="flex-1 h-12 bg-charcoal hover:bg-gold hover:text-charcoal text-white rounded-xl font-bold uppercase tracking-widest text-[10px] shadow-xl transition-all duration-500">
               {saving ? "Saving..." : "Save Subcategory"}
             </Button>
           </DialogFooter>
