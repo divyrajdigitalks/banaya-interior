@@ -94,13 +94,13 @@ export default function InteriorCollectionsPage() {
         <div className="flex items-center gap-2">
           <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+            className="w-10 h-10  flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
           >
             <Edit3 size={16} />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+            className="w-10 h-10  flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm"
           >
             <Trash2 size={16} />
           </button>
@@ -193,9 +193,9 @@ export default function InteriorCollectionsPage() {
 
         <Button 
           onClick={() => handleOpenDialog()}
-          className="w-full lg:w-auto bg-slate-900 hover:bg-black text-white font-black text-[11px] uppercase tracking-[0.2em] px-10 h-16 rounded-[2rem] shadow-2xl flex items-center gap-4 group transition-all duration-500 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full lg:w-auto bg-slate-900 hover:bg-black text-white font-black text-[11px] uppercase p-4 rounded-lg] shadow-2xl flex items-center gap-4 group transition-all duration-500 hover:scale-[1.02] active:scale-[0.98]"
         >
-          <div className="w-8 h-8 rounded-xl bg-gold/20 flex items-center justify-center text-gold group-hover:rotate-90 transition-transform duration-500">
+          <div className="w-8 h-8 bg-gold/20 flex items-center justify-center text-gold group-hover:rotate-90 transition-transform duration-500">
             <Plus size={18} />
           </div>
           New Interior Collection

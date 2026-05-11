@@ -98,7 +98,7 @@ export default function InteriorProjectsPage() {
         <div className="flex items-center gap-4 max-w-md">
           <div className="w-20 h-14 rounded-2xl overflow-hidden shadow-md border border-charcoal/5 flex-shrink-0">
             {item.image ? (
-              <img src={buildImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
+              <img src={item.image.startsWith('http') ? item.image : buildImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-charcoal/5 flex items-center justify-center">
                 <Briefcase size={16} className="text-charcoal/30" />
@@ -261,76 +261,141 @@ export default function InteriorProjectsPage() {
         <AdminTable columns={columns} data={filteredProjects} />
       </AdminCard>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] w-[95vw] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-charcoal">
-              {editingProject ? "Edit Project" : "Add Project"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <AdminFormInputEnhanced 
-                label="Project Title"
-                value={formData.name || ""}
-                onChange={(val) => setFormData({ ...formData, name: val })}
-                placeholder="e.g. Niseko Dining House"
-                required
-                error={formErrors.name}
-              />
-              <div className="space-y-2">
-                <Label className="text-[11px] font-black uppercase tracking-widest text-charcoal/40">Category</Label>
-                <Select 
-                  value={typeof formData.category === 'string' ? formData.category : typeof formData.category === 'object' ? formData.category?._id : undefined} 
-                  onValueChange={(val) => setFormData({ ...formData, category: val })}
-                >
-                  <SelectTrigger className="h-12 rounded-xl border-charcoal/10 bg-white">
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-charcoal/10 shadow-2xl">
-                    {categories.map((cat) => (
-                      <SelectItem key={cat._id} value={cat._id} className="text-sm font-medium">{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formErrors.category && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">{formErrors.category}</p>}
-              </div>
-            </div>
+   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+  <DialogContent className="sm:max-w-[720px] w-[95vw] rounded-3xl border border-charcoal/10 bg-white p-0 overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.08)]">
+    
+    {/* Header */}
+    <div className="px-8 py-6 border-b border-charcoal/10 bg-gradient-to-r from-neutral-50 to-white">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold text-charcoal tracking-tight">
+          {editingProject ? "Edit Project" : "Add Project"}
+        </DialogTitle>
+        <p className="text-sm text-charcoal/50 mt-1">
+          Fill in the project details below.
+        </p>
+      </DialogHeader>
+    </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <AdminFormInputEnhanced 
-                label="Location"
-                value={formData.location || ""}
-                onChange={(val) => setFormData({ ...formData, location: val })}
-                placeholder="e.g. Hokkaido, Japan"
-              />
-              <AdminFormInputEnhanced 
-                label="Description"
-                value={formData.description || ""}
-                onChange={(val) => setFormData({ ...formData, description: val })}
-                placeholder="Tell the story..."
-              />
-            </div>
+    {/* Body */}
+    <div className="px-8 py-7 space-y-6">
+      
+      {/* Row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="rounded-2xl border border-charcoal/10 bg-neutral-50/60 p-4">
+          <AdminFormInputEnhanced
+            label="Project Title"
+            value={formData.name || ""}
+            onChange={(val) => setFormData({ ...formData, name: val })}
+            placeholder="e.g. Niseko Dining House"
+            required
+            error={formErrors.name}
+          />
+        </div>
 
-            <ImageUpload 
-              label="Project Image"
-              value={formData.image}
-              onChange={(val, file) => {
-                setFormData({ ...formData, image: val });
-                if (file) setSelectedFile(file);
-              }}
-              error={formErrors.image}
-            />
+        <div className="rounded-2xl border border-charcoal/10 bg-neutral-50/60 p-4">
+          <div className="space-y-2">
+            <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-charcoal/40">
+              Category
+            </Label>
+
+            <Select
+              value={
+                typeof formData.category === "string"
+                  ? formData.category
+                  : typeof formData.category === "object"
+                  ? formData.category?._id
+                  : undefined
+              }
+              onValueChange={(val) =>
+                setFormData({ ...formData, category: val })
+              }
+            >
+              <SelectTrigger className="h-12 rounded-2xl border-charcoal/10 bg-white shadow-sm transition-all focus:ring-2 focus:ring-charcoal/10">
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+
+              <SelectContent className="rounded-2xl border-charcoal/10 shadow-2xl">
+                {categories.map((cat) => (
+                  <SelectItem
+                    key={cat._id}
+                    value={cat._id}
+                    className="text-sm font-medium"
+                  >
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {formErrors.category && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
+                {formErrors.category}
+              </p>
+            )}
           </div>
-          <DialogFooter className="flex gap-3">
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-1 h-9 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
-              <Save size={16} className="mr-2" />
-              {saving ? "Saving..." : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="rounded-2xl border border-charcoal/10 bg-neutral-50/60 p-4">
+          <AdminFormInputEnhanced
+            label="Location"
+            value={formData.location || ""}
+            onChange={(val) =>
+              setFormData({ ...formData, location: val })
+            }
+            placeholder="e.g. Hokkaido, Japan"
+          />
+        </div>
+
+        <div className="rounded-2xl border border-charcoal/10 bg-neutral-50/60 p-4">
+          <AdminFormInputEnhanced
+            label="Description"
+            value={formData.description || ""}
+            onChange={(val) =>
+              setFormData({ ...formData, description: val })
+            }
+            placeholder="Tell the story..."
+          />
+        </div>
+      </div>
+
+      {/* Upload */}
+      <div className="rounded-3xl border border-dashed border-charcoal/15 bg-neutral-50/70 p-5">
+        <ImageUpload
+          label="Project Image"
+          value={formData.image}
+          onChange={(val, file) => {
+            setFormData({ ...formData, image: val });
+            if (file) setSelectedFile(file);
+          }}
+          error={formErrors.image}
+        />
+      </div>
+    </div>
+
+    {/* Footer */}
+    <DialogFooter className="border-t border-charcoal/10 bg-neutral-50 px-8 py-5 flex flex-col sm:flex-row gap-3">
+      <Button
+        variant="ghost"
+        onClick={() => setIsDialogOpen(false)}
+        className="flex-1 h-11 rounded-2xl border border-charcoal/10 bg-white hover:bg-neutral-100 text-charcoal font-semibold transition-all"
+      >
+        Cancel
+      </Button>
+
+      <Button
+        onClick={handleSave}
+        disabled={saving}
+        className="flex-1 h-11 rounded-2xl bg-charcoal hover:bg-charcoal/90 text-white font-semibold shadow-lg transition-all"
+      >
+        <Save size={16} className="mr-2" />
+        {saving ? "Saving..." : "Save Project"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="rounded-2xl">

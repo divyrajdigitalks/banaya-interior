@@ -1,38 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Edit3, Trash2, Plus, Save, ArrowLeft, Award, Users, Clock, Shield, Palette, Home, Star, Heart, CheckCircle, Zap, Settings, List, Image as ImageIcon, Sparkles, ShieldCheck, Truck } from "lucide-react";
+import { Trash2, Plus, Save, ArrowLeft, Award, Users, Clock, Shield, Palette, Home, Star, Heart, CheckCircle, Zap, Image as ImageIcon, Sparkles, ShieldCheck, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter
-} from "@/components/ui/dialog";
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
-import { aboutService, type AboutSection, type AboutSectionSettings } from "@/lib/api";
+import { aboutService, type AboutSectionSettings } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
-import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
 const ICON_OPTIONS = [
   { id: "Award", icon: Award, label: "Award" },
@@ -48,15 +28,6 @@ const ICON_OPTIONS = [
   { id: "Sparkles", icon: Sparkles, label: "Sparkles" },
   { id: "ShieldCheck", icon: ShieldCheck, label: "Shield Check" },
   { id: "Truck", icon: Truck, label: "Truck" },
-];
-
-
-const SECTION_TYPES = [
-  { value: "hero", label: "Hero Section" },
-  { value: "story", label: "Story Section" },
-  { value: "values", label: "Values Section" },
-  { value: "team", label: "Team Section" },
-  { value: "stats", label: "Stats Section" },
 ];
 
 interface AboutSectionSettings {
@@ -75,20 +46,17 @@ interface AboutSectionSettings {
 export default function AboutAdminPage() {
   const router = useRouter();
   const { showSuccess, showError } = useAdminToast();
-  const [loading, setLoading] = useState(true);
-  
-  // Section settings states
   const [sectionSettings, setSectionSettings] = useState<AboutSectionSettings>({
     title: "Design with Purpose. Executed with Precision.",
     subtitle: "Our philosophy and approach",
-    description: "Banaya Interiors transforms spaces into legacies. We don't just design rooms; we curate experiences that resonate with your heritage and aspirations.",
+    description: "Banaya Interiors transforms spaces into legacies.",
     primaryImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80",
     secondaryImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
     circularImage: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&q=80",
     statsValue: "20+",
     statsLabel: "Bespoke Sanctuaries Crafted",
     features: [],
-    isActive: true
+    isActive: true,
   });
   const [sectionImageFiles, setSectionImageFiles] = useState<{
     primaryImage?: File;
@@ -98,18 +66,14 @@ export default function AboutAdminPage() {
   const [savingSection, setSavingSection] = useState(false);
   const [loadingSection, setLoadingSection] = useState(true);
 
-  useEffect(() => {
-    loadSectionSettings();
-  }, []);
+  useEffect(() => { loadSectionSettings(); }, []);
 
   const loadSectionSettings = async () => {
     setLoadingSection(true);
     try {
       const data = await aboutService.getSectionSettings();
-      console.log('Loaded about section settings:', data);
       setSectionSettings(data);
-    } catch (error) {
-      console.error('Failed to load section settings:', error);
+    } catch {
       showError("Failed to load section settings");
     } finally {
       setLoadingSection(false);
@@ -119,343 +83,273 @@ export default function AboutAdminPage() {
   const handleSaveSection = async () => {
     setSavingSection(true);
     try {
-      console.log('Saving about section settings...');
-      
-      const updatedSettings = await aboutService.updateSectionSettings(sectionSettings, sectionImageFiles);
-      
-      console.log('Settings saved successfully:', updatedSettings);
-      
-      setSectionSettings(updatedSettings);
+      const updated = await aboutService.updateSectionSettings(sectionSettings, sectionImageFiles);
+      setSectionSettings(updated);
       setSectionImageFiles({});
-      
-      showSuccess("Section settings updated successfully!");
-      
-    } catch (error) {
-      console.error('Save error:', error);
-      showError("Failed to save section settings");
+      showSuccess("Saved successfully!");
+    } catch {
+      showError("Failed to save");
     } finally {
       setSavingSection(false);
     }
   };
 
-  const addFeature = () => {
-    const newFeature = { title: "", description: "", iconId: "CheckCircle" };
-    setSectionSettings({ 
-      ...sectionSettings, 
-      features: [...(sectionSettings.features || []), newFeature] 
-    });
+  const set = (key: keyof AboutSectionSettings, val: any) =>
+    setSectionSettings((p) => ({ ...p, [key]: val }));
+
+  const addFeature = () =>
+    set("features", [...(sectionSettings.features || []), { title: "", description: "", iconId: "CheckCircle" }]);
+
+  const removeFeature = (i: number) =>
+    set("features", sectionSettings.features.filter((_, idx) => idx !== i));
+
+  const updateFeature = (i: number, field: string, val: string) => {
+    const arr = [...sectionSettings.features];
+    arr[i] = { ...arr[i], [field]: val };
+    set("features", arr);
   };
 
-  const removeFeature = (index: number) => {
-    const updatedFeatures = sectionSettings.features?.filter((_, i) => i !== index) || [];
-    setSectionSettings({ ...sectionSettings, features: updatedFeatures });
-  };
+  const imgSrc = (url: string) =>
+    url.startsWith("http") ? url : buildImageUrl(url);
 
-  const updateFeature = (index: number, field: string, value: string) => {
-    const updatedFeatures = [...(sectionSettings.features || [])];
-    updatedFeatures[index] = { ...updatedFeatures[index], [field]: value };
-    setSectionSettings({ ...sectionSettings, features: updatedFeatures });
-  };
-
-  if (loadingSection) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-charcoal/40">Loading...</p>
-      </div>
-    );
-  }
+  if (loadingSection) return (
+    <div className="flex items-center justify-center h-40">
+      <p className="text-xs text-charcoal/40">Loading...</p>
+    </div>
+  );
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-4 pb-8">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()}
-            className="h-9 w-9 rounded-xl bg-white border border-charcoal/10"
-          >
-            <ArrowLeft size={18} className="text-charcoal/60" />
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" onClick={() => router.back()} className="h-8 w-8 rounded-lg bg-white border border-charcoal/10 p-0">
+            <ArrowLeft size={16} className="text-charcoal/60" />
           </Button>
           <div>
-            <h1 className="text-xl font-semibold text-charcoal">About Section Management</h1>
-            <p className="text-xs text-charcoal/40 mt-0.5">Manage section settings and content</p>
+            <h1 className="text-base font-semibold text-charcoal">About Section</h1>
+            <p className="text-[11px] text-charcoal/40">Manage content and images</p>
           </div>
         </div>
+        <Button onClick={handleSaveSection} disabled={savingSection} className="h-8 px-4 bg-charcoal hover:bg-charcoal/90 text-white rounded-lg text-xs">
+          <Save size={13} className="mr-1.5" />
+          {savingSection ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
 
-      <AdminCard>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Content Settings */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-charcoal">Content Settings</h3>
-                
-                <AdminFormInputEnhanced 
-                  label="Section Title"
-                  value={sectionSettings.title}
-                  onChange={(val) => setSectionSettings({ ...sectionSettings, title: val })}
-                  placeholder="e.g. Design with Purpose. Executed with Precision."
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Left: Content */}
+        <div className="lg:col-span-2 space-y-4">
+
+          {/* Basic Info */}
+          <AdminCard>
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider">Content</p>
+              <AdminFormInputEnhanced
+                label="Title"
+                value={sectionSettings.title}
+                onChange={(v) => set("title", v)}
+                placeholder="Section title"
+              />
+              <AdminFormInputEnhanced
+                label="Subtitle"
+                value={sectionSettings.subtitle}
+                onChange={(v) => set("subtitle", v)}
+                placeholder="Section subtitle"
+              />
+              <div className="space-y-1">
+                <Label className="text-[11px] font-medium text-charcoal/60">Description</Label>
+                <Textarea
+                  value={sectionSettings.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  placeholder="Company description"
+                  className="min-h-[72px] resize-none text-sm"
                 />
-                
-                <AdminFormInputEnhanced 
-                  label="Section Subtitle"
-                  value={sectionSettings.subtitle}
-                  onChange={(val) => setSectionSettings({ ...sectionSettings, subtitle: val })}
-                  placeholder="e.g. Our philosophy and approach"
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <AdminFormInputEnhanced
+                  label="Stats Value"
+                  value={sectionSettings.statsValue}
+                  onChange={(v) => set("statsValue", v)}
+                  placeholder="e.g. 20+"
                 />
-                
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-charcoal">Description</Label>
-                  <Textarea
-                    value={sectionSettings.description}
-                    onChange={(e) => setSectionSettings({ ...sectionSettings, description: e.target.value })}
-                    placeholder="Detailed description of your company"
-                    className="min-h-[100px] resize-none"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <AdminFormInputEnhanced 
-                    label="Stats Value"
-                    value={sectionSettings.statsValue}
-                    onChange={(val) => setSectionSettings({ ...sectionSettings, statsValue: val })}
-                    placeholder="e.g. 20+"
-                  />
-                  
-                  <AdminFormInputEnhanced 
-                    label="Stats Label"
-                    value={sectionSettings.statsLabel}
-                    onChange={(val) => setSectionSettings({ ...sectionSettings, statsLabel: val })}
-                    placeholder="e.g. Projects Completed"
-                  />
-                </div>
+                <AdminFormInputEnhanced
+                  label="Stats Label"
+                  value={sectionSettings.statsLabel}
+                  onChange={(v) => set("statsLabel", v)}
+                  placeholder="e.g. Projects Completed"
+                />
+              </div>
+            </div>
+          </AdminCard>
 
-                {/* Key Features Section */}
-                <div className="space-y-4 pt-6 border-t border-charcoal/5">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-base font-semibold text-charcoal flex items-center gap-2">
-                      <Sparkles size={18} className="text-gold" />
-                      Key Features
-                    </Label>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={addFeature}
-                      className="h-8 rounded-lg border-gold/20 text-gold hover:bg-gold/5"
-                    >
-                      <Plus size={14} className="mr-1" /> Add Feature
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {sectionSettings.features?.map((feature, index) => (
-                      <div key={index} className="p-4 bg-charcoal/5 rounded-xl border border-charcoal/10 space-y-3 relative group">
-                        <button 
-                          onClick={() => removeFeature(index)}
-                          className="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="space-y-1.5">
-                            <Label className="text-[11px] font-medium text-charcoal/60">Icon</Label>
-                            <Select 
-                              value={feature.iconId} 
-                              onValueChange={(val) => updateFeature(index, "iconId", val)}
-                            >
-                              <SelectTrigger className="h-9 bg-white">
-                                <SelectValue placeholder="Select icon" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {ICON_OPTIONS.map((opt) => (
-                                  <SelectItem key={opt.id} value={opt.id}>
-                                    <div className="flex items-center gap-2">
-                                      <opt.icon size={14} />
-                                      <span>{opt.label}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <Label className="text-[11px] font-medium text-charcoal/60">Feature Title</Label>
-                            <input
-                              value={feature.title}
-                              onChange={(e) => updateFeature(index, "title", e.target.value)}
-                              placeholder="e.g. Artisanal Mastery"
-                              className="w-full h-9 px-3 bg-white border border-charcoal/10 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <Label className="text-[11px] font-medium text-charcoal/60">Description</Label>
-                          <textarea
-                            value={feature.description}
-                            onChange={(e) => updateFeature(index, "description", e.target.value)}
-                            placeholder="Brief description of this feature"
-                            className="w-full h-16 p-3 bg-white border border-charcoal/10 rounded-lg text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold outline-none resize-none"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {(!sectionSettings.features || sectionSettings.features.length === 0) && (
-                      <div className="text-center py-8 border-2 border-dashed border-charcoal/5 rounded-2xl">
-                        <p className="text-xs text-charcoal/30">No features added yet. Click 'Add Feature' to start.</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="sectionActive"
-                    checked={sectionSettings.isActive}
-                    onChange={(e) => setSectionSettings({ ...sectionSettings, isActive: e.target.checked })}
-                    className="rounded border-gray-300 text-gold focus:ring-gold"
-                  />
-                  <Label htmlFor="sectionActive" className="text-sm font-medium text-charcoal">
-                    Section Active (visible on website)
-                  </Label>
-                </div>
-                
-                <Button 
-                  onClick={handleSaveSection}
-                  disabled={savingSection}
-                  className="w-full h-10 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl"
-                >
-                  <Save size={16} className="mr-2" />
-                  {savingSection ? "Saving..." : "Save Section Settings"}
+          {/* Key Features */}
+          <AdminCard>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles size={13} className="text-gold" /> Key Features
+                </p>
+                <Button type="button" variant="outline" size="sm" onClick={addFeature}
+                  className="h-7 px-2.5 rounded-lg border-gold/20 text-gold hover:bg-gold/5 text-xs">
+                  <Plus size={12} className="mr-1" /> Add
                 </Button>
               </div>
-            </div>
-            
-            {/* Right Column - Image Settings */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-charcoal">Image Settings</h3>
-              
-              {/* Primary Image */}
+
+              {sectionSettings.features?.length === 0 && (
+                <div className="text-center py-6 border-2 border-dashed border-charcoal/5 rounded-xl">
+                  <p className="text-xs text-charcoal/30">No features yet. Click Add to start.</p>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-charcoal flex items-center gap-2">
-                  <ImageIcon size={16} />
-                  Primary Image (Left Top)
+                {sectionSettings.features?.map((feature, index) => (
+                  <div key={index} className="p-3 bg-charcoal/[0.03] rounded-xl border border-charcoal/8 space-y-2 relative group">
+                    <button onClick={() => removeFeature(index)}
+                      className="absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center bg-red-50 text-red-400 border border-red-100 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">
+                      <Trash2 size={11} />
+                    </button>
+                    <div className="grid grid-cols-2 gap-2 pr-8">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-medium text-charcoal/50">Icon</Label>
+                        <Select value={feature.iconId} onValueChange={(v) => updateFeature(index, "iconId", v)}>
+                          <SelectTrigger className="h-8 bg-white text-xs">
+                            <SelectValue placeholder="Icon" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ICON_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.id} value={opt.id}>
+                                <div className="flex items-center gap-2">
+                                  <opt.icon size={13} /><span className="text-xs">{opt.label}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-medium text-charcoal/50">Title</Label>
+                        <input value={feature.title} onChange={(e) => updateFeature(index, "title", e.target.value)}
+                          placeholder="Feature title"
+                          className="w-full h-8 px-2.5 bg-white border border-charcoal/10 rounded-lg text-xs focus:ring-1 focus:ring-gold/30 focus:border-gold outline-none" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-medium text-charcoal/50">Description</Label>
+                      <textarea value={feature.description} onChange={(e) => updateFeature(index, "description", e.target.value)}
+                        placeholder="Brief description"
+                        className="w-full h-14 p-2.5 bg-white border border-charcoal/10 rounded-lg text-xs focus:ring-1 focus:ring-gold/30 focus:border-gold outline-none resize-none" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </AdminCard>
+
+          {/* Active toggle */}
+          <AdminCard>
+            <div className="flex items-center gap-2.5">
+              <input type="checkbox" id="sectionActive" checked={sectionSettings.isActive}
+                onChange={(e) => set("isActive", e.target.checked)}
+                className="rounded border-gray-300 text-gold focus:ring-gold w-4 h-4" />
+              <Label htmlFor="sectionActive" className="text-sm text-charcoal cursor-pointer">
+                Section Active <span className="text-charcoal/40 font-normal">(visible on website)</span>
+              </Label>
+            </div>
+          </AdminCard>
+        </div>
+
+        {/* Right: Images */}
+        <div className="space-y-4">
+          <AdminCard>
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-charcoal/50 uppercase tracking-wider">Images</p>
+
+              {/* Primary */}
+              <div className="space-y-1.5">
+                <Label className="text-[11px] font-medium text-charcoal/60 flex items-center gap-1">
+                  <ImageIcon size={11} /> Primary <span className="text-charcoal/30">(Left Top)</span>
                 </Label>
                 {sectionSettings.primaryImage && (
-                  <div className="mb-3">
-                    <img 
-                      src={sectionSettings.primaryImage.startsWith('http') ? sectionSettings.primaryImage : buildImageUrl(sectionSettings.primaryImage)} 
-                      alt="Primary image preview" 
-                      className="w-full h-32 object-cover rounded-lg border"
-                    />
-                  </div>
+                  <img src={imgSrc(sectionSettings.primaryImage)} alt="Primary"
+                    className="w-full h-24 object-cover rounded-lg border border-charcoal/10" />
                 )}
-                <div className="min-h-[100px]">
-                  <ImageUpload 
-                    label=""
-                    value={""}
-                    onChange={(val, file) => {
-                      if (file) {
-                        setSectionImageFiles({ ...sectionImageFiles, primaryImage: file });
-                      } else if (val) {
-                        setSectionSettings({ ...sectionSettings, primaryImage: val });
-                      }
-                    }}
-                    onRemove={() => {
-                      setSectionImageFiles({ ...sectionImageFiles, primaryImage: undefined });
-                      setSectionSettings({ ...sectionSettings, primaryImage: "" });
-                    }}
-                  />
-                </div>
+                <ImageUpload label="" value=""
+                  onChange={(val, file) => {
+                    if (file) setSectionImageFiles((p) => ({ ...p, primaryImage: file }));
+                    else if (val) set("primaryImage", val);
+                  }}
+                  onRemove={() => {
+                    setSectionImageFiles((p) => ({ ...p, primaryImage: undefined }));
+                    set("primaryImage", "");
+                  }}
+                />
               </div>
-              
-              {/* Secondary Image */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-charcoal flex items-center gap-2">
-                  <ImageIcon size={16} />
-                  Secondary Image (Right Top)
+
+              <div className="border-t border-charcoal/5" />
+
+              {/* Secondary */}
+              <div className="space-y-1.5">
+                <Label className="text-[11px] font-medium text-charcoal/60 flex items-center gap-1">
+                  <ImageIcon size={11} /> Secondary <span className="text-charcoal/30">(Right Top)</span>
                 </Label>
                 {sectionSettings.secondaryImage && (
-                  <div className="mb-3">
-                    <img 
-                      src={sectionSettings.secondaryImage.startsWith('http') ? sectionSettings.secondaryImage : buildImageUrl(sectionSettings.secondaryImage)} 
-                      alt="Secondary image preview" 
-                      className="w-full h-32 object-cover rounded-lg border"
-                    />
-                  </div>
+                  <img src={imgSrc(sectionSettings.secondaryImage)} alt="Secondary"
+                    className="w-full h-24 object-cover rounded-lg border border-charcoal/10" />
                 )}
-                <div className="min-h-[100px]">
-                  <ImageUpload 
-                    label=""
-                    value={""}
-                    onChange={(val, file) => {
-                      if (file) {
-                        setSectionImageFiles({ ...sectionImageFiles, secondaryImage: file });
-                      } else if (val) {
-                        setSectionSettings({ ...sectionSettings, secondaryImage: val });
-                      }
-                    }}
-                    onRemove={() => {
-                      setSectionImageFiles({ ...sectionImageFiles, secondaryImage: undefined });
-                      setSectionSettings({ ...sectionSettings, secondaryImage: "" });
-                    }}
-                  />
-                </div>
+                <ImageUpload label="" value=""
+                  onChange={(val, file) => {
+                    if (file) setSectionImageFiles((p) => ({ ...p, secondaryImage: file }));
+                    else if (val) set("secondaryImage", val);
+                  }}
+                  onRemove={() => {
+                    setSectionImageFiles((p) => ({ ...p, secondaryImage: undefined }));
+                    set("secondaryImage", "");
+                  }}
+                />
               </div>
-              
-              {/* Circular Image */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-charcoal flex items-center gap-2">
-                  <ImageIcon size={16} />
-                  Circular Image (Right Bottom)
+
+              <div className="border-t border-charcoal/5" />
+
+              {/* Circular */}
+              <div className="space-y-1.5">
+                <Label className="text-[11px] font-medium text-charcoal/60 flex items-center gap-1">
+                  <ImageIcon size={11} /> Circular <span className="text-charcoal/30">(Right Bottom)</span>
                 </Label>
                 {sectionSettings.circularImage && (
-                  <div className="mb-3">
-                    <img 
-                      src={sectionSettings.circularImage.startsWith('http') ? sectionSettings.circularImage : buildImageUrl(sectionSettings.circularImage)} 
-                      alt="Circular image preview" 
-                      className="w-24 h-24 object-cover rounded-full border mx-auto"
-                    />
+                  <div className="flex justify-center">
+                    <img src={imgSrc(sectionSettings.circularImage)} alt="Circular"
+                      className="w-16 h-16 object-cover rounded-full border border-charcoal/10" />
                   </div>
                 )}
-                <div className="min-h-[100px]">
-                  <ImageUpload 
-                    label=""
-                    value={""}
-                    onChange={(val, file) => {
-                      if (file) {
-                        setSectionImageFiles({ ...sectionImageFiles, circularImage: file });
-                      } else if (val) {
-                        setSectionSettings({ ...sectionSettings, circularImage: val });
-                      }
-                    }}
-                    onRemove={() => {
-                      setSectionImageFiles({ ...sectionImageFiles, circularImage: undefined });
-                      setSectionSettings({ ...sectionSettings, circularImage: "" });
-                    }}
-                  />
-                </div>
-              </div>
-              
-              <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <p className="text-sm text-blue-800 font-medium mb-2">💡 Image Guidelines</p>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>• Primary & Secondary: 500x600px (3:4 ratio)</li>
-                  <li>• Circular: 300x300px (1:1 ratio)</li>
-                  <li>• Format: JPG, PNG, WebP</li>
-                  <li>• Max file size: 2MB each</li>
-                </ul>
+                <ImageUpload label="" value=""
+                  onChange={(val, file) => {
+                    if (file) setSectionImageFiles((p) => ({ ...p, circularImage: file }));
+                    else if (val) set("circularImage", val);
+                  }}
+                  onRemove={() => {
+                    setSectionImageFiles((p) => ({ ...p, circularImage: undefined }));
+                    set("circularImage", "");
+                  }}
+                />
               </div>
             </div>
+          </AdminCard>
+
+          {/* Guidelines */}
+          <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+            <p className="text-[11px] font-semibold text-blue-700 mb-1">💡 Guidelines</p>
+            <ul className="text-[10px] text-blue-600 space-y-0.5">
+              <li>• Primary & Secondary: 500×600px</li>
+              <li>• Circular: 300×300px</li>
+              <li>• JPG, PNG, WebP · Max 2MB</li>
+            </ul>
           </div>
         </div>
-      </AdminCard>
+
+      </div>
     </div>
   );
 }

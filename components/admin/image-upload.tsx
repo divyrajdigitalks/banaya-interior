@@ -9,12 +9,13 @@ interface ImageUploadProps {
   value?: string;
   onChange: (value: string, file?: File) => void;
   onFileSelect?: (file: File) => void;
+  onRemove?: () => void;
   label?: string;
   className?: string;
   error?: string;
 }
 
-export function ImageUpload({ value, onChange, onFileSelect, label, className, error }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onFileSelect, onRemove, label, className, error }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(value || null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -46,6 +47,7 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className, e
     setPreview(null);
     setSelectedFile(null);
     onChange("");
+    onRemove?.();
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -61,7 +63,8 @@ export function ImageUpload({ value, onChange, onFileSelect, label, className, e
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative aspect-[3/2] w-full rounded-2xl border-2 border-dashed ${error ? 'border-red-300 bg-red-50' : 'border-charcoal/10'} hover:border-gold/40 hover:bg-gold/5 transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center group ${preview ? 'border-solid' : ''}`}
+        className={`relative w-full rounded-xl border-2 border-dashed ${error ? 'border-red-300 bg-red-50' : 'border-charcoal/10'} hover:border-gold/40 hover:bg-gold/5 transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center group ${preview ? 'border-solid' : ''}`}
+        style={{ height: preview ? '120px' : '80px' }}
       >
         <input 
           type="file" 

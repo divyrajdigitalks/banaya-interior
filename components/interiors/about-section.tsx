@@ -239,14 +239,7 @@ export function AboutSection() {
               </div>
             )}
 
-            <div className="pt-8">
-              <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                <span className="relative z-10 flex items-center gap-4 tracking-widest">
-                  Explore Our Legacy <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                </span>
-                <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
-              </button>
-            </div>
+       
           </div>
 
         </div>
