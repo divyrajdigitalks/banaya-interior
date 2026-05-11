@@ -1,38 +1,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MapPin, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { projectService, type Project } from "@/lib/api";
+import { interiorService, type InteriorProject, legacyProjectService, type LegacyProject, type LegacySettings } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 
 export function ProjectsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<LegacyProject[]>([]);
+  const [settings, setSettings] = useState<LegacySettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await projectService.getProjectList(true);
-        setProjects(data.length > 0 ? data : [
-          {
-            id: "1",
-            name: "Niseko Dining House",
-            location: "Hokkaido, Japan",
-            image: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80",
-            description: "A harmonious blend of traditional Japanese aesthetics and modern luxury, featuring bespoke walnut furniture."
-          },
-          {
-            id: "2",
-            name: "Urban Loft Studio",
-            location: "Mumbai, India",
-            image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80",
-            description: "Industrial chic meets royal comfort in this expansive open-plan sanctuary overlooking the Arabian Sea."
-          },
+        const [projectsRes, settingsRes] = await Promise.all([
+          legacyProjectService.getProjects(),
+          legacyProjectService.getSettings()
         ]);
+        
+        if (projectsRes.success) {
+          setProjects(projectsRes.data);
+        }
+        if (settingsRes.success) {
+          setSettings(settingsRes.data);
+        }
+      } catch (error) {
+        console.error("Failed to load projects", error);
       } finally {
         setLoading(false);
       }
@@ -73,11 +70,11 @@ export function ProjectsSection() {
               className="space-y-4"
             >
               <span className="text-lg text-gold font-bold block">
-                Portfolio of distinction
+                {settings?.topLabel || "Portfolio of distinction"}
               </span>
               <h2 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
-                Living <br />
-                <span className="italic font-light text-gold">Masterpieces.</span>
+                {settings?.headingLine1 || "Living"} <br />
+                <span className="italic font-light text-gold">{settings?.headingLine2 || "Masterpieces."}</span>
               </h2>
             </motion.div>
 
@@ -88,7 +85,7 @@ export function ProjectsSection() {
               transition={{ delay: 0.2 }}
               className=" text-lg font-light leading-relaxed max-w-sm"
             >
-              Each project is a unique dialogue between architecture and soul, meticulously crafted to reflect the essence of its inhabitants.
+              {settings?.description || "Each project is a unique dialogue between architecture and soul, meticulously crafted to reflect the essence of its inhabitants."}
             </motion.p>
 
             {/* Navigation Controls */}
@@ -123,7 +120,7 @@ export function ProjectsSection() {
                   className="absolute inset-0"
                 >
                   <Image
-                    src={buildImageUrl(currentProject.image) || currentProject.image}
+                    src={currentProject.image ? (currentProject.image.startsWith('http') ? currentProject.image : buildImageUrl(currentProject.image)) : ""}
                     alt={currentProject.name}
                     fill
                     className="object-cover"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Search, FolderTree, Edit3, Trash2, Plus, Save, Layers } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, FolderTree, Edit3, Trash2, Plus, Save, Layers, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -15,22 +15,36 @@ import { Label } from "@/components/ui/label";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInput } from "@/components/admin/form-input";
 import { motion } from "framer-motion";
-
-const INITIAL_CATEGORIES = [
-  { id: "1", name: "All" },
-  { id: "2", name: "2 BHK" },
-  { id: "3", name: "3 BHK" },
-  { id: "4", name: "4 BHK" },
-  { id: "5", name: "Villa" },
-  { id: "6", name: "Commercial" },
-];
+import { interiorService } from "@/lib/api/services/interior.service";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 
 export default function InteriorCategoriesPage() {
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const { showSuccess, showError } = useAdminToast();
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [formData, setFormData] = useState<any>({ name: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await interiorService.getCategories();
+      if (response.success) {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      showError("Failed to load categories");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -56,7 +70,7 @@ export default function InteriorCategoriesPage() {
     },
     {
       header: "Action",
-      accessorKey: "id",
+      accessorKey: "_id",
       cell: (item: any) => (
         <div className="flex items-center gap-2">
           <button 
@@ -66,7 +80,7 @@ export default function InteriorCategoriesPage() {
             <Edit3 size={16} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); setCategories(categories.filter(c => c.id !== item.id)); }}
+            onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}
             className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm"
           >
             <Trash2 size={16} />
@@ -79,7 +93,7 @@ export default function InteriorCategoriesPage() {
   const handleOpenDialog = (category: any = null) => {
     if (category) {
       setEditingCategory(category);
-      setFormData(category);
+      setFormData({ name: category.name });
     } else {
       setEditingCategory(null);
       setFormData({ name: "" });
@@ -87,20 +101,50 @@ export default function InteriorCategoriesPage() {
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name) return;
 
-    if (editingCategory) {
-      setCategories(categories.map(c => c.id === editingCategory.id ? formData : c));
-    } else {
-      setCategories([{ id: Date.now().toString(), ...formData }, ...categories]);
+    setSaving(true);
+    try {
+      let response;
+      if (editingCategory) {
+        response = await interiorService.updateCategory(editingCategory._id, formData);
+      } else {
+        response = await interiorService.createCategory(formData);
+      }
+
+      if (response.success) {
+        showSuccess(editingCategory ? "Category updated" : "Category created");
+        loadCategories();
+        setIsDialogOpen(false);
+      } else {
+        showError(response.error || "Save failed");
+      }
+    } catch (error) {
+      showError("An error occurred");
+    } finally {
+      setSaving(false);
     }
-    setIsDialogOpen(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      const response = await interiorService.deleteCategory(id);
+      if (response.success) {
+        showSuccess("Category deleted");
+        loadCategories();
+      }
+    } catch (error) {
+      showError("Delete failed");
+    }
   };
 
   const filteredCategories = categories.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) return <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-gold" /></div>;
 
   return (
     <div className="space-y-12 pb-24 pt-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">

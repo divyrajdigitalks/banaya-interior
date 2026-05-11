@@ -9,3 +9,5 @@ export { processService, type ProcessStep } from './process.service';
 export { testimonialService, type Testimonial } from './testimonial.service';
 export { heroService, type DecorHeroData, type InteriorHeroData } from './hero.service';
 export { featuresService, type DecorFeaturesData, type QuickFeature, type Badge } from './features.service';
+export { interiorService, type InteriorCategory, type InteriorProject } from './interior.service';
+export { legacyProjectService, type LegacyProject, type LegacySettings } from './legacy-project.service';

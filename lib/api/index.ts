@@ -9,3 +9,4 @@ export { whyChooseService, type WhyChooseItem, type WhyChooseSectionSettings } f
 export { aboutService, type AboutSection, type AboutSectionSettings } from './services/about.service';
 export { offerService, type OfferData } from './services/offer.service';
 export { couponService, type CouponData } from './services/coupon.service';
+export { legacyProjectService, type LegacyProject, type LegacySettings } from './services/legacy-project.service';

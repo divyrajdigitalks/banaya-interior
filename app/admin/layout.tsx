@@ -48,6 +48,7 @@ const sidebarLinks = [
   { name: "Interior Hero", icon: GalleryHorizontal, href: "/admin/interiors/hero" },
   { name: "Interior Categories", icon: FolderTree, href: "/admin/interiors/categories" },
   { name: "Interior Projects", icon: Briefcase, href: "/admin/interiors/projects" },
+  { name: "Living Masterpieces", icon: Sparkles, href: "/admin/interiors/legacy-projects" },
   { name: "Interior Gallery", icon: GalleryHorizontal, href: "/admin/interiors/gallery" },
   { name: "Interior Collections", icon: Library, href: "/admin/interiors/collections" },
   { name: "Interior Testimonials", icon: Users, href: "/admin/interiors/testimonials" },

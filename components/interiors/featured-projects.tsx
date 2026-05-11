@@ -1,52 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-
-const FILTERS = ["All", "2 BHK", "3 BHK", "4 BHK", "Villa", "Commercial"];
-
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Modern Minimal Home",
-    desc: "3 BHK Apartment | Pune",
-    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
-    category: "3 BHK",
-  },
-  {
-    id: 2,
-    title: "Warm Contemporary Home",
-    desc: "2 BHK Apartment | Mumbai",
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
-    category: "2 BHK",
-  },
-  {
-    id: 3,
-    title: "Luxury Villa Interiors",
-    desc: "4 BHK Villa | Hyderabad",
-    image: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=800&q=80",
-    category: "Villa",
-  },
-  {
-    id: 4,
-    title: "Elegant Classic Home",
-    desc: "3 BHK Apartment | Bangalore",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-    category: "3 BHK",
-  },
-];
+import { ArrowRight, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { interiorService, type InteriorProject, type InteriorCategory } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
 
 export function FeaturedProjectsSection() {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [categories] = useState(FILTERS); // This would come from an API/Admin in a real app
+  const [projects, setProjects] = useState<InteriorProject[]>([]);
+  const [categories, setCategories] = useState<InteriorCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [projectsRes, categoriesRes] = await Promise.all([
+        interiorService.getProjects(),
+        interiorService.getCategories()
+      ]);
+      
+      if (projectsRes.success) {
+        setProjects(projectsRes.data);
+      }
+      if (categoriesRes.success) {
+        setCategories(categoriesRes.data);
+      }
+    } catch (error) {
+      console.error("Failed to load data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const FILTERS = ["All", ...categories.map(c => c.name)];
 
   const filteredProjects =
     activeFilter === "All"
-      ? PROJECTS
-      : PROJECTS.filter((p) => p.category === activeFilter);
+      ? projects
+      : projects.filter((p) => {
+          const catName = typeof p.category === 'object' ? p.category.name : '';
+          return catName === activeFilter;
+        });
+
+  if (loading) {
+    return (
+      <div className="py-20 flex items-center justify-center bg-[#faf7f2]">
+        <Loader2 className="w-10 h-10 animate-spin text-gold" />
+      </div>
+    );
+  }
 
   return (
     <section className="py-16 bg-[#faf7f2] relative">
@@ -61,7 +69,7 @@ export function FeaturedProjectsSection() {
             </span>
 
             <h2 className="text-3xl md:text-4xl font-serif font-medium text-primary tracking-tight">
-              Featured{" "}
+              Interior{" "}
               <span className="text-gold font-bold">
                 Creations
               </span>
@@ -69,7 +77,7 @@ export function FeaturedProjectsSection() {
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 md:gap-6 pt-2">
-              {categories.map((f) => (
+              {FILTERS.map((f) => (
                 <button
                   key={f}
                   onClick={() => setActiveFilter(f)}
@@ -109,7 +117,7 @@ export function FeaturedProjectsSection() {
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, idx) => (
               <motion.div
-                key={project.id}
+                key={project._id}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -120,8 +128,8 @@ export function FeaturedProjectsSection() {
                 <div className="relative aspect-[16/10] overflow-hidden">
                   
                   <Image
-                    src={project.image}
-                    alt={project.title}
+                    src={project.image ? (project.image.startsWith('http') ? project.image : buildImageUrl(project.image)) : ""}
+                    alt={project.name}
                     fill
                     className="object-cover transition-transform duration-[1.8s] group-hover:scale-105"
                   />
@@ -133,15 +141,15 @@ export function FeaturedProjectsSection() {
                   <div className="absolute inset-0 flex flex-col justify-end p-6 translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
                     
                     <span className="text-gold text-[11px] font-semibold uppercase tracking-wide mb-1">
-                      {project.category}
+                      {typeof project.category === 'object' ? project.category.name : ""}
                     </span>
 
                     <h3 className="text-xl font-semibold text-white mb-2">
-                      {project.title}
+                      {project.name}
                     </h3>
 
                     <p className="text-white/80 text-sm font-normal mb-4">
-                      {project.desc}
+                      {project.location}
                     </p>
 
                     <button className="flex items-center gap-2 text-white text-[12px] font-semibold uppercase tracking-wide">

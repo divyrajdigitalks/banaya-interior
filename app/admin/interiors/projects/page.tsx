@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Briefcase, Edit3, Trash2, Plus, ArrowLeft, Save, MapPin } from "lucide-react";
+import { Search, Briefcase, Edit3, Trash2, Plus, ArrowLeft, Save, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   AlertDialog,
@@ -26,25 +26,29 @@ import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminLabel } from "@/components/admin/admin-label";
-import { projectService, type Project } from "@/lib/api";
+import { interiorService, type InteriorProject, type InteriorCategory } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
 
-const INITIAL_CATEGORIES = [
-  { id: "1", name: "Residential" },
-  { id: "2", name: "Commercial" },
-  { id: "3", name: "Hospitality" },
-];
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "recharts";
 
 export default function InteriorProjectsPage() {
   const router = useRouter();
   const { showSuccess, showError } = useAdminToast();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<InteriorProject[]>([]);
+  const [categories, setCategories] = useState<InteriorCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [formData, setFormData] = useState<Partial<Project>>({ name: "", categoryId: "", description: "", image: "", location: "" });
+  const [editingProject, setEditingProject] = useState<InteriorProject | null>(null);
+  const [formData, setFormData] = useState<Partial<InteriorProject>>({ name: "", category: "", description: "", image: "", location: "" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [saving, setSaving] = useState(false);
@@ -52,16 +56,20 @@ export default function InteriorProjectsPage() {
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
-    loadProjects();
+    loadData();
   }, []);
 
-  const loadProjects = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const data = await projectService.getProjectList(true);
-      setProjects(data);
+      const [projectsRes, categoriesRes] = await Promise.all([
+        interiorService.getProjects(),
+        interiorService.getCategories()
+      ]);
+      if (projectsRes.success) setProjects(projectsRes.data);
+      if (categoriesRes.success) setCategories(categoriesRes.data);
     } catch (error) {
-      showError("Failed to load projects");
+      showError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -70,6 +78,7 @@ export default function InteriorProjectsPage() {
   const validateForm = () => {
     const formState = {
       name: { value: formData.name, rules: ValidationRules.name },
+      category: { value: formData.category, rules: ValidationRules.required },
       image: { 
         value: formData.image || (selectedFile ? 'file' : ''), 
         rules: ValidationRules.required 
@@ -85,7 +94,7 @@ export default function InteriorProjectsPage() {
     {
       header: "Project Info",
       accessorKey: "name",
-      cell: (item: Project) => (
+      cell: (item: InteriorProject) => (
         <div className="flex items-center gap-4 max-w-md">
           <div className="w-20 h-14 rounded-2xl overflow-hidden shadow-md border border-charcoal/5 flex-shrink-0">
             {item.image ? (
@@ -99,9 +108,9 @@ export default function InteriorProjectsPage() {
           <div className="min-w-0">
             <p className="font-bold text-charcoal truncate">{item.name}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              {item.categoryName && (
-                <span className="text-[9px] font-black uppercase tracking-widest text-gold bg-gold/5 px-2 py-0.5 rounded-full border border-gold/10">{item.categoryName}</span>
-              )}
+              <span className="text-[9px] font-black uppercase tracking-widest text-gold bg-gold/5 px-2 py-0.5 rounded-full border border-gold/10">
+                {typeof item.category === 'object' ? item.category.name : item.category}
+              </span>
               <span className="text-[9px] font-bold text-charcoal/30 flex items-center gap-1 uppercase tracking-widest">
                 <MapPin size={10} /> {item.location || "Location N/A"}
               </span>
@@ -112,15 +121,15 @@ export default function InteriorProjectsPage() {
     },
     {
       header: "ID",
-      accessorKey: "id",
-      cell: (item: Project) => (
-        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item.id.substring(0, 6)}</span>
+      accessorKey: "_id",
+      cell: (item: InteriorProject) => (
+        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/30">#{item._id.substring(0, 6)}</span>
       )
     },
     {
       header: "Actions",
-      accessorKey: "id",
-      cell: (item: Project) => (
+      accessorKey: "_id",
+      cell: (item: InteriorProject) => (
         <div className="flex items-center gap-2">
           <button 
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
@@ -129,7 +138,7 @@ export default function InteriorProjectsPage() {
             <Edit3 size={14} />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
+            onClick={(e) => { e.stopPropagation(); setDeleteId(item._id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all"
           >
             <Trash2 size={14} />
@@ -139,21 +148,20 @@ export default function InteriorProjectsPage() {
     }
   ];
 
-  const handleOpenDialog = (project: Project | null = null) => {
+  const handleOpenDialog = (project: InteriorProject | null = null) => {
     if (project) {
       setEditingProject(project);
       setFormData({ 
         name: project.name, 
-        categoryId: project.categoryId, 
-        categoryName: project.categoryName,
+        category: typeof project.category === 'object' ? project.category._id : project.category, 
         description: project.description, 
         image: project.image || "", 
-        location: project.location 
+        location: project.location,
       });
       setSelectedFile(null);
     } else {
       setEditingProject(null);
-      setFormData({ name: "", categoryId: "", categoryName: "", description: "", image: "", location: "" });
+      setFormData({ name: "", category: "", description: "", image: "", location: "" });
       setSelectedFile(null);
     }
     setFormErrors({});
@@ -169,17 +177,15 @@ export default function InteriorProjectsPage() {
     setSaving(true);
     try {
       if (editingProject) {
-        await projectService.updateProject(editingProject.id, formData, selectedFile || undefined);
+        await interiorService.updateProject(editingProject._id, formData, selectedFile || undefined);
         showSuccess("Project updated successfully!");
       } else {
-        await projectService.createProject(formData as Project, selectedFile || undefined);
+        await interiorService.createProject(formData, selectedFile || undefined);
         showSuccess("Project created successfully!");
       }
       
       setIsDialogOpen(false);
-      setTimeout(() => {
-        loadProjects();
-      }, 500);
+      loadData();
     } catch (error) {
       showError(editingProject ? "Failed to update project" : "Failed to create project");
     } finally {
@@ -189,11 +195,9 @@ export default function InteriorProjectsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await projectService.deleteProject(id);
+      await interiorService.deleteProject(id);
       showSuccess("Project deleted successfully!");
-      setTimeout(() => {
-        loadProjects();
-      }, 500);
+      loadData();
     } catch (error) {
       showError("Failed to delete project");
     } finally {
@@ -202,8 +206,7 @@ export default function InteriorProjectsPage() {
   };
 
   const filteredProjects = projects.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.categoryName && p.categoryName.toLowerCase().includes(searchQuery.toLowerCase()))
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -266,27 +269,49 @@ export default function InteriorProjectsPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminFormInputEnhanced 
-              label="Project Title"
-              value={formData.name || ""}
-              onChange={(val) => setFormData({ ...formData, name: val })}
-              placeholder="e.g. Niseko Dining House"
-              required
-              error={formErrors.name}
-            />
-            <AdminFormInputEnhanced 
-              label="Location"
-              value={formData.location || ""}
-              onChange={(val) => setFormData({ ...formData, location: val })}
-              placeholder="e.g. Hokkaido, Japan"
-            />
-            <AdminFormInputEnhanced 
-              label="Description"
-              value={formData.description || ""}
-              onChange={(val) => setFormData({ ...formData, description: val })}
-              placeholder="Tell the story of this masterpiece..."
-              textarea
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <AdminFormInputEnhanced 
+                label="Project Title"
+                value={formData.name || ""}
+                onChange={(val) => setFormData({ ...formData, name: val })}
+                placeholder="e.g. Niseko Dining House"
+                required
+                error={formErrors.name}
+              />
+              <div className="space-y-2">
+                <Label className="text-[11px] font-black uppercase tracking-widest text-charcoal/40">Category</Label>
+                <Select 
+                  value={typeof formData.category === 'string' ? formData.category : typeof formData.category === 'object' ? formData.category?._id : undefined} 
+                  onValueChange={(val) => setFormData({ ...formData, category: val })}
+                >
+                  <SelectTrigger className="h-12 rounded-xl border-charcoal/10 bg-white">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-charcoal/10 shadow-2xl">
+                    {categories.map((cat) => (
+                      <SelectItem key={cat._id} value={cat._id} className="text-sm font-medium">{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formErrors.category && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">{formErrors.category}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <AdminFormInputEnhanced 
+                label="Location"
+                value={formData.location || ""}
+                onChange={(val) => setFormData({ ...formData, location: val })}
+                placeholder="e.g. Hokkaido, Japan"
+              />
+              <AdminFormInputEnhanced 
+                label="Description"
+                value={formData.description || ""}
+                onChange={(val) => setFormData({ ...formData, description: val })}
+                placeholder="Tell the story..."
+              />
+            </div>
+
             <ImageUpload 
               label="Project Image"
               value={formData.image}
