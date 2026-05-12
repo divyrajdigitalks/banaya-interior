@@ -136,16 +136,24 @@ class GalleryService {
     }
   }
 
-  async updateGalleryImage(id: string, data: Partial<GalleryImage>): Promise<GalleryImage | null> {
+  async updateGalleryImage(id: string, data: Partial<GalleryImage>, file?: File): Promise<GalleryImage | null> {
     try {
-      // Map frontend 'src' field to backend 'image' field
-      const backendData = {
-        ...data,
-        image: data.src, // Backend expects 'image' field
-      };
-      delete backendData.src; // Remove 'src' field
+      const formData = new FormData();
+      
+      // Add text fields
+      if (data.title) formData.append('title', data.title);
+      if (data.subtitle) formData.append('subtitle', data.subtitle);
+      
+      // Add image file
+      if (file) {
+        formData.append('image', file);
+      }
 
-      const res = await api.put(`${endPointApi.adminGallery}/${id}`, backendData);
+      const res = await api.put(`${endPointApi.adminGallery}/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       const payload = res.data;
 
       if (!payload || !payload.data) {

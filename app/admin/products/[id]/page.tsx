@@ -227,7 +227,7 @@ export default function ProductFormPage() {
 
       let result;
       if (isEditMode && id) {
-        result = await productService.updateProduct(id, productData);
+        result = await productService.updateProduct(id, productData, selectedFiles);
         showSuccess("Product updated successfully!");
       } else {
         result = await productService.createProduct(productData, selectedFiles);
