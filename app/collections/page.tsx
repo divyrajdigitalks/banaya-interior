@@ -7,18 +7,18 @@ import { ArrowLeft, ArrowRight, Sparkles, ShieldCheck, Truck } from "lucide-reac
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Footer } from "@/components/footer";
+import { collectionService, type Collection } from "@/lib/api";
 
 export default function CollectionsPage() {
   const router = useRouter();
-  const [collections, setCollections] = useState<any[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCollections = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/collections`);
-        const data = await res.json();
-        if (data.success) setCollections(data.data);
+        const data = await collectionService.getCollectionList();
+        setCollections(data);
       } catch (err) {
         console.error("Failed to fetch collections", err);
       } finally {

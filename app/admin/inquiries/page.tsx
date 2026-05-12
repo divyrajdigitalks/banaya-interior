@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   Mail, 
   Phone, 
   Calendar, 
-  ChevronRight, 
   Filter,
   CheckCircle2,
-  Clock,
-  AlertCircle,
   MoreVertical,
   Trash2,
-  ExternalLink
+  ExternalLink,
+  MapPin,
+  Layers,
+  IndianRupee,
+  Clock,
+  X
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,70 +27,79 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const INITIAL_INQUIRIES = [
-  { 
-    id: "INQ001", 
-    name: "Rajesh Kumar", 
-    email: "rajesh@example.com", 
-    phone: "+91 98765 43210", 
-    service: "Full Interior Design", 
-    status: "New", 
-    date: "2024-04-28",
-    message: "Interested in 3BHK interior design for my new apartment in Gurgaon."
-  },
-  { 
-    id: "INQ002", 
-    name: "Anita Sharma", 
-    email: "anita.s@example.com", 
-    phone: "+91 87654 32109", 
-    service: "Decor Shopping", 
-    status: "In Progress", 
-    date: "2024-04-27",
-    message: "Looking for premium lighting fixtures and wall art for my living room."
-  },
-  { 
-    id: "INQ003", 
-    name: "Vikram Singh", 
-    email: "vikram.v@example.com", 
-    phone: "+91 76543 21098", 
-    service: "Furniture Customization", 
-    status: "Completed", 
-    date: "2024-04-25",
-    message: "Need a custom-sized dining table in teak wood finish."
-  },
-  { 
-    id: "INQ004", 
-    name: "Sonal Gupta", 
-    email: "sonal.g@example.com", 
-    phone: "+91 65432 10987", 
-    service: "Heritage Consultation", 
-    status: "New", 
-    date: "2024-04-24",
-    message: "Want to restore a family heirloom chair and match it with new decor."
-  },
-];
+import { inquiryService, type Inquiry } from "@/lib/api";
+import { useAdminToast } from "@/hooks/use-admin-toast";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
 
 export default function InquiriesManagementPage() {
-  const [inquiries, setInquiries] = useState(INITIAL_INQUIRIES);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const { showSuccess, showError } = useAdminToast();
+
+  useEffect(() => {
+    loadInquiries();
+  }, []);
+
+  const loadInquiries = async () => {
+    setLoading(true);
+    try {
+      const data = await inquiryService.getInquiries();
+      setInquiries(data);
+    } catch (error) {
+      showError("Failed to load inquiries");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredInquiries = inquiries.filter(inq => {
-    const matchesSearch = inq.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          inq.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          inq.service.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = 
+      inq.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      inq.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inq.service.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || inq.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = (id: string) => {
-    setInquiries(inquiries.filter(inq => inq.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      const success = await inquiryService.deleteInquiry(id);
+      if (success) {
+        showSuccess("Inquiry deleted successfully");
+        loadInquiries();
+      }
+    } catch (error) {
+      showError("Failed to delete inquiry");
+    }
   };
 
-  const updateStatus = (id: string, newStatus: string) => {
-    setInquiries(inquiries.map(inq => inq.id === id ? { ...inq, status: newStatus } : inq));
+  const updateStatus = async (id: string, newStatus: string) => {
+    try {
+      const success = await inquiryService.updateInquiryStatus(id, newStatus as any);
+      if (success) {
+        showSuccess(`Status updated to ${newStatus}`);
+        loadInquiries();
+      }
+    } catch (error) {
+      showError("Failed to update status");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-charcoal/40 font-bold uppercase tracking-widest text-[10px]">Loading inquiries...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12 pb-12">
@@ -161,6 +172,10 @@ export default function InquiriesManagementPage() {
                               {inq.status}
                             </span>
                           </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <MapPin size={10} className="text-gold" />
+                            <span className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest">{inq.city || "Unknown City"}</span>
+                          </div>
                         </div>
                       </div>
 
@@ -174,6 +189,13 @@ export default function InquiriesManagementPage() {
                         </div>
                         <div className="h-10 w-px bg-charcoal/5" />
                         <div className="flex gap-2">
+                          <Button 
+                            onClick={() => setSelectedInquiry(inq)}
+                            variant="ghost" 
+                            className="p-3 hover:bg-warm-cream rounded-xl text-gold hover:text-charcoal transition-all"
+                          >
+                            <ExternalLink size={20} />
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="p-3 hover:bg-warm-cream rounded-xl text-charcoal/30 hover:text-charcoal transition-all">
@@ -203,10 +225,23 @@ export default function InquiriesManagementPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                       <div className="lg:col-span-2 space-y-4">
                         <div className="p-6 bg-warm-cream/30 rounded-3xl border border-charcoal/5 relative overflow-hidden group/msg">
-                          <p className="text-[10px] uppercase tracking-widest font-black text-charcoal/30 mb-3">Customer Message</p>
-                          <p className="text-[13px] leading-relaxed font-medium text-charcoal/80 italic">"{inq.message}"</p>
+                          <p className="text-[10px] uppercase tracking-widest font-black text-charcoal/30 mb-3">Estimate Summary</p>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-charcoal/5">
+                              <IndianRupee size={14} className="text-gold" />
+                              <span className="text-sm font-black text-charcoal">
+                                {inq.estimateDetails?.estimate?.toLocaleString() || "N/A"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-charcoal/5">
+                              <Layers size={14} className="text-gold" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/60">
+                                {inq.estimateDetails?.brand || "Standard"}
+                              </span>
+                            </div>
+                          </div>
                           <div className="absolute top-4 right-6 opacity-5 group-hover/msg:opacity-10 transition-opacity">
-                            <Mail size={40} />
+                            <IndianRupee size={40} />
                           </div>
                         </div>
                       </div>
@@ -243,6 +278,126 @@ export default function InquiriesManagementPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Details Dialog */}
+      <Dialog open={!!selectedInquiry} onOpenChange={() => setSelectedInquiry(null)}>
+        <DialogContent className="max-w-4xl bg-white border-none rounded-[2.5rem] p-0 overflow-hidden shadow-2xl">
+          <DialogHeader className="p-10 border-b border-charcoal/5 bg-warm-cream/20">
+            <div className="flex justify-between items-start">
+              <div>
+                <DialogTitle className="text-3xl font-serif font-black text-charcoal tracking-tight">Inquiry Details</DialogTitle>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-charcoal/40 mt-2">Reference ID: {selectedInquiry?.id}</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                onClick={() => setSelectedInquiry(null)}
+                className="w-10 h-10 rounded-full p-0 hover:bg-charcoal/5"
+              >
+                <X size={20} />
+              </Button>
+            </div>
+          </DialogHeader>
+          
+          <div className="p-10 space-y-10 overflow-y-auto max-h-[70vh]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gold mb-4">Customer Information</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-warm-cream flex items-center justify-center text-charcoal text-lg font-black">{selectedInquiry?.name[0]}</div>
+                      <div>
+                        <p className="text-lg font-serif font-black text-charcoal">{selectedInquiry?.name}</p>
+                        <p className="text-[11px] font-bold text-charcoal/40">{selectedInquiry?.email}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-2xl bg-warm-cream/30 border border-charcoal/5">
+                        <p className="text-[8px] font-black uppercase tracking-widest text-charcoal/30 mb-1">Phone</p>
+                        <p className="text-[11px] font-black text-charcoal">{selectedInquiry?.phone}</p>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-warm-cream/30 border border-charcoal/5">
+                        <p className="text-[8px] font-black uppercase tracking-widest text-charcoal/30 mb-1">City</p>
+                        <p className="text-[11px] font-black text-charcoal">{selectedInquiry?.city}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gold mb-4">Estimate Details</h4>
+                  <div className="p-6 rounded-3xl bg-charcoal text-white space-y-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Total Estimate</span>
+                      <span className="text-2xl font-black text-gold">₹{selectedInquiry?.estimateDetails?.estimate?.toLocaleString()}</span>
+                    </div>
+                    <div className="h-px bg-white/10" />
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Service Type</p>
+                        <p className="text-[11px] font-black">{selectedInquiry?.service}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Quality Level</p>
+                        <p className="text-[11px] font-black">{selectedInquiry?.estimateDetails?.brand || "Standard"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Project Scope</p>
+                        <p className="text-[11px] font-black uppercase">{selectedInquiry?.estimateDetails?.reqType?.replace('_', ' ') || "Full Home"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">BHK Config</p>
+                        <p className="text-[11px] font-black">{selectedInquiry?.estimateDetails?.selBHK || "N/A"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gold mb-4">Selected Items</h4>
+                  <div className="space-y-3">
+                    {selectedInquiry?.estimateDetails?.items?.map((item: any, i: number) => (
+                      <div key={i} className="flex justify-between items-center p-4 rounded-2xl bg-white border border-charcoal/5 shadow-sm">
+                        <span className="text-[11px] font-bold text-charcoal">{item.id.replace(/-/g, ' ').toUpperCase()}</span>
+                        <span className="text-[10px] font-black px-3 py-1 rounded-full bg-gold/10 text-gold">QTY: {item.qty}</span>
+                      </div>
+                    ))}
+                    {!selectedInquiry?.estimateDetails?.items?.length && (
+                      <p className="text-[11px] text-charcoal/40 font-bold italic">No specific items selected.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8 border-t border-charcoal/5 bg-warm-cream/10 flex justify-between items-center">
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => updateStatus(selectedInquiry!.id, "In Progress")}
+                className="bg-blue-500 text-white hover:bg-blue-600 px-6 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/10"
+              >
+                Start Process
+              </Button>
+              <Button 
+                onClick={() => updateStatus(selectedInquiry!.id, "Completed")}
+                className="bg-emerald-500 text-white hover:bg-emerald-600 px-6 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/10"
+              >
+                Complete Inquiry
+              </Button>
+            </div>
+            <Button 
+              onClick={() => setSelectedInquiry(null)}
+              variant="ghost" 
+              className="text-[9px] font-black uppercase tracking-widest text-charcoal/40"
+            >
+              Close Details
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Empty State */}
       {filteredInquiries.length === 0 && (

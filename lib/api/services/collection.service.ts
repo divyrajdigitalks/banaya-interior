@@ -3,9 +3,11 @@ import endPointApi from '../endpoints';
 
 export interface Collection {
   id: string;
+  _id?: string;
   name: string;
-  image?: string;
   description?: string;
+  image: string;
+  productCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -13,6 +15,7 @@ export interface Collection {
 export interface CollectionListResponse {
   status: number;
   message: string;
+  success: boolean;
   data: Collection[];
 }
 
@@ -30,21 +33,22 @@ class CollectionService {
 
     this.collectionListPromise = (async () => {
       try {
-        const res = await api.get(endPointApi.adminCollections, {
-          params: {
-            page: 1,
-            limit: 100,
-          },
-        });
-
+        const res = await api.get(endPointApi.collections);
         const payload = res.data;
+        
+        if (!payload.success) {
+          return [];
+        }
+
         const rawList = Array.isArray(payload?.data) ? payload.data : [];
 
         const mapped: Collection[] = rawList.map((item: any) => ({
           id: item.id || item._id,
+          _id: item._id,
           name: item.name,
-          image: buildImageUrl(item.image),
           description: item.description,
+          image: buildImageUrl(item.image),
+          productCount: item.productCount,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         }));
@@ -52,6 +56,7 @@ class CollectionService {
         this.collectionList = mapped;
         return mapped;
       } catch (error) {
+        console.error('Failed to fetch collections', error);
         this.collectionListPromise = null;
         return [];
       }

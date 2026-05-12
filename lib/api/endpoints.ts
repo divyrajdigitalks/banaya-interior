@@ -37,6 +37,7 @@ export interface EndPointApi {
   adminProductDelete: string;
 
   // Collections
+  collections: string;
   adminCollections: string;
   adminCollectionCreate: string;
   adminCollectionUpdate: string;
@@ -71,6 +72,18 @@ export interface EndPointApi {
   adminTestimonialCreate: string;
   adminTestimonialUpdate: string;
   adminTestimonialDelete: string;
+
+  // Services
+  adminServices: string;
+  adminServiceCreate: string;
+  adminServiceUpdate: string;
+  adminServiceDelete: string;
+
+  // Inquiries/Quotations
+  adminInquiries: string;
+  adminInquiryDelete: string;
+  adminInquiryUpdateStatus: string;
+  submitInquiry: string;
 
   // Upload
   adminUpload: string;
@@ -115,6 +128,7 @@ const endPointApi: EndPointApi = {
   adminProductDelete: 'products',
 
   // Collections
+  collections: 'collections',
   adminCollections: 'collections',
   adminCollectionCreate: 'collections',
   adminCollectionUpdate: 'collections',
@@ -149,6 +163,18 @@ const endPointApi: EndPointApi = {
   adminTestimonialCreate: 'testimonials',
   adminTestimonialUpdate: 'testimonials',
   adminTestimonialDelete: 'testimonials',
+
+  // Services
+  adminServices: 'services',
+  adminServiceCreate: 'services',
+  adminServiceUpdate: 'services',
+  adminServiceDelete: 'services',
+
+  // Inquiries/Quotations
+  adminInquiries: 'inquiries',
+  adminInquiryDelete: 'inquiries',
+  adminInquiryUpdateStatus: 'inquiries/status',
+  submitInquiry: 'inquiries',
 
   // Upload
   adminUpload: 'upload',

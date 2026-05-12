@@ -1,524 +1,392 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { 
-  Plus, 
-  Search, 
-  Edit2, 
-  Trash2, 
-  Calculator,
-  Home,
-  LayoutGrid,
-  Sparkles, 
-  Zap, 
-  Paintbrush, 
-  Layers, 
-  ChevronRight, 
-  Settings2,
-  Wind
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Plus, Edit3, Trash2, Layout, Image as ImageIcon, Type, IndianRupee, Layers, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { AdminTable } from "@/components/admin/admin-table";
+import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
+import { AdminSelectEnhanced } from "@/components/admin/admin-select-enhanced";
+import { ImageUpload } from "@/components/admin/image-upload";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { calculatorService, type CalculatorItem } from "@/lib/api";
+import { buildImageUrl } from "@/lib/api/axios";
+import { useAdminToast } from "@/hooks/use-admin-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger,
-  DialogFooter
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
-import { 
-  BHK_OPTIONS, 
-  ROOM_OPTIONS, 
-  FURNITURE_ITEMS, 
-  BASIC_REQUIREMENTS,
-  BRAND_OPTIONS,
-  DETAILED_FURNITURE,
-  GENERAL_SERVICES
-} from "@/lib/data/calculator";
 
-export default function AdminCalculatorManagementPage() {
-  const [activeTab, setActiveTab] = useState("bhk");
-  const [bhkOptions, setBhkOptions] = useState(BHK_OPTIONS);
-  const [roomOptions, setRoomOptions] = useState(ROOM_OPTIONS);
-  const [furnitureItems, setFurnitureItems] = useState(FURNITURE_ITEMS);
-  const [basicReqs, setBasicReqs] = useState(BASIC_REQUIREMENTS);
-  const [brandOptions, setBrandOptions] = useState(BRAND_OPTIONS);
-  const [detailedFurniture, setDetailedFurniture] = useState(DETAILED_FURNITURE);
-  const [generalServices, setGeneralServices] = useState(GENERAL_SERVICES);
-
-  // Dialog State
+export default function CalculatorManagementPage() {
+  const { showSuccess, showError } = useAdminToast();
+  const [items, setItems] = useState<CalculatorItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({});
+  const [editingItem, setEditingService] = useState<CalculatorItem | null>(null);
+  const [formData, setFormData] = useState<any>({
+    calculatorType: 'interior',
+    type: 'furniture',
+    name: '',
+    price: 0,
+    unit: 'unit',
+    category: '',
+    options: []
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCalculatorType, setFilterCalculatorType] = useState<string>("all");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleOpenDialog = (item: any = null) => {
-    if (item && item.id) {
-      setEditingItem(item);
-      setFormData(item);
+  const [brands, setBrands] = useState<any[]>([]);
+  const [isBrandDialogOpen, setIsBrandDialogOpen] = useState(false);
+  const [editingBrand, setEditingBrand] = useState<any>(null);
+  const [brandFormData, setBrandFormData] = useState({ 
+    name: '', 
+    multiplier: 1.0, 
+    image: '',
+    calculatorType: 'all' 
+  });
+  const [brandFile, setBrandFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    loadItems();
+    loadBrands();
+  }, []);
+
+  const loadBrands = async () => {
+    const data = await calculatorService.getBrands();
+    setBrands(data);
+  };
+
+  const handleSaveBrand = async () => {
+    if (editingBrand) {
+      await calculatorService.updateBrand(editingBrand.id, brandFormData, brandFile || undefined);
     } else {
-      setEditingItem(null);
-      // Initialize based on tab
-      const initialData: any = { 
-        id: Math.random().toString(36).substr(2, 9),
-        category: item?.category || "" 
-      };
-      if (activeTab === "bhk") initialData.price = 0;
-      if (activeTab === "rooms") initialData.basePrice = 0;
-      if (activeTab === "furniture") initialData.price = 0;
-      if (activeTab === "requirements") initialData.price = 0;
-      if (activeTab === "brands") initialData.multiplier = 1.0;
-      if (activeTab === "detailed") initialData.price = 0;
-      if (activeTab === "services") initialData.price = 0;
-      setFormData(initialData);
+      await calculatorService.addBrand(brandFormData, brandFile || undefined);
     }
-    setIsDialogOpen(true);
+    setIsBrandDialogOpen(false);
+    loadBrands();
   };
 
-  const handleSave = () => {
-    if (activeTab === "bhk") {
-      if (editingItem) setBhkOptions(bhkOptions.map(o => o.id === editingItem.id ? formData : o));
-      else setBhkOptions([...bhkOptions, formData]);
-    } else if (activeTab === "rooms") {
-      if (editingItem) setRoomOptions(roomOptions.map(o => o.id === editingItem.id ? formData : o));
-      else setRoomOptions([...roomOptions, formData]);
-    } else if (activeTab === "furniture") {
-      if (editingItem) setFurnitureItems(furnitureItems.map(o => o.id === editingItem.id ? formData : o));
-      else setFurnitureItems([...furnitureItems, formData]);
-    } else if (activeTab === "requirements") {
-      if (editingItem) setBasicReqs(basicReqs.map(o => o.id === editingItem.id ? formData : o));
-      else setBasicReqs([...basicReqs, formData]);
-    } else if (activeTab === "brands") {
-      if (editingItem) setBrandOptions(brandOptions.map(o => o.id === editingItem.id ? formData : o));
-      else setBrandOptions([...brandOptions, formData]);
-    } else if (activeTab === "detailed") {
-      // Logic for detailed furniture might be complex as it's an object of arrays
-      // For simplicity, we can just handle it as a flat list if we pass the category in formData
-      const category = formData.category || "Living Area";
-      const updatedDetailed = { ...detailedFurniture };
+  const handleDeleteBrand = async (id: string) => {
+    await calculatorService.deleteBrand(id);
+    loadBrands();
+  };
+
+  const loadItems = async () => {
+    setLoading(true);
+    const data = await calculatorService.getAllItems();
+    setItems(data);
+    setLoading(false);
+  };
+
+  const handleSave = async () => {
+    try {
       if (editingItem) {
-        updatedDetailed[category] = updatedDetailed[category].map(o => o.id === editingItem.id ? formData : o);
+        await calculatorService.updateItem(editingItem.id, formData, selectedFile || undefined);
+        showSuccess("Item updated successfully");
       } else {
-        updatedDetailed[category] = [...(updatedDetailed[category] || []), formData];
+        await calculatorService.addItem(formData, selectedFile || undefined);
+        showSuccess("Item added successfully");
       }
-      setDetailedFurniture(updatedDetailed);
-    } else if (activeTab === "services") {
-      if (editingItem) setGeneralServices(generalServices.map(o => o.id === editingItem.id ? formData : o));
-      else setGeneralServices([...generalServices, formData]);
+      setIsDialogOpen(false);
+      loadItems();
+    } catch (error) {
+      showError("Failed to save item");
     }
-    setIsDialogOpen(false);
   };
 
-  const handleDelete = (id: string, category?: string) => {
-    if (activeTab === "bhk") setBhkOptions(bhkOptions.filter(o => o.id !== id));
-    else if (activeTab === "rooms") setRoomOptions(roomOptions.filter(o => o.id !== id));
-    else if (activeTab === "furniture") setFurnitureItems(furnitureItems.filter(o => o.id !== id));
-    else if (activeTab === "requirements") setBasicReqs(basicReqs.filter(o => o.id !== id));
-    else if (activeTab === "brands") setBrandOptions(brandOptions.filter(o => o.id !== id));
-    else if (activeTab === "detailed" && category) {
-      const updatedDetailed = { ...detailedFurniture };
-      updatedDetailed[category] = updatedDetailed[category].filter(o => o.id !== id);
-      setDetailedFurniture(updatedDetailed);
+  const handleDelete = async (id: string) => {
+    const success = await calculatorService.deleteItem(id);
+    if (success) {
+      showSuccess("Item deleted");
+      loadItems();
+    } else {
+      showError("Failed to delete");
     }
-    else if (activeTab === "services") setGeneralServices(generalServices.filter(o => o.id !== id));
+    setDeleteId(null);
   };
+
+  const columns = [
+    {
+      header: "Item Info",
+      accessorKey: "name",
+      cell: (item: any) => (
+        <div className="flex items-center gap-3">
+          {item.image ? (
+            <img src={buildImageUrl(item.image)} className="w-10 h-10 rounded-lg object-cover" alt="" />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+              <ImageIcon size={16} className="text-slate-400" />
+            </div>
+          )}
+          <div>
+            <p className="font-bold text-charcoal">{item.name}</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-black">{item.type}</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: "Calculator",
+      accessorKey: "calculatorType",
+      cell: (item: any) => (
+        <span className="px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600">
+          {item.calculatorType}
+        </span>
+      )
+    },
+    {
+      header: "Category",
+      accessorKey: "category",
+      cell: (item: any) => <span className="text-xs font-bold text-slate-600">{item.category || "—"}</span>
+    },
+    {
+      header: "Price",
+      accessorKey: "price",
+      cell: (item: any) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-black text-charcoal">₹{item.price.toLocaleString()}</span>
+          <span className="text-[10px] uppercase text-slate-400 font-bold">per {item.unit}</span>
+        </div>
+      )
+    },
+    {
+      header: "Actions",
+      accessorKey: "id",
+      cell: (item: any) => (
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm" onClick={() => { setEditingService(item); setFormData(item); setIsDialogOpen(true); }}>
+            <Edit3 size={14} />
+          </Button>
+          <Button variant="ghost" size="sm" className="text-red-500" onClick={() => setDeleteId(item.id)}>
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   return (
-    <div className="space-y-12 pb-12">
-      {/* ── Header ── */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-10 h-px bg-gold" />
-            <span className="text-xs text-gold font-medium">Logic Engine</span>
-          </motion.div>
-          <h1 className="text-4xl md:text-5xl font-serif font-semibold text-charcoal tracking-tight">
-            Calculator <span className="italic font-light text-gold">Systems</span>
-          </h1>
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-serif font-black text-charcoal">Calculator Management</h1>
+          <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Manage all dynamic calculator options and brands</p>
         </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <Button 
-            onClick={() => handleOpenDialog()}
-            className="bg-charcoal hover:bg-gold text-white font-medium py-7 px-8 rounded-2xl transition-all duration-500 shadow-xl shadow-charcoal/10 group overflow-hidden relative"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <Plus size={16} />
-              Add New Configuration
-            </span>
-            <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-          </Button>
+      </div>
 
-          <DialogContent className="max-w-2xl bg-white rounded-3xl border-none shadow-2xl p-0 overflow-hidden">
-            <div className="bg-charcoal p-8 text-white relative">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-serif font-semibold tracking-tight text-white">
-                  {editingItem ? "Edit" : "Add New"} {activeTab}
-                </DialogTitle>
-                <p className="text-xs text-gold font-medium mt-1">Update Calculator Logic Values</p>
-              </DialogHeader>
-            </div>
-            
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-charcoal/60 ml-1">Name</Label>
-                  <Input 
-                    value={formData.name || ""} 
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="e.g. Premium Finish" 
-                    className="bg-warm-cream/30 border-charcoal/5 rounded-2xl py-6 text-sm font-normal" 
-                  />
-                </div>
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-charcoal/60 ml-1">
-                    {activeTab === "brands" ? "Multiplier" : "Price (₹)"}
-                  </Label>
-                  <Input 
-                    type="number"
-                    value={activeTab === "brands" ? formData.multiplier : (formData.price || formData.basePrice || 0)} 
-                    onChange={(e) => setFormData({
-                      ...formData, 
-                      [activeTab === "brands" ? "multiplier" : (activeTab === "rooms" ? "basePrice" : "price")]: parseFloat(e.target.value)
-                    })}
-                    placeholder="Value" 
-                    className="bg-warm-cream/30 border-charcoal/5 rounded-2xl py-6 text-sm font-normal" 
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2.5">
-                <Label className="text-xs font-medium text-charcoal/60 ml-1">Image URL</Label>
-                <Input 
-                  value={formData.image || ""} 
-                  onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  placeholder="https://..." 
-                  className="bg-warm-cream/30 border-charcoal/5 rounded-2xl py-6 text-sm font-normal" 
-                />
-              </div>
-
-              { (activeTab === "requirements" || activeTab === "detailed" || activeTab === "services") && (
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-charcoal/60 ml-1">Unit</Label>
-                  <Input 
-                    value={formData.unit || ""} 
-                    onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                    placeholder="sqft / unit" 
-                    className="bg-warm-cream/30 border-charcoal/5 rounded-2xl py-6 text-sm font-normal" 
-                  />
-                </div>
-              )}
-
-              { activeTab === "detailed" && (
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-charcoal/60 ml-1">Category</Label>
-                  <Select 
-                    value={formData.category} 
-                    onValueChange={(val) => setFormData({...formData, category: val})}
-                  >
-                    <SelectTrigger className="bg-warm-cream/30 border-charcoal/5 rounded-2xl py-6 text-sm font-normal">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-charcoal/5 rounded-2xl">
-                      {Object.keys(detailedFurniture).map(cat => (
-                        <SelectItem key={cat} value={cat} className="text-xs font-medium focus:bg-warm-cream">{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-            
-            <DialogFooter className="p-8 pt-4 border-t border-charcoal/5 flex sm:justify-between items-center bg-warm-cream/10">
-              <button onClick={() => setIsDialogOpen(false)} className="text-xs font-medium text-charcoal/40 hover:text-charcoal transition-colors">Cancel</button>
-              <Button onClick={handleSave} className="bg-gold hover:bg-charcoal text-white font-medium py-6 px-10 rounded-2xl transition-all duration-500 shadow-xl shadow-gold/10">
-                Save Configuration
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </header>
-
-      {/* ── Tabs Navigation ── */}
-      <Tabs defaultValue="bhk" onValueChange={setActiveTab} className="space-y-8">
-        <TabsList className="bg-white/50 backdrop-blur-md p-1.5 rounded-2xl border border-charcoal/5 h-auto flex flex-wrap gap-2">
-          <TabsTrigger value="bhk" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Home size={14} className="mr-2" /> BHK Config
-          </TabsTrigger>
-          <TabsTrigger value="rooms" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <LayoutGrid size={14} className="mr-2" /> Room Base
-          </TabsTrigger>
-          <TabsTrigger value="furniture" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Sparkles size={14} className="mr-2" /> Furniture
-          </TabsTrigger>
-          <TabsTrigger value="requirements" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Zap size={14} className="mr-2" /> Essentials
-          </TabsTrigger>
-          <TabsTrigger value="brands" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Layers size={14} className="mr-2" /> Brand Multipliers
-          </TabsTrigger>
-          <TabsTrigger value="detailed" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Settings2 size={14} className="mr-2" /> Detailed Furniture
-          </TabsTrigger>
-          <TabsTrigger value="services" className="rounded-xl px-6 py-3 text-xs font-medium data-[state=active]:bg-charcoal data-[state=active]:text-white transition-all">
-            <Wind size={14} className="mr-2" /> General Services
-          </TabsTrigger>
+      <Tabs defaultValue="items" className="space-y-8">
+        <TabsList className="bg-slate-50 p-1 rounded-2xl border border-slate-100">
+          <TabsTrigger value="items" className="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Calculator Items</TabsTrigger>
+          <TabsTrigger value="brands" className="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:shadow-sm">Brand Options</TabsTrigger>
         </TabsList>
 
-        {/* ── BHK Options Content ── */}
-        <TabsContent value="bhk" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">BHK Configuration Prices</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size={14} className="mr-2" /> Add BHK Type
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {bhkOptions.map((opt) => (
-              <Card key={opt.id} className="border-charcoal/5 shadow-lg rounded-3xl overflow-hidden bg-white group">
-                <div className="relative h-40 overflow-hidden">
-                  <Image src={opt.image} alt={opt.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-charcoal/40 transition-colors" />
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-charcoal">{opt.name}</h3>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-2xl font-serif font-semibold text-gold">₹{(opt.price / 100000).toFixed(1)}L</span>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleOpenDialog(opt)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={14} /></button>
-                      <button onClick={() => handleDelete(opt.id)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* ── Room Options Content ── */}
-        <TabsContent value="rooms" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">Room Base Estimates</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size={14} className="mr-2" /> Add Room Type
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {roomOptions.map((room) => (
-              <Card key={room.id} className="border-charcoal/5 shadow-lg rounded-3xl overflow-hidden bg-white flex items-center group">
-                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
-                  <Image src={room.image} alt={room.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                </div>
-                <CardContent className="p-6 flex-1 flex flex-col justify-between">
-                  <h3 className="text-sm font-medium text-charcoal">{room.name}</h3>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xl font-serif font-semibold text-gold">₹{(room.basePrice / 1000).toFixed(0)}K</span>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleOpenDialog(room)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={14} /></button>
-                      <button onClick={() => handleDelete(room.id)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* ── Furniture Items Content ── */}
-        <TabsContent value="furniture" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">Furniture Catalog & Pricing</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size={14} className="mr-2" /> Add Furniture
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {furnitureItems.map((item) => (
-              <Card key={item.id} className="border-charcoal/5 shadow-lg rounded-3xl overflow-hidden bg-white group">
-                <div className="flex">
-                  <div className="relative w-48 h-full min-h-[180px] overflow-hidden">
-                    <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                  </div>
-                  <CardContent className="p-6 flex-1 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-charcoal">{item.name}</h3>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleOpenDialog(item)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={14} /></button>
-                        <button onClick={() => handleDelete(item.id)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-charcoal/30">Variants & Pricing</p>
-                      {item.options ? (
-                        <div className="space-y-2">
-                          {item.options.map(opt => (
-                            <div key={opt.id} className="flex items-center justify-between bg-warm-cream/30 p-2 rounded-xl border border-charcoal/5">
-                              <span className="text-xs font-medium text-charcoal">{opt.name}</span>
-                              <span className="text-xs font-semibold text-gold">₹{opt.price.toLocaleString()}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between bg-warm-cream/30 p-3 rounded-xl border border-charcoal/5">
-                          <span className="text-xs font-medium text-charcoal">Base Price</span>
-                          <span className="text-xs font-semibold text-gold">₹{item.price?.toLocaleString()}</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* ── Requirements Content ── */}
-        <TabsContent value="requirements" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">Essential Service Rates</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size="14" className="mr-2" /> Add Essential
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {basicReqs.map((req) => (
-              <Card key={req.id} className="border-charcoal/5 shadow-lg rounded-3xl bg-white group hover:shadow-xl transition-all">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="p-3 bg-warm-cream/50 rounded-2xl group-hover:bg-gold/10 transition-colors">
-                      <Zap size={20} className="text-gold" />
-                    </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleOpenDialog(req)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={12} /></button>
-                      <button onClick={() => handleDelete(req.id)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={12} /></button>
-                    </div>
-                  </div>
-                  <div className="mt-6">
-                    <h3 className="text-xs font-semibold text-charcoal">{req.name}</h3>
-                    <p className="text-[10px] font-medium text-charcoal/30 mt-1">Unit: {req.unit}</p>
-                  </div>
-                  <div className="mt-4 flex items-baseline">
-                    <span className="text-2xl font-serif font-semibold text-charcoal">₹{req.price.toLocaleString()}</span>
-                    <span className="text-[10px] font-medium text-charcoal/30 ml-2">/ {req.unit}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* ── Brands Content ── */}
-        <TabsContent value="brands" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">Brand Tier Multipliers</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size={14} className="mr-2" /> Add Brand Tier
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {brandOptions.map((brand) => (
-              <Card key={brand.id} className="border-charcoal/5 shadow-lg rounded-3xl overflow-hidden bg-white group relative">
-                <div className="absolute top-4 right-4 z-10 flex gap-2">
-                  <button onClick={() => handleOpenDialog(brand)} className="p-2 bg-white/80 backdrop-blur-md rounded-xl text-charcoal/30 hover:text-gold transition-colors shadow-sm"><Edit2 size={14} /></button>
-                  <button onClick={() => handleDelete(brand.id)} className="p-2 bg-white/80 backdrop-blur-md rounded-xl text-charcoal/30 hover:text-red-500 transition-colors shadow-sm"><Trash2 size={14} /></button>
-                </div>
-                <div className="h-32 bg-charcoal flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-20 flex items-center justify-center scale-150 rotate-12">
-                    <Layers size={100} className="text-white" />
-                  </div>
-                  <div className="text-center relative z-10">
-                    <h3 className="text-2xl font-serif font-semibold tracking-tight text-white">{brand.name}</h3>
-                    <p className="text-xs text-gold font-medium mt-1">Multiplier: {brand.multiplier}x</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* ── Detailed Furniture Content ── */}
-        <TabsContent value="detailed" className="space-y-12">
-          {Object.entries(detailedFurniture).map(([category, items]) => (
-            <div key={category} className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-1.5 h-10 bg-gold rounded-full" />
-                  <h3 className="text-xl font-serif font-semibold text-charcoal">{category}</h3>
-                </div>
-                <Button onClick={() => handleOpenDialog({ category })} size="sm" className="bg-charcoal hover:bg-gold text-white rounded-xl text-xs font-medium px-6">
-                  <Plus size={14} className="mr-2" /> Add {category} Item
-                </Button>
+        <TabsContent value="items" className="space-y-8">
+          <div className="flex justify-between items-center">
+            <div className="flex gap-4 items-center">
+              <div className="relative w-96">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                <AdminFormInputEnhanced placeholder="Search items..." value={searchQuery} onChange={(val) => setSearchQuery(val as string)} className="pl-11" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {items.map((item: any) => (
-                  <Card key={item.id} className="border-charcoal/5 shadow-lg rounded-3xl bg-white overflow-hidden group hover:shadow-xl transition-all">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-xs font-semibold text-charcoal leading-tight">{item.name}</h4>
-                        <div className="flex gap-1">
-                          <button onClick={() => handleOpenDialog({ ...item, category })} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={12} /></button>
-                          <button onClick={() => handleDelete(item.id, category)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={12} /></button>
-                        </div>
-                      </div>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-serif font-semibold text-charcoal">₹{item.price.toLocaleString()}</span>
-                        <span className="text-[10px] font-medium text-charcoal/30 ml-1">/ {item.unit}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <AdminSelectEnhanced 
+                value={filterCalculatorType} 
+                onChange={(val) => setFilterCalculatorType(val)} 
+                options={[
+                  { value: 'all', label: 'All Calculators' },
+                  { value: 'services', label: 'Services' },
+                  { value: 'interior', label: 'Interior' },
+                  { value: 'homes', label: 'Homes' }
+                ]} 
+              />
             </div>
-          ))}
-        </TabsContent>
-
-        {/* ── General Services Content ── */}
-        <TabsContent value="services" className="space-y-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-serif font-semibold text-charcoal">General Service Rates</h2>
-            <Button onClick={() => handleOpenDialog()} size="sm" className="bg-gold hover:bg-charcoal text-white rounded-xl text-xs font-medium px-6">
-              <Plus size={14} className="mr-2" /> Add Service
+            <Button onClick={() => { setEditingService(null); setFormData({ calculatorType: 'interior', type: 'furniture', name: '', price: 0, unit: 'unit', category: '', options: [] }); setIsDialogOpen(true); }} className="bg-charcoal text-white hover:bg-gold px-8 py-6 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl transition-all">
+              <Plus size={16} className="mr-2" /> Add Item
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {generalServices.map((service) => (
-              <Card key={service.id} className="border-charcoal/5 shadow-lg rounded-3xl bg-white p-6 group hover:shadow-xl transition-all">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="p-3 bg-gold/10 rounded-2xl text-gold">
-                    <Paintbrush size={20} />
+          <AdminTable 
+            columns={columns} 
+            data={items.filter(i => 
+              i.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
+              (filterCalculatorType === 'all' || i.calculatorType === filterCalculatorType)
+            )} 
+          />
+        </TabsContent>
+
+        <TabsContent value="brands" className="space-y-8">
+          <div className="flex justify-end">
+            <Button onClick={() => { setEditingBrand(null); setBrandFormData({ name: '', multiplier: 1.0, image: '' }); setIsBrandDialogOpen(true); }} className="bg-charcoal text-white hover:bg-gold px-8 py-6 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl transition-all">
+              <Plus size={16} className="mr-2" /> Add Brand
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {brands.map(brand => (
+              <div key={brand.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all space-y-4">
+                <div className="aspect-video rounded-2xl overflow-hidden bg-slate-50">
+                  <img src={brand.image ? buildImageUrl(brand.image) : "https://via.placeholder.com/300x200"} className="w-full h-full object-cover" alt="" />
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-charcoal">{brand.name}</h3>
+                    <p className="text-[10px] font-black uppercase text-gold tracking-widest">{brand.multiplier}x Multiplier</p>
                   </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => handleOpenDialog(service)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-gold transition-colors"><Edit2 size={12} /></button>
-                    <button onClick={() => handleDelete(service.id)} className="p-2 hover:bg-warm-cream rounded-lg text-charcoal/30 hover:text-red-500 transition-colors"><Trash2 size={12} /></button>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingBrand(brand); setBrandFormData(brand); setIsBrandDialogOpen(true); }}>
+                      <Edit3 size={14} />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteBrand(brand.id)}>
+                      <Trash2 size={14} />
+                    </Button>
                   </div>
                 </div>
-                <h3 className="text-xs font-semibold text-charcoal mb-2">{service.name}</h3>
-                <div className="flex items-baseline">
-                  <span className="text-2xl font-serif font-semibold text-charcoal">₹{service.price.toLocaleString()}</span>
-                  <span className="text-[10px] font-medium text-charcoal/30 ml-2">/ {service.unit}</span>
-                </div>
-              </Card>
+              </div>
             ))}
           </div>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] w-[95vw] rounded-2xl p-0 overflow-hidden">
+          <DialogHeader className="p-6 border-b border-charcoal/5 bg-warm-cream/20">
+            <DialogTitle className="text-lg font-semibold text-charcoal">
+              {editingItem ? "Edit Calculator Item" : "Add New Item"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-4">
+              <AdminSelectEnhanced 
+                label="Calculator Type" 
+                value={formData.calculatorType} 
+                onChange={(val) => setFormData({ ...formData, calculatorType: val })} 
+                options={[
+                  { value: 'services', label: 'Services Calculator' },
+                  { value: 'interior', label: 'Interior Calculator' },
+                  { value: 'homes', label: 'Homes Calculator' }
+                ]} 
+              />
+              <AdminSelectEnhanced 
+                label="Item Step / Category" 
+                value={formData.type} 
+                onChange={(val) => setFormData({ ...formData, type: val })} 
+                options={[
+                  { value: 'bhk', label: 'Step 1: BHK / Area Option' },
+                  { value: 'furniture', label: 'Step 2: Furniture Selection' },
+                  { value: 'detailed', label: 'Step 3: Detailed Components' },
+                  { value: 'basic', label: 'Step 4: Basic Requirements' },
+                  { value: 'general_service', label: 'General Services' }
+                ]} 
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <AdminFormInputEnhanced 
+                label="Item Name" 
+                value={formData.name} 
+                onChange={(val) => setFormData({ ...formData, name: val })} 
+                placeholder="e.g. King Bed, Wall Paint" 
+              />
+              <AdminFormInputEnhanced 
+                label="Base Price" 
+                type="number" 
+                value={formData.price} 
+                onChange={(val) => setFormData({ ...formData, price: Number(val) })} 
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <AdminSelectEnhanced 
+                label="Unit" 
+                value={formData.unit} 
+                onChange={(val) => setFormData({ ...formData, unit: val })} 
+                options={[
+                  { value: 'unit', label: 'Per Unit' },
+                  { value: 'sqft', label: 'Per SQ FT' }
+                ]} 
+              />
+              <AdminFormInputEnhanced 
+                label="Category / Room (Optional)" 
+                value={formData.category} 
+                onChange={(val) => setFormData({ ...formData, category: val })} 
+                placeholder="e.g. Living Area, Kitchen" 
+              />
+            </div>
+
+            <ImageUpload 
+              label="Item Image"
+              value={selectedFile ? URL.createObjectURL(selectedFile) : (formData.image ? buildImageUrl(formData.image) : "")} 
+              onChange={(val, file) => setSelectedFile(file || null)} 
+            />
+          </div>
+          <DialogFooter className="p-6 border-t border-charcoal/5 bg-warm-cream/5 flex gap-3">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 h-10 rounded-xl border border-charcoal/10">Cancel</Button>
+            <Button onClick={handleSave} className="flex-1 h-10 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+              <Save size={16} className="mr-2" />
+              Save Item
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the calculator item.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-3">
+            <AlertDialogCancel className="flex-1 h-10 rounded-xl border border-charcoal/10">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId)} className="flex-1 h-10 bg-red-500 hover:bg-red-600 text-white rounded-xl">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={isBrandDialogOpen} onOpenChange={setIsBrandDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl p-0 overflow-hidden">
+          <DialogHeader className="p-6 border-b border-charcoal/5 bg-warm-cream/20">
+            <DialogTitle className="text-lg font-semibold text-charcoal">
+              {editingBrand ? "Edit Brand" : "Add New Brand"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
+            <AdminSelectEnhanced 
+              label="Calculator Type" 
+              value={brandFormData.calculatorType} 
+              onChange={(val) => setBrandFormData({ ...brandFormData, calculatorType: val })} 
+              options={[
+                { value: 'all', label: 'All Calculators' },
+                { value: 'services', label: 'Services Calculator' },
+                { value: 'interior', label: 'Interior Calculator' },
+                { value: 'homes', label: 'Homes Calculator' }
+              ]} 
+            />
+            <AdminFormInputEnhanced 
+              label="Brand Name" 
+              value={brandFormData.name} 
+              onChange={(val) => setBrandFormData({ ...brandFormData, name: val as string })} 
+              placeholder="e.g. Premium Brand" 
+            />
+            <AdminFormInputEnhanced 
+              label="Price Multiplier" 
+              type="number" 
+              value={brandFormData.multiplier} 
+              onChange={(val) => setBrandFormData({ ...brandFormData, multiplier: Number(val) })} 
+            />
+            <ImageUpload 
+              label="Brand Logo / Image"
+              value={brandFile ? URL.createObjectURL(brandFile) : (brandFormData.image ? buildImageUrl(brandFormData.image) : "")} 
+              onChange={(val, file) => setBrandFile(file || null)} 
+            />
+          </div>
+          <DialogFooter className="p-6 border-t border-charcoal/5 bg-warm-cream/5 flex gap-3">
+            <Button variant="ghost" onClick={() => setIsBrandDialogOpen(false)} className="flex-1 h-10 rounded-xl border border-charcoal/10">Cancel</Button>
+            <Button onClick={handleSaveBrand} className="flex-1 h-10 bg-charcoal hover:bg-charcoal/90 text-white rounded-xl">
+              <Save size={16} className="mr-2" />
+              Save Brand
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
