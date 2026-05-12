@@ -305,9 +305,6 @@ class ProductService {
       if (data.categoryId) formData.append('category', data.categoryId);
       if (data.subcategoryId) formData.append('subcategory', data.subcategoryId);
       if (data.sku) formData.append('sku', data.sku);
-      if (data.stock) formData.append('stock', data.stock.toString());
-      if (data.subcategoryId) formData.append('subcategory', data.subcategoryId);
-      if (data.sku) formData.append('sku', data.sku);
       if (data.stock !== undefined) formData.append('stock', data.stock.toString());
       if (data.careInstructions) formData.append('careInstructions', data.careInstructions);
       if (data.shippingReturns) formData.append('shippingReturns', data.shippingReturns);
@@ -395,7 +392,8 @@ class ProductService {
       return updatedProduct;
     } catch (error) {
       console.error('Update product error:', error);
-   this.productListPromise = null;
+      return null;
+    }
   }
 }
 
