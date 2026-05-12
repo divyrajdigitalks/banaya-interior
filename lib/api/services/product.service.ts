@@ -306,6 +306,9 @@ class ProductService {
       if (data.subcategoryId) formData.append('subcategory', data.subcategoryId);
       if (data.sku) formData.append('sku', data.sku);
       if (data.stock) formData.append('stock', data.stock.toString());
+      if (data.subcategoryId) formData.append('subcategory', data.subcategoryId);
+      if (data.sku) formData.append('sku', data.sku);
+      if (data.stock !== undefined) formData.append('stock', data.stock.toString());
       if (data.careInstructions) formData.append('careInstructions', data.careInstructions);
       if (data.shippingReturns) formData.append('shippingReturns', data.shippingReturns);
       if (data.collectionId) formData.append('collection', data.collectionId);
@@ -354,15 +357,15 @@ class ProductService {
       const updatedProduct: Product = {
         id: item.id || item._id,
         name: item.name,
-        categoryId: item.categoryId,
-        subcategoryId: item.subcategoryId,
+        description: item.description,
         price: Number(item.price) || 0,
         originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
+        categoryId: item.category?._id || item.category,
+        subcategoryId: item.subcategory?._id || item.subcategory,
         image: buildImageUrl(item.image),
         subImages: item.subImages?.map((img: string) => buildImageUrl(img)) || [],
-        description: item.description,
-        stock: item.stock ? Number(item.stock) : undefined,
         sku: item.sku,
+        stock: item.stock ? Number(item.stock) : undefined,
         sizes: item.sizes || [],
         tags: item.tags || [],
         isPersonalisable: Boolean(item.isPersonalisable),
@@ -370,6 +373,8 @@ class ProductService {
         specifications: item.specifications || [],
         careInstructions: item.careInstructions,
         shippingReturns: item.shippingReturns,
+        collectionId: item.collection?._id || item.collection,
+        isActive: Boolean(item.isActive),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         type: item.type,
@@ -389,27 +394,8 @@ class ProductService {
 
       return updatedProduct;
     } catch (error) {
-      return null;
-    }
-  }
-
-  async deleteProduct(id: string): Promise<boolean> {
-    try {
-      await api.delete(`${endPointApi.adminProducts}/${id}`);
-
-      if (this.productList) {
-        this.productList = this.productList.filter(prod => prod.id !== id);
-      }
-
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  clearCache() {
-    this.productList = null;
-    this.productListPromise = null;
+      console.error('Update product error:', error);
+   this.productListPromise = null;
   }
 }
 
