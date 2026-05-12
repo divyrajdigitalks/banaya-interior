@@ -293,9 +293,56 @@ class ProductService {
     }
   }
 
-  async updateProduct(id: string, data: Partial<Product>): Promise<Product | null> {
+  async updateProduct(id: string, data: Partial<Product>, files?: { image?: File; subImages?: File[] }): Promise<Product | null> {
     try {
-      const res = await api.put(`${endPointApi.adminProducts}/${id}`, data);
+      const formData = new FormData();
+      
+      // Add text fields
+      if (data.name) formData.append('name', data.name);
+      if (data.description) formData.append('description', data.description);
+      if (data.price !== undefined) formData.append('price', data.price.toString());
+      if (data.originalPrice !== undefined) formData.append('originalPrice', data.originalPrice.toString());
+      if (data.categoryId) formData.append('category', data.categoryId);
+      if (data.subcategoryId) formData.append('subcategory', data.subcategoryId);
+      if (data.sku) formData.append('sku', data.sku);
+      if (data.stock !== undefined) formData.append('stock', data.stock.toString());
+      if (data.careInstructions) formData.append('careInstructions', data.careInstructions);
+      if (data.shippingReturns) formData.append('shippingReturns', data.shippingReturns);
+      if (data.collectionId) formData.append('collection', data.collectionId);
+      if (data.type) formData.append('type', data.type);
+      if (data.colour) formData.append('colour', data.colour);
+      if (data.materials) formData.append('materials', data.materials);
+      if (data.shape) formData.append('shape', data.shape);
+      if (data.usePurpose) formData.append('usePurpose', data.usePurpose);
+      if (data.occasions) formData.append('occasions', data.occasions);
+      if (data.discount !== undefined) formData.append('discount', data.discount.toString());
+      if (data.relatedProducts) formData.append('relatedProducts', JSON.stringify(data.relatedProducts));
+      
+      // Add array fields as JSON
+      if (data.sizes) formData.append('sizes', JSON.stringify(data.sizes));
+      if (data.tags) formData.append('tags', JSON.stringify(data.tags));
+      if (data.features) formData.append('features', JSON.stringify(data.features));
+      if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
+      
+      // Add boolean fields
+      if (data.isPersonalisable !== undefined) formData.append('isPersonalisable', data.isPersonalisable.toString());
+      if (data.isActive !== undefined) formData.append('isActive', data.isActive.toString());
+      
+      // Add image files
+      if (files?.image) {
+        formData.append('image', files.image);
+      }
+      if (files?.subImages) {
+        files.subImages.forEach(file => {
+          formData.append('subImages', file);
+        });
+      }
+
+      const res = await api.put(`${endPointApi.adminProducts}/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       const payload = res.data;
 
       if (!payload || !payload.data) {
@@ -307,15 +354,15 @@ class ProductService {
       const updatedProduct: Product = {
         id: item.id || item._id,
         name: item.name,
-        categoryId: item.categoryId,
-        subcategoryId: item.subcategoryId,
+        description: item.description,
         price: Number(item.price) || 0,
         originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
+        categoryId: item.category?._id || item.category,
+        subcategoryId: item.subcategory?._id || item.subcategory,
         image: buildImageUrl(item.image),
         subImages: item.subImages?.map((img: string) => buildImageUrl(img)) || [],
-        description: item.description,
-        stock: item.stock ? Number(item.stock) : undefined,
         sku: item.sku,
+        stock: item.stock ? Number(item.stock) : undefined,
         sizes: item.sizes || [],
         tags: item.tags || [],
         isPersonalisable: Boolean(item.isPersonalisable),
@@ -323,6 +370,8 @@ class ProductService {
         specifications: item.specifications || [],
         careInstructions: item.careInstructions,
         shippingReturns: item.shippingReturns,
+        collectionId: item.collection?._id || item.collection,
+        isActive: Boolean(item.isActive),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         type: item.type,
@@ -342,6 +391,7 @@ class ProductService {
 
       return updatedProduct;
     } catch (error) {
+      console.error('Update product error:', error);
       return null;
     }
   }
