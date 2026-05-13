@@ -73,13 +73,13 @@ export function DecorHeroSection() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href={data?.cta1Link || "/shop"}>
-                <button className="group flex items-center justify-between gap-4 px-8 py-5 bg-gold text-primary text-sm font-bold rounded-full hover:bg-white transition-all duration-500 shadow-2xl shadow-gold/20">
+                <button className="group flex items-center justify-between gap-4 px-8 py-3.5 bg-gold text-primary text-sm font-bold rounded-full hover:bg-white transition-all duration-500 shadow-2xl shadow-gold/20">
                   {data?.cta1Text || "Shop Collection"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
               <Link href={data?.cta2Link || "/decor"}>
-                <button className="group flex items-center justify-between gap-4 px-8 py-5 border border-white/30 text-white text-sm font-bold rounded-full hover:bg-white hover:text-primary transition-all duration-500">
+                <button className="group flex items-center justify-between gap-4 px-8 py-3.5 border border-white/30 text-white text-sm font-bold rounded-full hover:bg-white hover:text-primary transition-all duration-500">
                   {data?.cta2Text || "View Lookbook"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>

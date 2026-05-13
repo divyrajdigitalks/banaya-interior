@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, ShoppingCart, ArrowLeft, Ticket, Check, X, Loader2, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { BackButton } from "@/components/ui/back-button";
 import { useStore } from "@/context/StoreContext";
 import { buildImageUrl } from "@/lib/api";
 import { couponService } from "@/lib/api";
@@ -14,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { type CartItem } from "@/lib/api/services/cart.service";
 
 export default function CartPage() {
+  const router = useRouter();
   const { cart, updateQuantity, removeFromCart, clearCart } = useStore();
   const { toast } = useToast();
 
@@ -119,6 +122,7 @@ export default function CartPage() {
             {/* ── Left: Cart Items ── */}
             <div className="flex-1 space-y-10">
               <div className="space-y-4">
+                <BackButton className="mb-4" />
                 <h1 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
                   Your <span className="italic font-light text-gold">Treasures.</span>
                 </h1>

@@ -30,6 +30,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { BackButton } from "@/components/ui/back-button";
 import {
   Dialog,
   DialogContent,
@@ -188,12 +189,22 @@ export default function ProductDetailPage() {
       <div className="container mx-auto px-4 md:px-8 py-12 pt-40">
         {/* ── Breadcrumbs ── */}
         <nav className="flex items-center gap-2 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
+          <BackButton className="mr-4" />
           <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Home</Link>
           <ChevronRight size={12} className="text-primary/20" />
-          <Link href="/shop" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Serveware</Link>
+          <Link href="/shop" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Shop</Link>
           <ChevronRight size={12} className="text-primary/20" />
-          <Link href="/shop?category=Serving Trays" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Serving Trays</Link>
-          <ChevronRight size={12} className="text-primary/20" />
+          {product.category && (
+            <>
+              <Link 
+                href={`/shop?category=${typeof product.category === 'object' ? product.category.name : product.category}`} 
+                className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors"
+              >
+                {typeof product.category === 'object' ? product.category.name : product.category}
+              </Link>
+              <ChevronRight size={12} className="text-primary/20" />
+            </>
+          )}
           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{product.name}</span>
         </nav>
 

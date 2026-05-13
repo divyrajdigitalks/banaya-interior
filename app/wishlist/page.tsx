@@ -1,16 +1,18 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingBag, ArrowRight, Trash2, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingBag, ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { DoorTransition } from "@/components/door-transition";
 import { useStore } from "@/context/StoreContext";
 import { ProductCard } from "@/components/product/product-card";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function WishlistPage() {
+  const router = useRouter();
   const { wishlist } = useStore();
 
   return (
@@ -22,6 +24,7 @@ export default function WishlistPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
             <div className="space-y-4">
+              <BackButton className="mb-4" />
               <h1 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight">
                 Your <span className="italic font-light text-gold">Wishlist.</span>
               </h1>

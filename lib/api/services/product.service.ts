@@ -9,6 +9,8 @@ export interface Product {
   originalPrice?: number;
   categoryId: string;
   subcategoryId: string;
+  category?: { id: string; name: string };
+  subcategory?: { id: string; name: string };
   image: string;
   subImages?: string[];
   sku?: string;
@@ -76,8 +78,8 @@ class ProductService {
           description: item.description,
           price: Number(item.price) || 0,
           originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
-          categoryId: item.category?._id || item.category,
-          subcategoryId: item.subcategory?._id || item.subcategory,
+          categoryId: item.category?._id || item.category || item.categoryId,
+          subcategoryId: item.subcategory?._id || item.subcategory || item.subcategoryId,
           image: buildImageUrl(item.image),
           subImages: item.subImages?.map((img: string) => buildImageUrl(img)) || [],
           sku: item.sku,
@@ -160,6 +162,8 @@ class ProductService {
       return {
         id: item.id || item._id,
         name: item.name,
+        category: item.category,
+        subcategory: item.subcategory,
         categoryId: item.category?._id || item.category || item.categoryId,
         subcategoryId: item.subcategory?._id || item.subcategory || item.subcategoryId,
         price: Number(item.price) || 0,

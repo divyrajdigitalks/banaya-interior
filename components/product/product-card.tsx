@@ -15,7 +15,7 @@ interface ProductCardProps {
   originalPrice?: number;
   image: string;
   hoverImage?: string;
-  category?: string;
+  category?: string | { id: string; name: string };
   categoryId?: string;
   tag?: string;
   rating?: number;
@@ -76,17 +76,17 @@ export function ProductCard({
   return (
     <Link href={`/product/${id}`} className="group block h-full">
       <motion.div 
-        className="flex flex-col h-full bg-white rounded-[2rem] p-2 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all duration-700 relative group/card border border-transparent hover:border-gold/20"
+        className="flex flex-col h-full bg-[#FDF9F3] rounded-[2rem] p-2 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_45px_rgba(60,42,30,0.12)] transition-all duration-700 relative group/card border border-transparent hover:border-[#C9A962]/30"
       >
         {/* Image Area - More Compact aspect ratio */}
-        <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-[#F9F6F2] flex-shrink-0">
+        <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-white flex-shrink-0">
           {/* Wishlist Button */}
           <button 
             onClick={toggleWishlist}
             className={`absolute top-3 right-3 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${
               isInWishlist(id) 
-                ? "bg-red-500 text-white" 
-                : "bg-white/90 backdrop-blur-sm text-charcoal/30 hover:text-red-500"
+                ? "bg-[#C9A962] text-white" 
+                : "bg-white/90 backdrop-blur-sm text-[#3C2A1E]/30 hover:text-[#C9A962]"
             }`}
           >
             <Heart size={14} className={isInWishlist(id) ? "fill-white" : ""} />
@@ -114,7 +114,7 @@ export function ProductCard({
         <div className="p-4 flex flex-col flex-1 gap-3">
           <div className="space-y-1">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="text-sm font-serif font-black text-charcoal tracking-tight truncate leading-tight">
+              <h3 className="text-sm font-serif font-black text-[#3C2A1E] tracking-tight truncate leading-tight">
                 {name}
               </h3>
               <div className="flex items-center gap-1 bg-[#F1F9F7] px-1.5 py-0.5 rounded-full border border-[#E0F2F1] shrink-0">
@@ -124,17 +124,17 @@ export function ProductCard({
                 <span className="text-[8px] font-bold text-[#00897B]/60">{reviewsCount}</span>
               </div>
             </div>
-            <p className="text-[10px] text-gold font-black uppercase tracking-widest line-clamp-1">
-              {category || categoryId || "Bespoke Decor"}
+            <p className="text-[10px] text-[#C9A962] font-black uppercase tracking-widest line-clamp-1">
+              {typeof category === 'object' ? category.name : (category || categoryId || "Bespoke Decor")}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-lg font-black text-charcoal">₹{price.toLocaleString()}</span>
+            <span className="text-lg font-black text-[#3C2A1E]">₹{price.toLocaleString()}</span>
             {originalPrice && (
               <>
-                <span className="text-[10px] text-charcoal/20 line-through font-bold">₹{originalPrice.toLocaleString()}</span>
-                <span className="text-[10px] font-black text-gold uppercase">
+                <span className="text-[10px] text-[#3C2A1E]/20 line-through font-bold">₹{originalPrice.toLocaleString()}</span>
+                <span className="text-[10px] font-black text-[#C9A962] uppercase">
                   {discount}% OFF
                 </span>
               </>
@@ -145,15 +145,15 @@ export function ProductCard({
             <button
               onClick={handleQuickAdd}
               disabled={isAdding}
-              className={`w-full py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all duration-700 relative overflow-hidden shadow-lg shadow-charcoal/5 group/btn ${
-                isAdding ? "bg-emerald-500 text-white" : "bg-charcoal text-white hover:bg-gold hover:text-charcoal"
+              className={`w-full py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all duration-700 relative overflow-hidden shadow-lg shadow-[#3C2A1E]/5 group/btn ${
+                isAdding ? "bg-emerald-500 text-white" : "bg-[#3C2A1E] text-white hover:bg-[#C9A962] hover:text-[#3C2A1E]"
               }`}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 {isAdding ? "Added" : "Add to Cart"}
                 {!isAdding && <ShoppingBag size={12} className="group-hover/btn:translate-x-1 transition-transform" />}
               </span>
-              <div className="absolute inset-0 bg-gold translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-[#C9A962] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
             </button>
           </div>
         </div>

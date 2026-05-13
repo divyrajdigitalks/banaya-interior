@@ -236,9 +236,9 @@ export default function DecorHeroAdmin() {
       <div className="mt-12 flex justify-end">
         <Button 
           onClick={handleSave}
-          className="h-16 bg-slate-900 hover:bg-black text-white font-bold text-base px-16 rounded-[2rem] shadow-2xl flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="h-10 bg-slate-900 hover:bg-black text-white font-bold text-sm px-8 rounded-xl shadow-lg flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
-          <Save size={24} className="text-gold" />
+          <Save size={16} className="text-gold" />
           Update Decor Hero
         </Button>
       </div>
