@@ -41,6 +41,11 @@ export function ImageUpload({ value, onChange, onFileSelect, onRemove, label, cl
     }
   };
 
+  const isVideo = (url: string | null) => {
+    if (!url) return false;
+    return url.match(/\.(mp4|webm|ogg|mov)$/i) || (url.startsWith('blob:') && selectedFile?.type.startsWith('video/'));
+  };
+
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -71,17 +76,27 @@ export function ImageUpload({ value, onChange, onFileSelect, onRemove, label, cl
           ref={fileInputRef} 
           onChange={handleFileChange} 
           className="hidden" 
-          accept="image/*"
+          accept="image/*,video/*"
         />
 
         {preview ? (
           <>
-            <Image 
-              src={preview} 
-              alt="Preview" 
-              fill 
-              className="object-contain p-2" 
-            />
+            {isVideo(preview) ? (
+              <video 
+                src={preview} 
+                className="w-full h-full object-contain p-2" 
+                autoPlay 
+                muted 
+                loop 
+              />
+            ) : (
+              <Image 
+                src={preview} 
+                alt="Preview" 
+                fill 
+                className="object-contain p-2" 
+              />
+            )}
             <div className="absolute inset-0 bg-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
               <div className="bg-white/90 p-3 rounded-full shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
                 <Upload className="text-charcoal h-5 w-5" />

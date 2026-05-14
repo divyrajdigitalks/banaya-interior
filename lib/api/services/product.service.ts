@@ -324,6 +324,12 @@ class ProductService {
       if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
       if (data.relatedProducts) formData.append('relatedProducts', JSON.stringify(data.relatedProducts));
       
+      // Filter out blob URLs and send only existing subImages URLs
+      if (data.subImages) {
+        const existingSubImages = data.subImages.filter(url => !url.startsWith('blob:'));
+        formData.append('existingSubImages', JSON.stringify(existingSubImages));
+      }
+      
       // Add boolean fields
       if (data.isPersonalisable !== undefined) formData.append('isPersonalisable', data.isPersonalisable.toString());
       if (data.isActive !== undefined) formData.append('isActive', data.isActive.toString());

@@ -4,7 +4,7 @@ import { Logo } from "./logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShoppingBag, Heart, Search, User, LogOut } from "lucide-react";
+import { ShoppingBag, Heart, Search, User, LogOut, Package } from "lucide-react";
 import { MegaMenu } from "./mega-menu";
 import { useStore } from "@/context/StoreContext";
 import { useUser } from "@/context/UserContext";
@@ -106,12 +106,24 @@ export function Header({ variant = "dark" }: HeaderProps) {
               <div className="flex items-center gap-8 text-primary">
                   {user ? (
                     <div className="flex items-center gap-6">
-                      <div className="relative group flex flex-col items-center gap-1.5 cursor-default">
+                      <Link 
+                        href="/profile" 
+                        className="relative group flex flex-col items-center gap-1.5 transition-all duration-300 hover:text-gold"
+                      >
                         <div className="w-6 h-6 rounded-full bg-gold/10 flex items-center justify-center text-gold text-[10px] font-black border border-gold/20 uppercase">
                           {user.name?.charAt(0) || user.username?.charAt(0) || 'U'}
                         </div>
                         <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase max-w-[60px] truncate">{user.name || user.username || 'User'}</span>
-                      </div>
+                      </Link>
+
+                      <Link 
+                        href="/profile/orders" 
+                        className="relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5"
+                      >
+                        <Package size={20} strokeWidth={1.5} />
+                        <span className="text-[9px] font-black tracking-widest hidden xl:block uppercase">Orders</span>
+                      </Link>
+
                       <button 
                         onClick={logout}
                         className="relative group hover:text-gold transition-all duration-300 flex flex-col items-center gap-1.5"

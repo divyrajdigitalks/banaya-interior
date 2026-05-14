@@ -9,6 +9,7 @@ import { Footer } from "@/components/footer";
 import { DoorTransition } from "@/components/door-transition";
 import { useStore } from "@/context/StoreContext";
 import { ProductCard } from "@/components/product/product-card";
+import { BackButton } from "@/components/common/back-button";
 
 export default function WishlistPage() {
   const { wishlist } = useStore();
@@ -20,6 +21,7 @@ export default function WishlistPage() {
       
       <div className="container mx-auto px-6 pt-48 pb-32">
         <div className="max-w-6xl mx-auto">
+          <BackButton className="mb-6" />
           <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
             <div className="space-y-4">
               <h1 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight">

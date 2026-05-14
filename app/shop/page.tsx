@@ -26,6 +26,7 @@ import { Header } from "@/components/header";
 import Image from "next/image";
 import Link from "next/link";
 import { productService, categoryService, filterService, type Product, type Category, type Subcategory, type FilterOptionsByGroup } from "@/lib/api";
+import { BackButton } from "@/components/common/back-button";
 
 function ShopContent() {
   const router = useRouter();
@@ -187,6 +188,7 @@ function ShopContent() {
       <section className="pt-40">
         {/* Breadcrumbs - Moved inside container for alignment */}
         <div className="container mx-auto px-4 md:px-8">
+          <BackButton className="mb-6" />
           <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/30 mb-8">
             <Link href="/" className="hover:text-gold transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3" />

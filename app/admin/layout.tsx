@@ -5,14 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/logo";
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Palette, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Palette,
+  Users,
+  Settings,
+  LogOut,
+  Menu,
   X,
   Bell,
   Search,
@@ -44,6 +44,7 @@ const sidebarLinks = [
   { name: "Decor Subcategories", icon: Grid, href: "/admin/subcategories" },
   { name: "Filter Options", icon: Filter, href: "/admin/filter-options" },
   { name: "Decor Products", icon: Package, href: "/admin/products" },
+  { name: "Decor Orders", icon: Package, href: "/admin/orders" },
   { type: "label", name: "Interiors Management" },
   { name: "Interior Hero", icon: GalleryHorizontal, href: "/admin/interiors/hero" },
   { name: "Interior Services", icon: Briefcase, href: "/admin/interiors/services" },
@@ -85,14 +86,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const getCurrentPageName = () => {
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length === 1 && segments[0] === 'admin') return 'Dashboard';
-    
+
     if (pathname.includes('/interiors/hero')) return 'Interior Hero Management';
     if (pathname.includes('/decor/hero')) return 'Decor Hero Management';
     if (pathname.includes('/decor/features')) return 'Decor Features Management';
     if (pathname.includes('/products/add')) return 'Add New Product';
-    
+
     const lastSegment = segments[segments.length - 1];
-    
+
     return lastSegment
       .split(/[-_]/)
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -110,7 +111,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         setIsMobile(false);
       }
     };
-    
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -171,24 +172,23 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     </p>
                   );
                 }
-                
+
                 const navLink = link as { name: string; icon: any; href: string };
                 const isActive = pathname === navLink.href;
-                
+
                 return (
                   <Link
                     key={navLink.href}
                     href={navLink.href}
-                    className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group relative ${
-                      isActive 
-                        ? "bg-gold text-charcoal shadow-lg shadow-gold/20 font-medium" 
+                    className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group relative ${isActive
+                        ? "bg-gold text-charcoal shadow-lg shadow-gold/20 font-medium"
                         : "text-white/50 hover:text-white hover:bg-white/5 font-normal"
-                    }`}
+                      }`}
                   >
                     <navLink.icon size={18} className={isActive ? "text-charcoal" : "text-white/30 group-hover:text-gold transition-colors"} />
                     <span className="text-sm">{navLink.name}</span>
                     {isActive && (
-                      <motion.div 
+                      <motion.div
                         layoutId="active-nav"
                         className="absolute right-4 w-1.5 h-1.5 rounded-full bg-charcoal"
                       />
@@ -209,7 +209,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   <p className="text-xs text-white/40">{user?.role || 'Super Admin'}</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={logout}
                 className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-white/50 hover:text-red-400 hover:bg-red-400/10 transition-all duration-500 font-normal group"
               >
@@ -241,8 +241,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-4">
             <div className="relative hidden sm:block">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20" />
-              <Input 
-                placeholder="Search..." 
+              <Input
+                placeholder="Search..."
                 className="bg-warm-cream/50 border-charcoal/5 rounded-full pl-11 pr-4 py-2 text-sm font-normal w-64 focus:ring-2 focus:ring-gold/5 focus:border-gold/20"
               />
             </div>

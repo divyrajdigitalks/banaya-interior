@@ -49,9 +49,9 @@ class CartService {
   /**
    * Add item to cart
    */
-  async addToCart(productId: string, quantity: number = 1): Promise<CartResponse> {
+  async addToCart(productId: string, quantity: number = 1, personalization?: any): Promise<CartResponse> {
     try {
-      const response = await api.post<CartResponse>('/cart/add', { productId, quantity });
+      const response = await api.post<CartResponse>('/cart/add', { productId, quantity, personalization });
       return response.data;
     } catch (error: any) {
       console.error('Add to cart error:', error);

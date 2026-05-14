@@ -7,11 +7,11 @@ import { ArrowRight } from "lucide-react";
 
 const services = [
   {
-    id: "full-home",
-    calculatorType: "homes",
-    title: "Full Home Interior",
-    description: "Complete estimation journey with a structured and accurate questionnaire for your entire sanctuary.",
-    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80",
+    id: "wardrobe",
+    calculatorType: "services",
+    title: "Services",
+    description: "General home services estimation flow from painting to plumbing.",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
     available: true,
   },
   {
@@ -23,13 +23,14 @@ const services = [
     available: true,
   },
   {
-    id: "wardrobe",
-    calculatorType: "interior",
-    title: "Service",
-    description: "Bespoke wardrobe estimation flow crafted for your personal collection.",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    id: "full-home",
+    calculatorType: "homes",
+    title: "Full Home Interior",
+    description: "Complete estimation journey with a structured and accurate questionnaire for your entire sanctuary.",
+    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&q=80",
     available: true,
   },
+
 ];
 
 export function ServicesSection() {
@@ -43,8 +44,8 @@ export function ServicesSection() {
       <div className="container mx-auto px-6 md:px-12">
         {/* Header */}
         <div className="text-center mb-24 space-y-6">
-       
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -55,7 +56,7 @@ export function ServicesSection() {
               {activeWord}.
             </span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -87,7 +88,7 @@ export function ServicesSection() {
                   fill
                   className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                 />
-                
+
                 {/* Floating Index */}
                 <div className="absolute top-8 left-8 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-xs font-black">
                   0{index + 1}
@@ -105,31 +106,30 @@ export function ServicesSection() {
               </div>
 
               {/* Action Button */}
-            <div className="mt-8 px-2">
-  <button
-    onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
-    className={`group/btn relative w-full py-6 rounded-full text-xs font-bold tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${
-      service.available
-        ? "bg-gold text-white hover:shadow-gold/20"
-        : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"
-    }`}
-  >
-    <span className="relative z-10 flex items-center justify-center gap-4">
-      {service.available ? (
-        <>
-          Begin Calculation 
-          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
-        </>
-      ) : (
-        "Locked"
-      )}
-    </span>
+              <div className="mt-8 px-2">
+                <button
+                  onClick={() => openCalculator(service.calculatorType as "services" | "interior" | "homes")}
+                  className={`group/btn relative w-full py-6 rounded-full text-xs font-bold tracking-widest overflow-hidden transition-all duration-700 shadow-xl ${service.available
+                    ? "bg-gold text-white hover:shadow-gold/20"
+                    : "bg-background text-primary/20 border border-primary/5 cursor-not-allowed shadow-none"
+                    }`}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-4">
+                    {service.available ? (
+                      <>
+                        Begin Calculation
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
+                      </>
+                    ) : (
+                      "Locked"
+                    )}
+                  </span>
 
-    {service.available && (
-      <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
-    )}
-  </button>
-</div>
+                  {service.available && (
+                    <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
+                  )}
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>

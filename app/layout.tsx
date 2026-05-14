@@ -4,6 +4,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { StoreProvider } from '@/context/StoreContext'
 import { UserProvider } from '@/context/UserContext'
 import { DoorTransition } from '@/components/door-transition'
+import { CalculatorDialog } from '@/components/interiors/calculator-dialog'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({ 
@@ -52,7 +54,9 @@ export default function RootLayout({
       <body className={`${cormorant.variable} ${inter.variable} font-sans antialiased`}>
         <UserProvider>
           <StoreProvider>
+            <Toaster position="top-center" richColors />
             <DoorTransition />
+            <CalculatorDialog />
             {children}
             <Analytics />
           </StoreProvider>
