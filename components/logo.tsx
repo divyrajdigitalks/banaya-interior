@@ -19,6 +19,8 @@ export function Logo({ variant = "dark", className = "", asChild = false }: Logo
       width={80}
       height={80}
       style={{
+        // width: "auto",
+        // height: "auto",
         filter: isWhite ? "brightness(0) invert(1)" : "none",
       }}
       priority

@@ -5,7 +5,7 @@ import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "./image-upload";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface MultiImageUploadProps {
   value: string[];
@@ -18,13 +18,14 @@ export function MultiImageUpload({ value, onChange, onFilesSelect, label }: Mult
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Initialize selectedFiles array to match value length when value changes (edit mode)
-  useState(() => {
-    if (value && value.length > 0) {
+  useEffect(() => {
+    if (value && value.length > 0 && selectedFiles.length === 0) {
       setSelectedFiles(new Array(value.length).fill(null));
     }
-  });
+  }, [value]);
 
   const handleAdd = () => {
+    if (value.length >= 5) return; // Enforce Max 5
     onChange([...value, ""]);
     setSelectedFiles([...selectedFiles, null as any]);
   };

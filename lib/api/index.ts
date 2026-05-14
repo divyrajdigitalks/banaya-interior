@@ -11,3 +11,5 @@ export { offerService, type OfferData } from './services/offer.service';
 export { couponService, type CouponData } from './services/coupon.service';
 export { legacyProjectService, type LegacyProject, type LegacySettings } from './services/legacy-project.service';
 export { collectionService, type Collection } from './services/collection.service';
+export { calculatorService, type CalculatorItem, type BrandOption, type CalculatorData } from './services/calculator.service';
+export { inquiryService, type Inquiry } from './services/inquiry.service';

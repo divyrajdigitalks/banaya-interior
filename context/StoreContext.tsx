@@ -25,7 +25,7 @@ interface StoreContextType {
   cart: CartItem[];
   wishlist: WishlistItem[];
   loading: boolean;
-  addToCart: (product: Product) => Promise<void>;
+  addToCart: (product: Product, quantity?: number, personalization?: any) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -95,7 +95,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const addToCart = async (product: Product) => {
+  const addToCart = async (product: Product, quantity: number = 1, personalization?: any) => {
     if (!user) {
       addToast("Please login to add items to cart", "error");
       return;
@@ -103,7 +103,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     setLoading(true);
     try {
-      const response = await cartService.addToCart(product.id);
+      const response = await cartService.addToCart(product.id, quantity, personalization);
       if (response.success) {
         setCart(response.data.items);
         addToast(response.message || `${product.name} added to cart`, "success");

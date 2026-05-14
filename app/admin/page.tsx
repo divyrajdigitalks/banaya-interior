@@ -185,16 +185,16 @@ export default function AdminDashboardPage() {
             </CardTitle>
             </CardHeader>
             <CardContent className="p-8 space-y-4">
-              <Link href="/admin/shop">
+              <Link href="/admin/orders">
                 <button className="w-full bg-white/5 hover:bg-gold hover:text-charcoal p-5 rounded-2xl transition-all duration-500 text-left group">
-                  <p className="text-xs font-medium text-white/40 mb-1">Product</p>
+                  <p className="text-xs font-medium text-white/40 mb-1">Orders</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-normal">Add New Item</span>
+                    <span className="text-sm font-normal">Manage Customer Orders</span>
                     <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </div>
                 </button>
               </Link>
-              <Link href="/admin/interiors">
+              <Link href="/admin/inquiries">
                 <button className="w-full bg-white/5 hover:bg-gold hover:text-charcoal p-5 rounded-2xl transition-all duration-500 text-left group">
                   <p className="text-xs font-medium text-white/40 mb-1">Project</p>
                   <div className="flex items-center justify-between">

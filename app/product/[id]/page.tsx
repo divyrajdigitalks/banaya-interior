@@ -43,9 +43,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { productService, type Product } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
+import { toast } from "sonner";
 
 import { useStore } from "@/context/StoreContext";
 import { useUser } from "@/context/UserContext";
+import { BackButton } from "@/components/common/back-button";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -112,13 +114,18 @@ export default function ProductDetailPage() {
   const handleAddToCart = async () => {
     if (!product) return;
     setIsAdding(true);
+    
+    // Create personalization object if any data is present
+    const hasPersonalization = personalisation.name || personalisation.description || personalisation.image;
+    const personalizationData = hasPersonalization ? personalisation : undefined;
+
     await addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
       category: product.category?.name || "Decor"
-    }, quantity);
+    }, quantity, personalizationData);
     setIsAdding(false);
   };
 
@@ -182,11 +189,17 @@ export default function ProductDetailPage() {
 
   const images = [product.image, ...(product.subImages || [])].slice(0, 5);
 
+  const isVideo = (url: string) => {
+    if (!url) return false;
+    return url.match(/\.(mp4|webm|ogg|mov)$/i);
+  };
+
   return (
     <div className="min-h-screen bg-[#fdf9f3]">
       <Header />
 
       <div className="container mx-auto px-4 md:px-8 py-12 pt-40">
+        <BackButton className="mb-6" />
         {/* ── Breadcrumbs ── */}
         <nav className="flex items-center gap-2 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
           <BackButton className="mr-4" />
@@ -212,10 +225,12 @@ export default function ProductDetailPage() {
           {/* ── Image Gallery Section ── */}
           <div className="lg:col-span-7">
             <div className="relative group rounded-2xl overflow-hidden bg-white shadow-sm">
-              <div className="absolute top-4 left-4 z-10">
-                <span className="bg-[#e87d3e] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md shadow-lg">
-                  Bestseller
-                </span>
+              <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                {product.tags && product.tags.map((tag) => (
+                  <span key={tag} className="bg-[#e87d3e] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md shadow-lg w-fit">
+                    {tag}
+                  </span>
+                ))}
               </div>
               <button 
                 onClick={toggleWishlist}
@@ -227,13 +242,25 @@ export default function ProductDetailPage() {
               </button>
 
               <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                {isVideo(images[selectedImage]) ? (
+                  <video 
+                    src={images[selectedImage]} 
+                    className="w-full h-full object-cover" 
+                    autoPlay 
+                    muted 
+                    loop 
+                    controls
+                  />
+                ) : (
+                  <Image
+                    src={images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    priority
+                    loading="eager"
+                  />
+                )}
                 <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/50 hover:bg-white text-primary transition-all">
                   <ChevronLeft size={24} />
                 </button>
@@ -255,7 +282,11 @@ export default function ProductDetailPage() {
                     selectedImage === idx ? "border-primary shadow-md scale-105" : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                  {isVideo(img) ? (
+                    <video src={img} className="w-full h-full object-cover" />
+                  ) : (
+                    <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                  )}
                 </button>
               ))}
             </div>
@@ -358,7 +389,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* BEST OFFERS SECTION */}
-                <div className="mt-12 p-8 border-2 border-dashed border-primary/10 rounded-2xl bg-white space-y-8">
+                {/* <div className="mt-12 p-8 border-2 border-dashed border-primary/10 rounded-2xl bg-white space-y-8">
                   <h3 className="text-sm font-black text-[#e87d3e] uppercase tracking-[0.2em]">Best Offers For You!</h3>
                   
                   <div className="space-y-6">
@@ -382,7 +413,7 @@ export default function ProductDetailPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* COMBO SECTION - People Also Shopped For */}
                 {/* People Also Shopped For - Manual Selections Only */}
@@ -462,19 +493,19 @@ export default function ProductDetailPage() {
               <h1 className="text-4xl font-serif font-black text-primary tracking-tight">
                 {product.name}
               </h1>
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={14} className="fill-gold text-gold" />
                   ))}
                 </div>
                 <span className="text-xs font-bold text-primary/40">128 reviews</span>
-              </div>
+              </div> */}
               
               <div className="flex items-center gap-4 pt-2">
                 <span className="text-3xl font-black text-primary">₹{product.price.toLocaleString()}</span>
-                <span className="text-xl text-primary/30 line-through">₹1,299</span>
-                <span className="bg-gold/10 text-gold text-[10px] font-black px-2 py-1 rounded">15% OFF</span>
+                <span className="text-xl text-primary/30 line-through">₹{product.originalPrice.toLocaleString()}</span>
+                <span className="bg-gold/10 text-gold text-[10px] font-black px-2 py-1 rounded">{product.discount}%</span>
               </div>
               <p className="text-[10px] text-primary/40 font-bold uppercase tracking-widest italic">Inclusive of all taxes</p>
             </div>
@@ -517,18 +548,20 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Personalisation (Optional)</p>
+              {product.isPersonalisable && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Personalisation (Optional)</p>
+                  </div>
+                  <p className="text-[9px] text-primary/40 italic">Add engraving, name or logo to make it special.</p>
+                  <button 
+                    onClick={() => setIsPersonaliseOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 border border-primary/10 rounded-lg text-[10px] font-bold text-primary/60 hover:border-primary transition-all"
+                  >
+                    <Plus size={14} /> ADD PERSONALISATION
+                  </button>
                 </div>
-                <p className="text-[9px] text-primary/40 italic">Add engraving, name or logo to make it special.</p>
-                <button 
-                  onClick={() => setIsPersonaliseOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 border border-primary/10 rounded-lg text-[10px] font-bold text-primary/60 hover:border-primary transition-all"
-                >
-                  <Plus size={14} /> ADD PERSONALISATION
-                </button>
-              </div>
+              )}
 
               {/* Personalisation Dialog */}
               <Dialog open={isPersonaliseOpen} onOpenChange={setIsPersonaliseOpen}>
@@ -618,6 +651,7 @@ export default function ProductDetailPage() {
                       onClick={() => {
                         console.log("Personalisation saved:", personalisation);
                         setIsPersonaliseOpen(false);
+                        toast.success("Personalisation details saved!");
                       }}
                       className="flex-1 h-14 bg-primary hover:bg-gold text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
                     >
@@ -643,9 +677,9 @@ export default function ProductDetailPage() {
                 </Button>
               </div>
 
-              <Button variant="outline" className="w-full py-7 rounded-xl border-primary/5 bg-[#f8f5f0] text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary hover:text-white transition-all">
+              {/* <Button variant="outline" className="w-full py-7 rounded-xl border-primary/5 bg-[#f8f5f0] text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary hover:text-white transition-all">
                 Buy Now
-              </Button>
+              </Button> */}
 
               <button className="w-full flex items-center justify-center gap-3 py-4 text-[10px] font-bold text-[#25D366] hover:opacity-80 transition-all">
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.064-4.516 10.066-10.066.002-5.548-4.512-10.064-10.066-10.064-5.548 0-10.064 4.516-10.066 10.066-.001 1.93.546 3.538 1.492 5.165l-.999 3.648 3.774-.991zm11.218-7.261c-.301-.15-1.78-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.65.075-.3-.15-1.265-.467-2.41-1.488-.891-.795-1.492-1.776-1.667-2.076-.175-.3-.019-.463.13-.612.134-.133.301-.35.451-.525.15-.175.2-.3.3-.5s.05-.375-.025-.525c-.075-.15-.675-1.628-.925-2.228-.243-.599-.488-.517-.675-.527l-.575-.01c-.2 0-.525.075-.8.35-.275.275-1.05 1.026-1.05 2.503 0 1.476 1.075 2.903 1.225 3.103.15.2 2.115 3.23 5.124 4.535.715.311 1.274.497 1.708.636.719.139 1.372.119 1.888.054.575-.072 1.78-.726 2.03-1.427.25-.7.25-1.3.175-1.427-.075-.125-.275-.2-.575-.35z"/></svg>

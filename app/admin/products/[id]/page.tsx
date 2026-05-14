@@ -48,7 +48,7 @@ export default function ProductFormPage() {
     price: "",
     originalPrice: "",
     image: "",
-    subImages: ["", "", ""],
+    subImages: [],
     description: "",
     stock: "",
     sku: "",
@@ -100,7 +100,7 @@ export default function ProductFormPage() {
               price: product.price.toString(),
               originalPrice: product.originalPrice?.toString() || "",
               image: product.image,
-              subImages: product.subImages || ["", "", ""],
+              subImages: product.subImages || [],
               description: product.description || "",
               stock: product.stock?.toString() || "",
               sku: product.sku || "",
@@ -176,18 +176,60 @@ export default function ProductFormPage() {
     setFormData({ ...formData, features: formData.features.filter((_: any, i: number) => i !== index) });
   };
 
+  const generateSKU = (name: string, catId: string) => {
+    if (!name || !catId) return formData.sku;
+    
+    const category = categories.find(c => c.id === catId);
+    if (!category) return formData.sku;
+
+    const namePart = name.trim().substring(0, 3).toUpperCase();
+    const catPart = category.name.trim().substring(0, 3).toUpperCase();
+    const randomPart = Math.floor(100 + Math.random() * 900); // 3 digit random number
+
+    return `${namePart}-${catPart}-${randomPart}`;
+  };
+
+  const calculateDiscount = (price: string, originalPrice: string) => {
+    const p = parseFloat(price);
+    const op = parseFloat(originalPrice);
+    if (p && op && op > p) {
+      return Math.round(((op - p) / op) * 100).toString();
+    }
+    return formData.discount;
+  };
+
+  const updateFormData = (updates: any) => {
+    setFormData((prev: any) => {
+      const newData = { ...prev, ...updates };
+      
+      // Auto-calculate discount if price or originalPrice changed
+      if ('price' in updates || 'originalPrice' in updates) {
+        newData.discount = calculateDiscount(newData.price, newData.originalPrice);
+      }
+
+      // Auto-generate SKU if name or categoryId changed and we're in "add" mode or SKU is empty
+      if (('name' in updates || 'categoryId' in updates) && (!isEditMode || !prev.sku)) {
+        if (newData.name.length >= 3 && newData.categoryId) {
+          newData.sku = generateSKU(newData.name, newData.categoryId);
+        }
+      }
+
+      return newData;
+    });
+  };
+
   const addSpec = () => {
-    setFormData({ ...formData, specifications: [...formData.specifications, { label: "", value: "" }] });
+    updateFormData({ specifications: [...formData.specifications, { label: "", value: "" }] });
   };
 
   const updateSpec = (index: number, field: string, value: string) => {
     const newSpecs = [...formData.specifications];
     newSpecs[index][field] = value;
-    setFormData({ ...formData, specifications: newSpecs });
+    updateFormData({ specifications: newSpecs });
   };
 
   const removeSpec = (index: number) => {
-    setFormData({ ...formData, specifications: formData.specifications.filter((_: any, i: number) => i !== index) });
+    updateFormData({ specifications: formData.specifications.filter((_: any, i: number) => i !== index) });
   };
 
   const handleSave = async () => {
@@ -302,7 +344,7 @@ export default function ProductFormPage() {
               <AdminFormInputEnhanced 
                 label="Product Name"
                 value={formData.name}
-                onChange={(val) => setFormData({ ...formData, name: val })}
+                onChange={(val) => updateFormData({ name: val })}
                 placeholder="Enter product name"
                 required
                 error={formErrors.name}
@@ -310,7 +352,7 @@ export default function ProductFormPage() {
               <AdminFormTextareaEnhanced 
                 label="Description"
                 value={formData.description}
-                onChange={(val) => setFormData({ ...formData, description: val })}
+                onChange={(val) => updateFormData({ description: val })}
                 placeholder="Describe your product..."
                 rows={4}
               />
@@ -324,7 +366,7 @@ export default function ProductFormPage() {
                   label="Price (₹)"
                   type="number"
                   value={formData.price}
-                  onChange={(val) => setFormData({ ...formData, price: val })}
+                  onChange={(val) => updateFormData({ price: val })}
                   placeholder="0"
                   required
                   error={formErrors.price}
@@ -333,7 +375,7 @@ export default function ProductFormPage() {
                   label="Original Price (₹)"
                   type="number"
                   value={formData.originalPrice}
-                  onChange={(val) => setFormData({ ...formData, originalPrice: val })}
+                  onChange={(val) => updateFormData({ originalPrice: val })}
                   placeholder="0"
                 />
               </div>
@@ -341,14 +383,14 @@ export default function ProductFormPage() {
                 <AdminFormInputEnhanced 
                   label="SKU"
                   value={formData.sku}
-                  onChange={(val) => setFormData({ ...formData, sku: val })}
+                  onChange={(val) => updateFormData({ sku: val })}
                   placeholder="e.g. PROD-001"
                 />
                 <AdminFormInputEnhanced 
                   label="Stock"
                   type="number"
                   value={formData.stock}
-                  onChange={(val) => setFormData({ ...formData, stock: val })}
+                  onChange={(val) => updateFormData({ stock: val })}
                   placeholder="0"
                 />
               </div>
@@ -356,7 +398,7 @@ export default function ProductFormPage() {
                 label="Discount (%)"
                 type="number"
                 value={formData.discount}
-                onChange={(val) => setFormData({ ...formData, discount: val })}
+                onChange={(val) => updateFormData({ discount: val })}
                 placeholder="0"
               />
             </div>
@@ -412,8 +454,8 @@ export default function ProductFormPage() {
           <AdminCard title="Product Gallery" icon={<ImageIcon size={18} />}>
             <div className="min-h-[160px]">
               <MultiImageUpload 
-                label="Upload Images (2 max)"
-                value={formData.subImages.slice(0, 2)}
+                label="Upload Images (Max 5)"
+                value={formData.subImages}
                 onChange={(val) => setFormData({ ...formData, subImages: val })}
                 onFilesSelect={(files) => setSelectedFiles(prev => ({ ...prev, subImages: files }))}
               />
@@ -562,7 +604,7 @@ export default function ProductFormPage() {
               <AdminSelectEnhanced 
                 label="Category"
                 value={formData.categoryId}
-                onChange={(val) => setFormData({...formData, categoryId: val, subcategoryId: ""})}
+                onChange={(val) => updateFormData({categoryId: val, subcategoryId: ""})}
                 options={categories.map(c => ({ value: c.id, label: c.name }))}
                 placeholder={loading ? "Loading categories..." : "Select category"}
                 disabled={loading}
@@ -572,7 +614,7 @@ export default function ProductFormPage() {
               <AdminSelectEnhanced 
                 label="Subcategory"
                 value={formData.subcategoryId}
-                onChange={(val) => setFormData({...formData, subcategoryId: val})}
+                onChange={(val) => updateFormData({subcategoryId: val})}
                 options={filteredSubcategories.map(s => ({ value: s.id, label: s.name }))}
                 placeholder="Select subcategory"
                 disabled={!formData.categoryId}

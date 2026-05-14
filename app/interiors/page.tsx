@@ -9,7 +9,7 @@ import { ProjectsSection } from "@/components/interiors/projects-section";
 import { GallerySection } from "@/components/interiors/gallery-section";
 import { TrustSection } from "@/components/trust-section";
 import { Footer } from "@/components/footer";
-import { CalculatorSection } from "@/components/calculator-section";
+// import { CalculatorSection } from "@/components/calculator-section";
 import { DoorTransition } from "@/components/door-transition";
 
 export default function InteriorsPage() {
@@ -35,9 +35,9 @@ export default function InteriorsPage() {
       <section id="services">
         <ServicesSection />
       </section>
-      <div className="hidden">
+      {/* <div className="hidden">
         <CalculatorSection />
-      </div>
+      </div> */}
       <ProjectsSection />
       <GallerySection />
       <TrustSection />
