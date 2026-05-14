@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface CostGuideItem {
   id: string;
@@ -23,11 +24,9 @@ export interface CreateCostGuideItem {
 }
 
 class CostGuideService {
-  private baseUrl = '/cost-guide';
-
   async getCostGuideList(adminView = false): Promise<CostGuideItem[]> {
     try {
-      const endpoint = adminView ? `${this.baseUrl}/admin/all` : this.baseUrl;
+      const endpoint = adminView ? endPointApi.costGuideAdmin : endPointApi.costGuide;
       const response = await api.get(endpoint);
       return response.data.data || [];
     } catch (error) {
@@ -38,7 +37,7 @@ class CostGuideService {
 
   async getCostGuideItem(id: string): Promise<CostGuideItem | null> {
     try {
-      const response = await api.get(`${this.baseUrl}/${id}`);
+      const response = await api.get(`${endPointApi.costGuide}/${id}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching cost guide item:', error);
@@ -62,7 +61,7 @@ class CostGuideService {
         formData.append('image', imageFile);
       }
 
-      const response = await api.post(this.baseUrl, formData, {
+      const response = await api.post(endPointApi.costGuide, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -91,7 +90,7 @@ class CostGuideService {
         formData.append('image', imageFile);
       }
 
-      const response = await api.put(`${this.baseUrl}/${id}`, formData, {
+      const response = await api.put(`${endPointApi.costGuide}/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -106,7 +105,7 @@ class CostGuideService {
 
   async deleteCostGuideItem(id: string): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/${id}`);
+      await api.delete(`${endPointApi.costGuide}/${id}`);
     } catch (error) {
       console.error('Error deleting cost guide item:', error);
       throw error;
@@ -115,7 +114,7 @@ class CostGuideService {
 
   async updateSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
     try {
-      await api.put(`${this.baseUrl}/sort/order`, { items });
+      await api.put(endPointApi.costGuideSort, { items });
     } catch (error) {
       console.error('Error updating sort order:', error);
       throw error;

@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface AboutStat {
   label: string;
@@ -57,11 +58,9 @@ export interface CreateAboutSection {
 }
 
 class AboutService {
-  private baseUrl = '/about';
-
   async getAboutSections(adminView = false): Promise<AboutSection[]> {
     try {
-      const endpoint = adminView ? `${this.baseUrl}/admin/all` : this.baseUrl;
+      const endpoint = adminView ? endPointApi.aboutAdmin : endPointApi.about;
       const response = await api.get(endpoint);
       return response.data.data || [];
     } catch (error) {
@@ -72,7 +71,7 @@ class AboutService {
 
   async getAboutSectionsByType(type: string): Promise<AboutSection[]> {
     try {
-      const response = await api.get(`${this.baseUrl}/type/${type}`);
+      const response = await api.get(`${endPointApi.aboutByType}/${type}`);
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching about sections by type:', error);
@@ -82,7 +81,7 @@ class AboutService {
 
   async getAboutSection(id: string): Promise<AboutSection | null> {
     try {
-      const response = await api.get(`${this.baseUrl}/${id}`);
+      const response = await api.get(`${endPointApi.about}/${id}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching about section:', error);
@@ -113,7 +112,7 @@ class AboutService {
         formData.append('secondaryImage', secondaryImageFile);
       }
 
-      const response = await api.post(this.baseUrl, formData, {
+      const response = await api.post(endPointApi.about, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -149,7 +148,7 @@ class AboutService {
         formData.append('secondaryImage', secondaryImageFile);
       }
 
-      const response = await api.put(`${this.baseUrl}/${id}`, formData, {
+      const response = await api.put(`${endPointApi.about}/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -164,7 +163,7 @@ class AboutService {
 
   async deleteAboutSection(id: string): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/${id}`);
+      await api.delete(`${endPointApi.about}/${id}`);
     } catch (error) {
       console.error('Error deleting about section:', error);
       throw error;
@@ -173,7 +172,7 @@ class AboutService {
 
   async updateSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
     try {
-      await api.put(`${this.baseUrl}/sort/order`, { items });
+      await api.put(`${endPointApi.about}/sort/order`, { items });
     } catch (error) {
       console.error('Error updating sort order:', error);
       throw error;
@@ -182,7 +181,7 @@ class AboutService {
 
   async getSectionSettings(): Promise<AboutSectionSettings> {
     try {
-      const response = await api.get(`${this.baseUrl}/section/settings`);
+      const response = await api.get(`${endPointApi.about}/section/settings`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching about section settings:', error);
@@ -235,7 +234,7 @@ class AboutService {
         }
       }
 
-      const response = await api.put(`${this.baseUrl}/section/settings`, formData, {
+      const response = await api.put(`${endPointApi.about}/section/settings`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

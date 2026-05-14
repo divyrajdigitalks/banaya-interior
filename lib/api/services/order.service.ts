@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface OrderItem {
   product: {
@@ -36,22 +37,22 @@ export interface Order {
 
 class OrderService {
   async createOrder(data: { shippingAddress: any; totalAmount: number }) {
-    const res = await api.post('/orders', data);
+    const res = await api.post(endPointApi.orders, data);
     return res.data;
   }
 
   async getMyOrders(): Promise<Order[]> {
-    const res = await api.get('/orders/my-orders');
+    const res = await api.get(endPointApi.myOrders);
     return res.data.data;
   }
 
   async getAllOrders(): Promise<Order[]> {
-    const res = await api.get('/orders');
+    const res = await api.get(endPointApi.orders);
     return res.data.data;
   }
 
   async updateOrderStatus(id: string, status: string) {
-    const res = await api.put(`/orders/${id}/status`, { status });
+    const res = await api.put(`${endPointApi.orders}/${id}/status`, { status });
     return res.data;
   }
 }

@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface InteriorCategory {
   _id: string;
@@ -19,28 +20,28 @@ export interface InteriorProject {
 class InteriorService {
   // Categories
   async getCategories(): Promise<any> {
-    const response = await api.get('/interior-categories');
+    const response = await api.get(endPointApi.interiorCategories);
     return response.data;
   }
 
   async createCategory(data: any): Promise<any> {
-    const response = await api.post('/interior-categories', data);
+    const response = await api.post(endPointApi.interiorCategories, data);
     return response.data;
   }
 
   async updateCategory(id: string, data: any): Promise<any> {
-    const response = await api.put(`/interior-categories/${id}`, data);
+    const response = await api.put(`${endPointApi.interiorCategories}/${id}`, data);
     return response.data;
   }
 
   async deleteCategory(id: string): Promise<any> {
-    const response = await api.delete(`/interior-categories/${id}`);
+    const response = await api.delete(`${endPointApi.interiorCategories}/${id}`);
     return response.data;
   }
 
   // Projects
   async getProjects(params?: { isFeatured?: boolean }): Promise<any> {
-    const response = await api.get('/interior-projects', { params });
+    const response = await api.get(endPointApi.interiorProjects, { params });
     return response.data;
   }
 
@@ -51,7 +52,7 @@ class InteriorService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.post('/interior-projects', formData, {
+    const response = await api.post(endPointApi.interiorProjects, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -64,14 +65,14 @@ class InteriorService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.put(`/interior-projects/${id}`, formData, {
+    const response = await api.put(`${endPointApi.interiorProjects}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   }
 
   async deleteProject(id: string): Promise<any> {
-    const response = await api.delete(`/interior-projects/${id}`);
+    const response = await api.delete(`${endPointApi.interiorProjects}/${id}`);
     return response.data;
   }
 }

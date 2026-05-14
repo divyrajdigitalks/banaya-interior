@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface CouponData {
   _id?: string;
@@ -16,27 +17,27 @@ export interface CouponData {
 
 class CouponService {
   async getCoupons(): Promise<any> {
-    const response = await api.get('/coupons');
+    const response = await api.get(endPointApi.coupons);
     return response.data;
   }
 
   async createCoupon(data: any): Promise<any> {
-    const response = await api.post('/coupons', data);
+    const response = await api.post(endPointApi.coupons, data);
     return response.data;
   }
 
   async updateCoupon(id: string, data: any): Promise<any> {
-    const response = await api.put(`/coupons/${id}`, data);
+    const response = await api.put(`${endPointApi.coupons}/${id}`, data);
     return response.data;
   }
 
   async deleteCoupon(id: string): Promise<any> {
-    const response = await api.delete(`/coupons/${id}`);
+    const response = await api.delete(`${endPointApi.coupons}/${id}`);
     return response.data;
   }
 
   async validateCoupon(code: string, amount: number): Promise<any> {
-    const response = await api.post('/coupons/validate', { code, amount });
+    const response = await api.post(endPointApi.couponValidate, { code, amount });
     return response.data;
   }
 }

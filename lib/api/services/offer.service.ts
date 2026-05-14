@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface OfferData {
   _id?: string;
@@ -15,7 +16,7 @@ export interface OfferData {
 
 class OfferService {
   async getOffers(): Promise<any> {
-    const response = await api.get('/offers');
+    const response = await api.get(endPointApi.offers);
     return response.data;
   }
 
@@ -26,7 +27,7 @@ class OfferService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.post('/offers', formData, {
+    const response = await api.post(endPointApi.offers, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -39,14 +40,14 @@ class OfferService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.put(`/offers/${id}`, formData, {
+    const response = await api.put(`${endPointApi.offers}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   }
 
   async deleteOffer(id: string): Promise<any> {
-    const response = await api.delete(`/offers/${id}`);
+    const response = await api.delete(`${endPointApi.offers}/${id}`);
     return response.data;
   }
 }

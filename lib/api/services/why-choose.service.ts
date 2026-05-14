@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface WhyChooseItem {
   id?: string;
@@ -32,11 +33,9 @@ export interface CreateWhyChooseItem {
 }
 
 class WhyChooseService {
-  private baseUrl = '/why-choose';
-
   async getWhyChooseList(adminView = false): Promise<WhyChooseItem[]> {
     try {
-      const endpoint = adminView ? `${this.baseUrl}/admin/all` : this.baseUrl;
+      const endpoint = adminView ? endPointApi.whyChooseAdmin : endPointApi.whyChoose;
       const response = await api.get(endpoint);
       return response.data.data || [];
     } catch (error) {
@@ -47,7 +46,7 @@ class WhyChooseService {
 
   async getWhyChooseItem(id: string): Promise<WhyChooseItem | null> {
     try {
-      const response = await api.get(`${this.baseUrl}/${id}`);
+      const response = await api.get(`${endPointApi.whyChoose}/${id}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching why choose item:', error);
@@ -71,7 +70,7 @@ class WhyChooseService {
         formData.append('image', imageFile);
       }
 
-      const response = await api.post(this.baseUrl, formData, {
+      const response = await api.post(endPointApi.whyChoose, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -100,7 +99,7 @@ class WhyChooseService {
         formData.append('image', imageFile);
       }
 
-      const response = await api.put(`${this.baseUrl}/${id}`, formData, {
+      const response = await api.put(`${endPointApi.whyChoose}/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -115,7 +114,7 @@ class WhyChooseService {
 
   async deleteWhyChooseItem(id: string): Promise<void> {
     try {
-      await api.delete(`${this.baseUrl}/${id}`);
+      await api.delete(`${endPointApi.whyChoose}/${id}`);
     } catch (error) {
       console.error('Error deleting why choose item:', error);
       throw error;
@@ -124,7 +123,7 @@ class WhyChooseService {
 
   async updateSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
     try {
-      await api.put(`${this.baseUrl}/sort/order`, { items });
+      await api.put(`${endPointApi.whyChoose}/sort/order`, { items });
     } catch (error) {
       console.error('Error updating sort order:', error);
       throw error;
@@ -133,7 +132,7 @@ class WhyChooseService {
 
   async getSectionSettings(): Promise<WhyChooseSectionSettings> {
     try {
-      const response = await api.get(`${this.baseUrl}/section/settings`);
+      const response = await api.get(`${endPointApi.whyChoose}/section/settings`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching section settings:', error);
@@ -165,7 +164,7 @@ class WhyChooseService {
       }
 
       console.log('Sending section settings update request...');
-      const response = await api.put(`${this.baseUrl}/section/settings`, formData, {
+      const response = await api.put(`${endPointApi.whyChoose}/section/settings`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

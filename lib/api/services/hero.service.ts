@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface DecorHeroData {
   _id?: string;
@@ -44,7 +45,7 @@ class HeroService {
   // Decor Hero
   async getDecorHero(): Promise<DecorHeroResponse> {
     try {
-      const response = await api.get<DecorHeroResponse>('/decor-hero');
+      const response = await api.get<DecorHeroResponse>(endPointApi.decorHero);
       return response.data;
     } catch (error: any) {
       return {
@@ -57,7 +58,7 @@ class HeroService {
 
   async updateDecorHero(data: Partial<DecorHeroData>): Promise<DecorHeroResponse> {
     try {
-      const response = await api.put<DecorHeroResponse>('/decor-hero', data);
+      const response = await api.put<DecorHeroResponse>(endPointApi.decorHero, data);
       return response.data;
     } catch (error: any) {
       return {
@@ -71,7 +72,7 @@ class HeroService {
   // Interior Hero
   async getInteriorHero(): Promise<InteriorHeroResponse> {
     try {
-      const response = await api.get<InteriorHeroResponse>('/interior-hero');
+      const response = await api.get<InteriorHeroResponse>(endPointApi.interiorHero);
       return response.data;
     } catch (error: any) {
       return {
@@ -90,7 +91,7 @@ class HeroService {
       });
       if (imageFile) formData.append('backgroundImage', imageFile);
 
-      const response = await api.put<InteriorHeroResponse>('/interior-hero', formData, {
+      const response = await api.put<InteriorHeroResponse>(endPointApi.interiorHero, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       return response.data;

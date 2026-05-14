@@ -3,6 +3,7 @@ export interface EndPointApi {
   adminLogin: string;
   register: string;
   logout: string;
+  profile: string;
 
   // Cart
   cart: string;
@@ -85,6 +86,51 @@ export interface EndPointApi {
   adminInquiryUpdateStatus: string;
   submitInquiry: string;
 
+  // Calculator
+  calculatorData: string;
+  calculatorItems: string;
+  calculatorBrands: string;
+  calculatorServices: string;
+  calculatorInteriorServices: string;
+  calculatorHomeServices: string;
+  calculatorDownloadPdf: string;
+
+  // Cost Guide
+  costGuide: string;
+  costGuideAdmin: string;
+  costGuideSort: string;
+
+  // Coupons
+  coupons: string;
+  couponValidate: string;
+
+  // Hero & Features
+  decorHero: string;
+  interiorHero: string;
+  decorFeatures: string;
+
+  // About & Why Choose
+  about: string;
+  aboutAdmin: string;
+  aboutByType: string;
+  whyChoose: string;
+  whyChooseAdmin: string;
+
+  // Offers
+  offers: string;
+
+  // Interior Projects & Categories
+  interiorCategories: string;
+  interiorProjects: string;
+
+  // Legacy Projects
+  legacyProjects: string;
+  legacyProjectSettings: string;
+
+  // Orders
+  orders: string;
+  myOrders: string;
+
   // Upload
   adminUpload: string;
 }
@@ -94,6 +140,7 @@ const endPointApi: EndPointApi = {
   adminLogin: 'auth/login',
   register: 'auth/register',
   logout: 'auth/logout',
+  profile: 'auth/profile',
 
   // Cart
   cart: 'cart',
@@ -175,6 +222,51 @@ const endPointApi: EndPointApi = {
   adminInquiryDelete: 'inquiries',
   adminInquiryUpdateStatus: 'inquiries/status',
   submitInquiry: 'inquiries',
+
+  // Calculator
+  calculatorData: 'calculator/data',
+  calculatorItems: 'calculator/items',
+  calculatorBrands: 'calculator/brands',
+  calculatorServices: 'calculator/services',
+  calculatorInteriorServices: 'calculator/interior-services',
+  calculatorHomeServices: 'calculator/home-services',
+  calculatorDownloadPdf: 'calculator/download-pdf',
+
+  // Cost Guide
+  costGuide: 'cost-guide',
+  costGuideAdmin: 'cost-guide/admin/all',
+  costGuideSort: 'cost-guide/sort/order',
+
+  // Coupons
+  coupons: 'coupons',
+  couponValidate: 'coupons/validate',
+
+  // Hero & Features
+  decorHero: 'decor-hero',
+  interiorHero: 'interior-hero',
+  decorFeatures: 'decor-features',
+
+  // About & Why Choose
+  about: 'about',
+  aboutAdmin: 'about/admin/all',
+  aboutByType: 'about/type',
+  whyChoose: 'why-choose',
+  whyChooseAdmin: 'why-choose/admin/all',
+
+  // Offers
+  offers: 'offers',
+
+  // Interior Projects & Categories
+  interiorCategories: 'interior-categories',
+  interiorProjects: 'interior-projects',
+
+  // Legacy Projects
+  legacyProjects: 'legacy-projects',
+  legacyProjectSettings: 'legacy-projects/settings',
+
+  // Orders
+  orders: 'orders',
+  myOrders: 'orders/my-orders',
 
   // Upload
   adminUpload: 'upload',

@@ -90,7 +90,7 @@ class AuthService {
    */
   async getProfile(): Promise<{ success: boolean; data?: User; error?: string }> {
     try {
-      const response = await api.get<{ success: boolean; data: User }>('/auth/profile');
+      const response = await api.get<{ success: boolean; data: User }>(endPointApi.profile);
       return response.data;
     } catch (error: any) {
       console.error('Get profile error:', error);

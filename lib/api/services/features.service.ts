@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface QuickFeature {
   label: string;
@@ -35,7 +36,7 @@ class FeaturesService {
   // Decor Features
   async getDecorFeatures(): Promise<DecorFeaturesResponse> {
     try {
-      const response = await api.get<DecorFeaturesResponse>('/decor-features');
+      const response = await api.get<DecorFeaturesResponse>(endPointApi.decorFeatures);
       return response.data;
     } catch (error: any) {
       return {
@@ -60,7 +61,7 @@ class FeaturesService {
       });
       if (imageFile) formData.append('mainImage', imageFile);
 
-      const response = await api.put<DecorFeaturesResponse>('/decor-features', formData, {
+      const response = await api.put<DecorFeaturesResponse>(endPointApi.decorFeatures, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       return response.data;

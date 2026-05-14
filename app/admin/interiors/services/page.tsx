@@ -24,11 +24,12 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
-import { calculatorService, type CalculatorItem } from "@/lib/api";
+import { calculatorService, interiorServicesService, type CalculatorItem, type InteriorService } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 
@@ -39,16 +40,26 @@ export default function ServicesManagementPage() {
   const [serviceItems, setServiceItems] = useState<CalculatorItem[]>([]);
   const [interiorServices, setInteriorServices] = useState<CalculatorItem[]>([]);
   const [homeServices, setHomeServices] = useState<CalculatorItem[]>([]);
+  const [mainServices, setMainServices] = useState<InteriorService[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<string>("services");
+  const [activeTab, setActiveTab] = useState<string>("main-services");
 
   // Item State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isMainDialogOpen, setIsMainDialogOpen] = useState(false);
+  
   const [editingItem, setEditingItem] = useState<CalculatorItem | null>(null);
+  const [editingMainService, setEditingMainService] = useState<InteriorService | null>(null);
+
   const [formData, setFormData] = useState<Partial<CalculatorItem>>({
     name: "", serviceType: "services", projectScope: "specific_area", price: 0, unit: "unit", category: ""
   });
+  const [mainFormData, setMainFormData] = useState<Partial<InteriorService>>({
+    title: "", description: "", calculatorType: "services", available: true
+  });
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteMainId, setDeleteMainId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [saving, setSaving] = useState(false);
@@ -60,16 +71,18 @@ export default function ServicesManagementPage() {
   const loadItems = async () => {
     setLoading(true);
     try {
-      const [allCalculatorItems, allServiceItems, allInteriorServices, allHomeServices] = await Promise.all([
+      const [allCalculatorItems, allServiceItems, allInteriorServices, allHomeServices, allMainServices] = await Promise.all([
         calculatorService.getAllItems(),
         calculatorService.getAllServiceItems(),
         calculatorService.getAllInteriorServices(),
-        calculatorService.getAllHomeServices()
+        calculatorService.getAllHomeServices(),
+        interiorServicesService.getServicesList(true)
       ]);
       setItems(allCalculatorItems);
       setServiceItems(allServiceItems);
       setInteriorServices(allInteriorServices);
       setHomeServices(allHomeServices);
+      setMainServices(allMainServices);
     } catch (error) {
       showError("Failed to load items");
     } finally {
@@ -93,6 +106,65 @@ export default function ServicesManagementPage() {
     .map(i => i.name);
 
   const areaOptions = activeTab === "services" ? serviceAreaOptions : (activeTab === "interior" ? interiorAreaOptions : homeAreaOptions);
+
+  const handleOpenMainDialog = (service: InteriorService | null = null) => {
+    if (service) {
+      setEditingMainService(service);
+      setMainFormData({
+        title: service.title,
+        description: service.description,
+        calculatorType: service.calculatorType,
+        available: service.available
+      });
+    } else {
+      setEditingMainService(null);
+      setMainFormData({
+        title: "",
+        description: "",
+        calculatorType: "services",
+        available: true
+      });
+    }
+    setSelectedFile(null);
+    setIsMainDialogOpen(true);
+  };
+
+  const handleSaveMainService = async () => {
+    if (!mainFormData.title || !mainFormData.description || (!editingMainService && !selectedFile)) {
+      showError("Please fill all required fields and upload an image");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (editingMainService) {
+        await interiorServicesService.updateService(editingMainService.id, mainFormData, selectedFile || undefined);
+        showSuccess("Main service updated successfully");
+      } else {
+        await interiorServicesService.createService(mainFormData, selectedFile!);
+        showSuccess("Main service created successfully");
+      }
+      setIsMainDialogOpen(false);
+      loadItems();
+    } catch (error) {
+      showError("Failed to save main service");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteMainService = async () => {
+    if (!deleteMainId) return;
+    try {
+      await interiorServicesService.deleteService(deleteMainId);
+      showSuccess("Main service deleted successfully");
+      loadItems();
+    } catch (error) {
+      showError("Failed to delete main service");
+    } finally {
+      setDeleteMainId(null);
+    }
+  };
 
   const handleOpenDialog = (item: CalculatorItem | null = null, prefilledCategory: string = "") => {
     if (item) {
@@ -235,17 +307,22 @@ export default function ServicesManagementPage() {
             <ArrowLeft size={18} className="text-charcoal/60" />
           </Button>
           <div>
-            <h1 className="text-xl font-semibold text-charcoal">Services Management</h1>
-            <p className="text-xs text-charcoal/40 mt-0.5">Manage detailed services for the calculator</p>
+            <h1 className="text-xl font-semibold text-charcoal">Calculator Management</h1>
+            <p className="text-xs text-charcoal/40 mt-0.5">Manage main calculator services and individual items</p>
           </div>
         </div>
-        <Button onClick={() => handleOpenDialog()} className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4">
-          <Plus size={16} className="mr-2" /> Add {activeTab === "services" ? "Service" : (activeTab === "interior" ? "Interior Item" : "Home Item")}
+        <Button 
+          onClick={() => activeTab === "main-services" ? handleOpenMainDialog() : handleOpenDialog()} 
+          className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
+        >
+          <Plus size={16} className="mr-2" /> 
+          {activeTab === "main-services" ? "Add Main Service" : `Add ${activeTab === "services" ? "Service" : (activeTab === "interior" ? "Interior Item" : "Home Item")}`}
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-white border border-charcoal/10 rounded-xl p-1">
+          <TabsTrigger value="main-services" className="rounded-lg px-8">Main Categories</TabsTrigger>
           <TabsTrigger value="services" className="rounded-lg px-8">Services</TabsTrigger>
           <TabsTrigger value="interior" className="rounded-lg px-8">Interior Services</TabsTrigger>
           <TabsTrigger value="homes" className="rounded-lg px-8">Home Services</TabsTrigger>
@@ -266,6 +343,43 @@ export default function ServicesManagementPage() {
         {loading ? (
           <div className="h-64 flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-charcoal" />
+          </div>
+        ) : activeTab === "main-services" ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {mainServices.map((service) => (
+              <AdminCard key={service.id} className="group overflow-hidden">
+                <div className="relative aspect-video mb-4 overflow-hidden rounded-xl border border-charcoal/5">
+                  <img 
+                    src={service.image} 
+                    alt={service.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                  {!service.available && (
+                    <div className="absolute inset-0 bg-charcoal/60 backdrop-blur-[2px] flex items-center justify-center">
+                      <span className="text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 border border-white/20 rounded-full">Coming Soon</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">{service.calculatorType}</span>
+                    <div className="flex gap-1">
+                      <button onClick={() => handleOpenMainDialog(service)} className="p-2 hover:bg-gold/10 text-charcoal/40 hover:text-gold rounded-lg transition-all"><Edit3 size={14} /></button>
+                      <button onClick={() => setDeleteMainId(service.id)} className="p-2 hover:bg-red-50 text-charcoal/40 hover:text-red-500 rounded-lg transition-all"><Trash2 size={14} /></button>
+                    </div>
+                  </div>
+                  <h3 className="font-serif text-lg font-black text-charcoal">{service.title}</h3>
+                  <p className="text-xs text-charcoal/50 leading-relaxed line-clamp-2">{service.description}</p>
+                </div>
+              </AdminCard>
+            ))}
+            {mainServices.length === 0 && (
+              <div className="col-span-full py-20 text-center">
+                <ImageIcon className="mx-auto text-charcoal/10 mb-4" size={48} />
+                <p className="text-charcoal/40 font-medium">No main services found.</p>
+                <p className="text-xs text-charcoal/20 mt-1">Add your first calculator entry point.</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-10">
@@ -304,6 +418,86 @@ export default function ServicesManagementPage() {
           </div>
         )}
       </Tabs>
+
+      {/* Main Service Dialog */}
+      <Dialog open={isMainDialogOpen} onOpenChange={setIsMainDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-0 overflow-hidden">
+          <DialogHeader className="p-8 border-b bg-warm-cream/20">
+            <DialogTitle className="font-serif font-black">{editingMainService ? "Edit Main Category" : "Add Main Category"}</DialogTitle>
+          </DialogHeader>
+          <div className="p-8 space-y-6">
+            <AdminFormInputEnhanced 
+              label="Category Title" 
+              value={mainFormData.title} 
+              onChange={(v) => setMainFormData({ ...mainFormData, title: v })} 
+              placeholder="e.g. Services, Interior, Full Home Interior"
+              required 
+            />
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40">Calculator Entry Type</Label>
+              <Select 
+                value={mainFormData.calculatorType} 
+                onValueChange={(v: any) => setMainFormData({ ...mainFormData, calculatorType: v })}
+              >
+                <SelectTrigger className="h-12 rounded-xl">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="services">General Services</SelectItem>
+                  <SelectItem value="interior">Interior (Kitchen/Wardrobe)</SelectItem>
+                  <SelectItem value="homes">Full Home Interior</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40">Description</Label>
+              <textarea 
+                value={mainFormData.description} 
+                onChange={(e) => setMainFormData({ ...mainFormData, description: e.target.value })}
+                placeholder="Short description for the home page card..."
+                className="w-full p-4 rounded-xl border border-charcoal/10 text-sm h-24 outline-none focus:border-gold transition-all"
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between p-4 bg-charcoal/5 rounded-xl">
+              <div className="space-y-0.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-charcoal/40 cursor-pointer" htmlFor="available-switch">
+                  Visible on Home Page
+                </Label>
+                <p className="text-[10px] text-charcoal/30 italic">Show or hide this service from users</p>
+              </div>
+              <Switch 
+                id="available-switch"
+                checked={mainFormData.available} 
+                onCheckedChange={(checked) => setMainFormData({ ...mainFormData, available: checked })}
+              />
+            </div>
+            <ImageUpload label="Card Image" value={editingMainService?.image} onChange={(_, f) => f && setSelectedFile(f)} />
+          </div>
+          <DialogFooter className="p-8 bg-white border-t gap-4">
+            <Button variant="ghost" onClick={() => setIsMainDialogOpen(false)} className="flex-1 rounded-xl">Cancel</Button>
+            <Button onClick={handleSaveMainService} disabled={saving} className="flex-1 bg-charcoal text-white rounded-xl">
+              {saving ? "Saving..." : "Save Category"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Main Service Delete Alert */}
+      <AlertDialog open={!!deleteMainId} onOpenChange={(o) => !o && setDeleteMainId(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Main Category?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove this service from the home page. Individual items inside the calculator will not be deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteMainService} className="bg-red-500 rounded-xl">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Service Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

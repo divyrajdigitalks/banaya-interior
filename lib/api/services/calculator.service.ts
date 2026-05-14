@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface CalculatorItem {
   _id: string;
@@ -45,128 +46,128 @@ export const calculatorService = {
     if (calculatorType) params.append('calculatorType', calculatorType);
     if (scope) params.append('scope', scope);
     
-    const response = await api.get(`/calculator/data?${params.toString()}`);
+    const response = await api.get(`${endPointApi.calculatorData}?${params.toString()}`);
     return response.data.data;
   },
 
   getAllItems: async (): Promise<CalculatorItem[]> => {
-    const response = await api.get('/calculator/items');
+    const response = await api.get(endPointApi.calculatorItems);
     return response.data.data;
   },
 
   getCalculatorItems: async (): Promise<CalculatorItem[]> => {
-    const response = await api.get('/calculator/items');
+    const response = await api.get(endPointApi.calculatorItems);
     return response.data.data;
   },
 
   addItem: async (formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.post('/calculator/items', formData, {
+    const response = await api.post(endPointApi.calculatorItems, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   updateItem: async (id: string, formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.put(`/calculator/items/${id}`, formData, {
+    const response = await api.put(`${endPointApi.calculatorItems}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   deleteItem: async (id: string): Promise<void> => {
-    await api.delete(`/calculator/items/${id}`);
+    await api.delete(`${endPointApi.calculatorItems}/${id}`);
   },
 
   getBrands: async (): Promise<BrandOption[]> => {
-    const response = await api.get('/calculator/brands');
+    const response = await api.get(endPointApi.calculatorBrands);
     return response.data.data;
   },
 
   addBrand: async (formData: FormData): Promise<BrandOption> => {
-    const response = await api.post('/calculator/brands', formData, {
+    const response = await api.post(endPointApi.calculatorBrands, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   updateBrand: async (id: string, formData: FormData): Promise<BrandOption> => {
-    const response = await api.put(`/calculator/brands/${id}`, formData, {
+    const response = await api.put(`${endPointApi.calculatorBrands}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   deleteBrand: async (id: string): Promise<void> => {
-    await api.delete(`/calculator/brands/${id}`);
+    await api.delete(`${endPointApi.calculatorBrands}/${id}`);
   },
 
   getAllServiceItems: async (): Promise<CalculatorItem[]> => {
-    const response = await api.get('/calculator/services');
+    const response = await api.get(endPointApi.calculatorServices);
     return response.data.data;
   },
 
   addServiceItem: async (formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.post('/calculator/services', formData, {
+    const response = await api.post(endPointApi.calculatorServices, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   updateServiceItem: async (id: string, formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.put(`/calculator/services/${id}`, formData, {
+    const response = await api.put(`${endPointApi.calculatorServices}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   deleteServiceItem: async (id: string): Promise<void> => {
-    await api.delete(`/calculator/services/${id}`);
+    await api.delete(`${endPointApi.calculatorServices}/${id}`);
   },
 
   getAllInteriorServices: async (): Promise<CalculatorItem[]> => {
-    const response = await api.get('/calculator/interior-services');
+    const response = await api.get(endPointApi.calculatorInteriorServices);
     return response.data.data;
   },
 
   addInteriorService: async (formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.post('/calculator/interior-services', formData, {
+    const response = await api.post(endPointApi.calculatorInteriorServices, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   updateInteriorService: async (id: string, formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.put(`/calculator/interior-services/${id}`, formData, {
+    const response = await api.put(`${endPointApi.calculatorInteriorServices}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   deleteInteriorService: async (id: string): Promise<void> => {
-    await api.delete(`/calculator/interior-services/${id}`);
+    await api.delete(`${endPointApi.calculatorInteriorServices}/${id}`);
   },
 
   getAllHomeServices: async (): Promise<CalculatorItem[]> => {
-    const response = await api.get('/calculator/home-services');
+    const response = await api.get(endPointApi.calculatorHomeServices);
     return response.data.data;
   },
 
   addHomeService: async (formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.post('/calculator/home-services', formData, {
+    const response = await api.post(endPointApi.calculatorHomeServices, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   updateHomeService: async (id: string, formData: FormData): Promise<CalculatorItem> => {
-    const response = await api.put(`/calculator/home-services/${id}`, formData, {
+    const response = await api.put(`${endPointApi.calculatorHomeServices}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data.data;
   },
 
   deleteHomeService: async (id: string): Promise<void> => {
-    await api.delete(`/calculator/home-services/${id}`);
+    await api.delete(`${endPointApi.calculatorHomeServices}/${id}`);
   },
 
   downloadPdf: async (payload: {
@@ -182,7 +183,7 @@ export const calculatorService = {
     phone?: string;
     city?: string;
   }): Promise<void> => {
-    const response = await api.post('/calculator/download-pdf', payload, {
+    const response = await api.post(endPointApi.calculatorDownloadPdf, payload, {
       responseType: 'blob',
     });
     const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));

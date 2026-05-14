@@ -124,9 +124,9 @@ export function ProductCard({
                 <span className="text-[8px] font-bold text-[#00897B]/60">{reviewsCount}</span>
               </div>
             </div>
-            <p className="text-[10px] text-[#C9A962] font-black uppercase tracking-widest line-clamp-1">
+            {/* <p className="text-[10px] text-[#C9A962] font-black uppercase tracking-widest line-clamp-1">
               {typeof category === 'object' ? category.name : (category || categoryId || "Bespoke Decor")}
-            </p>
+            </p> */}
           </div>
 
           <div className="flex items-center gap-2">

@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface CartItem {
   _id: string;
@@ -34,7 +35,7 @@ class CartService {
    */
   async getCart(): Promise<CartResponse> {
     try {
-      const response = await api.get<CartResponse>('/cart');
+      const response = await api.get<CartResponse>(endPointApi.cart);
       return response.data;
     } catch (error: any) {
       console.error('Get cart error:', error);
@@ -51,7 +52,7 @@ class CartService {
    */
   async addToCart(productId: string, quantity: number = 1, personalization?: any): Promise<CartResponse> {
     try {
-      const response = await api.post<CartResponse>('/cart/add', { productId, quantity, personalization });
+      const response = await api.post<CartResponse>(endPointApi.cartAdd, { productId, quantity, personalization });
       return response.data;
     } catch (error: any) {
       console.error('Add to cart error:', error);
@@ -68,7 +69,7 @@ class CartService {
    */
   async updateCartItem(productId: string, quantity: number): Promise<CartResponse> {
     try {
-      const response = await api.put<CartResponse>('/cart/update', { productId, quantity });
+      const response = await api.put<CartResponse>(endPointApi.cartUpdate, { productId, quantity });
       return response.data;
     } catch (error: any) {
       console.error('Update cart error:', error);
@@ -85,7 +86,7 @@ class CartService {
    */
   async removeFromCart(productId: string): Promise<CartResponse> {
     try {
-      const response = await api.delete<CartResponse>(`/cart/remove/${productId}`);
+      const response = await api.delete<CartResponse>(`${endPointApi.cartRemove}/${productId}`);
       return response.data;
     } catch (error: any) {
       console.error('Remove from cart error:', error);
@@ -102,7 +103,7 @@ class CartService {
    */
   async clearCart(): Promise<CartResponse> {
     try {
-      const response = await api.delete<CartResponse>('/cart/clear');
+      const response = await api.delete<CartResponse>(endPointApi.cartClear);
       return response.data;
     } catch (error: any) {
       console.error('Clear cart error:', error);

@@ -1,4 +1,5 @@
 import api from '../axios';
+import endPointApi from '../endpoints';
 
 export interface LegacyProject {
   _id: string;
@@ -35,18 +36,18 @@ export interface LegacySettingsResponse {
 class LegacyProjectService {
   // Settings
   async getSettings(): Promise<LegacySettingsResponse> {
-    const response = await api.get('/legacy-projects/settings');
+    const response = await api.get(endPointApi.legacyProjectSettings);
     return response.data;
   }
 
   async updateSettings(data: Partial<LegacySettings>): Promise<LegacySettingsResponse> {
-    const response = await api.put('/legacy-projects/settings', data);
+    const response = await api.put(endPointApi.legacyProjectSettings, data);
     return response.data;
   }
 
   // Projects
   async getProjects(): Promise<LegacyProjectResponse> {
-    const response = await api.get('/legacy-projects');
+    const response = await api.get(endPointApi.legacyProjects);
     return response.data;
   }
 
@@ -57,7 +58,7 @@ class LegacyProjectService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.post('/legacy-projects', formData, {
+    const response = await api.post(endPointApi.legacyProjects, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -77,14 +78,14 @@ class LegacyProjectService {
     });
     if (imageFile) formData.append('image', imageFile);
 
-    const response = await api.put(`/legacy-projects/${id}`, formData, {
+    const response = await api.put(`${endPointApi.legacyProjects}/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   }
 
   async deleteProject(id: string): Promise<any> {
-    const response = await api.delete(`/legacy-projects/${id}`);
+    const response = await api.delete(`${endPointApi.legacyProjects}/${id}`);
     return response.data;
   }
 }
