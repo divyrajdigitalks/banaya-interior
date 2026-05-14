@@ -380,11 +380,7 @@ export default function ProductDetailPage() {
                 </AnimatePresence>
 
                 {/* Bulk Purchase Link */}
-                <div className="pt-8 border-t border-primary/10 mt-8">
-                  <p className="text-xs font-bold text-primary/70">
-                    Want to buy this in bulk? <Link href="#" className="text-gold border-b border-gold pb-0.5 hover:text-primary hover:border-primary transition-all">Click here</Link>
-                  </p>
-                </div>
+          
 
                 {/* BEST OFFERS SECTION */}
                 {/* <div className="mt-12 p-8 border-2 border-dashed border-primary/10 rounded-2xl bg-white space-y-8">
@@ -675,14 +671,17 @@ export default function ProductDetailPage() {
                 </Button>
               </div>
 
-              {/* <Button variant="outline" className="w-full py-7 rounded-xl border-primary/5 bg-[#f8f5f0] text-primary font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary hover:text-white transition-all">
-                Buy Now
-              </Button> */}
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <button className="flex-1 flex items-center justify-center gap-3 py-4 text-[10px] font-bold text-[#25D366] hover:opacity-80 transition-all ">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.064-4.516 10.066-10.066.002-5.548-4.512-10.064-10.066-10.064-5.548 0-10.064 4.516-10.066 10.066-.001 1.93.546 3.538 1.492 5.165l-.999 3.648 3.774-.991zm11.218-7.261c-.301-.15-1.78-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.65.075-.3-.15-1.265-.467-2.41-1.488-.891-.795-1.492-1.776-1.667-2.076-.175-.3-.019-.463.13-.612.134-.133.301-.35.451-.525.15-.175.2-.3.3-.5s.05-.375-.025-.525c-.075-.15-.675-1.628-.925-2.228-.243-.599-.488-.517-.675-.527l-.575-.01c-.2 0-.525.075-.8.35-.275.275-1.05 1.026-1.05 2.503 0 1.476 1.075 2.903 1.225 3.103.15.2 2.115 3.23 5.124 4.535.715.311 1.274.497 1.708.636.719.139 1.372.119 1.888.054.575-.072 1.78-.726 2.03-1.427.25-.7.25-1.3.175-1.427-.075-.125-.275-.2-.575-.35z"/></svg>
+                  Order on WhatsApp
+                </button>
+                  <p className="text-xs font-bold text-primary/70">
+                    Want to buy this in bulk? <Link href="#" className="text-gold border-b border-gold pb-0.5 hover:text-primary hover:border-primary transition-all">Click here</Link>
+                  </p>
+              </div>
 
-              <button className="w-full flex items-center justify-center gap-3 py-4 text-[10px] font-bold text-[#25D366] hover:opacity-80 transition-all">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.064-4.516 10.066-10.066.002-5.548-4.512-10.064-10.066-10.064-5.548 0-10.064 4.516-10.066 10.066-.001 1.93.546 3.538 1.492 5.165l-.999 3.648 3.774-.991zm11.218-7.261c-.301-.15-1.78-.879-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.179-.175.2-.35.225-.65.075-.3-.15-1.265-.467-2.41-1.488-.891-.795-1.492-1.776-1.667-2.076-.175-.3-.019-.463.13-.612.134-.133.301-.35.451-.525.15-.175.2-.3.3-.5s.05-.375-.025-.525c-.075-.15-.675-1.628-.925-2.228-.243-.599-.488-.517-.675-.527l-.575-.01c-.2 0-.525.075-.8.35-.275.275-1.05 1.026-1.05 2.503 0 1.476 1.075 2.903 1.225 3.103.15.2 2.115 3.23 5.124 4.535.715.311 1.274.497 1.708.636.719.139 1.372.119 1.888.054.575-.072 1.78-.726 2.03-1.427.25-.7.25-1.3.175-1.427-.075-.125-.275-.2-.575-.35z"/></svg>
-                Order on WhatsApp
-              </button>
+           
             </div>
 
             {/* Trust Info */}

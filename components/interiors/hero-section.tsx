@@ -42,8 +42,11 @@ export function HeroSection() {
     headingLine2: "Speak Softly.",
     description: "Crafting timeless residential and commercial environments where every corner reflects a royal legacy and modern sophistication.",
     cta1Text: "Book Free Consultation",
-    cta2Text: "Explore Collections"
+    cta2Text: "Shop Decor",
+    cta2Link: "/decor"
   };
+
+  const cta2Text = hero.cta2Text?.trim().toLowerCase() === "explore collections" ? "Shop Decor" : hero.cta2Text || "Shop Decor";
 
   return (
     <section className="relative min-h-screen lg:h-screen overflow-hidden bg-primary py-20 lg:py-0">
@@ -122,9 +125,9 @@ export function HeroSection() {
               >
                 {hero.cta1Text}
               </button>
-              <Link href="/collections">
+              <Link href={hero.cta2Link || "/decor"}>
                 <button className="px-10 py-5 border border-white/20 text-white font-black text-xs rounded-full hover:bg-white hover:text-primary transition-all duration-700 shadow-xl hover:scale-105 active:scale-95 uppercase tracking-[0.2em]">
-                  {hero.cta2Text}
+                  {cta2Text}
                 </button>
               </Link>
             </motion.div>

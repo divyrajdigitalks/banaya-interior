@@ -179,7 +179,7 @@ export default function InteriorCollectionsPage() {
   );
 
   return (
-    <div className="space-y-12 pb-24 pt-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-12 pb-24 pt-8  mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
         <div className="relative w-full lg:w-[500px] group">
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-gold transition-colors" size={20} />
