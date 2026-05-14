@@ -38,7 +38,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
     { name: "PROJECTS", href: "/interiors/projects" },
     { name: "COST CALCULATOR", href: "/interiors/cost-calculator" },
     { name: "PROCESS", href: "/interiors#process" },
-    { name: "BLOG", href: "#" },
+    // { name: "BLOG", href: "#" },
     { name: "CONTACT US", href: "#contact" },
   ];
 

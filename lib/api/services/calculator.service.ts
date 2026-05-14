@@ -167,5 +167,32 @@ export const calculatorService = {
 
   deleteHomeService: async (id: string): Promise<void> => {
     await api.delete(`/calculator/home-services/${id}`);
-  }
+  },
+
+  downloadPdf: async (payload: {
+    estimate: number;
+    serviceType: string | null;
+    brand?: string;
+    reqType: string;
+    selBHK?: string;
+    items: { name: string; qty: number }[];
+    carpetArea?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    city?: string;
+  }): Promise<void> => {
+    const response = await api.post('/calculator/download-pdf', payload, {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const a = Object.assign(document.createElement('a'), {
+      href: url,
+      download: `Banaya_Quote_${Date.now()}.pdf`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
 };

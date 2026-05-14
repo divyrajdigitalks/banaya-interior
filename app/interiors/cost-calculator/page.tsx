@@ -1,10 +1,10 @@
 "use client";
 
 import { CostGuideSection } from "@/components/interiors/cost-guide";
-import { CalculatorSection } from "@/components/calculator-section";
 import { TrustSection } from "@/components/trust-section";
 import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
+import { ServicesSection } from "@/components/interiors/services-section";
 
 export default function InteriorsCalculatorPage() {
   return (
@@ -38,9 +38,9 @@ export default function InteriorsCalculatorPage() {
 
       <CostGuideSection />
       
-      <div className="py-10 bg-white">
-        <CalculatorSection />
-      </div>
+      <section id="services">
+        <ServicesSection />
+      </section>
 
       <section className="py-24 bg-warm-cream/20">
         <div className="container mx-auto px-6 md:px-12">

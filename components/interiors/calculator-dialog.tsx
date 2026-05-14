@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Calculator, Download, CheckCircle2, ChevronRight,
   Home, LayoutGrid, Armchair, Layers,
-  Paintbrush, X
+  Paintbrush, X, Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,38 +140,71 @@ const ItemCard = ({
   onToggle: () => void;
   onUpdateQty: (d: number | string) => void;
   qty: number;
-}) => (
-  <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-slate-900 ring-1 ring-slate-900" : "border-slate-100 bg-white"}`}>
-    <div className="p-5 space-y-2">
-      <div className="flex justify-between items-start">
-        <div className="space-y-1">
-          <h4 className="font-bold text-slate-900">{item.name}</h4>
-        </div>
-        <ToggleSwitch on={isSelected} onClick={onToggle} />
-      </div>
-    </div>
-
-    {isSelected && (
-      <div className="mt-auto border-t border-slate-100 p-4 bg-slate-50/50 rounded-b-xl flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-400">
-          Enter sq.ft / units
-        </span>
-        <div className="flex items-center gap-3">
-          <div className="relative w-24">
-            <input
-              type="number"
-              min="1"
-              value={qty}
-              onChange={(e) => onUpdateQty(e.target.value)}
-              className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-slate-900 text-center"
-              placeholder="0"
-            />
+}) => {
+  const [imgOpen, setImgOpen] = useState(false);
+  return (
+    <>
+      {imgOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setImgOpen(false)}
+        >
+          <div className="relative max-w-lg w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <img src={buildImageUrl(item.image)} alt={item.name} className="w-full rounded-2xl object-contain shadow-2xl" />
+            <button
+              onClick={() => setImgOpen(false)}
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg"
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
+      )}
+      <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-slate-900 ring-1 ring-slate-900 shadow-md" : "border-slate-100 bg-white"}`}>
+        <div className="p-5 space-y-4">
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex items-center gap-4 flex-1">
+              
+              <div className="space-y-1">
+                <h4 className="font-bold text-slate-900 leading-tight">{item.name}</h4>
+              </div>
+            </div>
+            {item.image && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setImgOpen(true); }}
+                  // className="w-8 h-8 rounded-lg flex-shrink-0 bg-slate-50 border border-slate-100 hover:bg-slate-100 hover:border-slate-300 transition-colors flex items-center justify-center"
+                >
+                  <Eye size={15} className="text-slate-500" />
+                </button>
+              )}
+            <ToggleSwitch on={isSelected} onClick={onToggle} />
+          </div>
+        </div>
+
+        {isSelected && (
+          <div className="mt-auto border-t border-slate-100 p-4 bg-slate-50/50 rounded-b-xl flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+              Enter {item.unit === 'sqft' ? 'sq.ft' : 'units'}
+            </span>
+            <div className="flex items-center gap-3">
+              <div className="relative w-24">
+                <input
+                  type="number"
+                  min="1"
+                  value={qty}
+                  onChange={(e) => onUpdateQty(e.target.value)}
+                  className="w-full h-9 bg-white border border-slate-200 rounded-lg px-3 text-sm font-bold focus:outline-none focus:border-slate-900 text-center shadow-sm"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    )}
-  </div>
-);
+    </>
+  );
+};
 
 export function CalculatorDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -385,15 +418,33 @@ export function CalculatorDialog() {
     }
   };
 
-  const handleDownload = () => {
-    const txt = `BANAYA — QUOTE\n${"─".repeat(30)}\nService: ${serviceType}\nEstimate: ₹${Math.round(estimate).toLocaleString()}\nBrand: ${data?.brandOptions.find(b => b._id === selBrand)?.name}\n\nContact: hello@banaya.com`;
-    const a = Object.assign(document.createElement("a"), {
-      href: URL.createObjectURL(new Blob([txt], { type: "text/plain" })),
-      download: `Banaya_Quote_${Date.now()}.txt`
-    });
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleDownload = async () => {
+    const selectedItems = serviceType === "homes"
+      ? selFurnOpts.map(o => ({
+          qty: o.qty,
+          name: data?.furnitureItems.find(i => i._id === o.id)?.name ||
+                data?.furnitureItems.flatMap(i => i.options || []).find((opt: any) => opt._id === o.id)?.name || 'Item'
+        }))
+      : serviceType === "interior"
+        ? [
+            ...selDetailed.map(o => ({ qty: o.qty, name: Object.values(data?.detailedFurniture || {}).flat().find(f => f._id === o.id)?.name || 'Item' })),
+            ...selBasic.map(o => ({ qty: o.qty, name: data?.basicRequirements.find(r => r._id === o.id)?.name || 'Item' }))
+          ]
+        : selServices.map(o => ({ qty: o.qty, name: data?.generalServices.find(i => i._id === o.id)?.name || 'Item' }));
+
+    try {
+      await calculatorService.downloadPdf({
+        estimate,
+        serviceType,
+        brand: data?.brandOptions.find(b => b._id === selBrand)?.name,
+        reqType,
+        selBHK: data?.bhkOptions.find(b => b._id === selBHK)?.name || data?.roomOptions.find(r => r._id === selBHK)?.name,
+        items: selectedItems,
+        carpetArea,
+      });
+    } catch {
+      toast.error("Failed to download PDF. Please try again.");
+    }
   };
 
   const getSteps = () => {

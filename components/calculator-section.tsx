@@ -152,11 +152,18 @@ const ItemCard = ({
   onUpdateQty: (d: number | string) => void;
   qty: number;
 }) => (
-  <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-primary ring-1 ring-primary" : "border-slate-100 bg-white"}`}>
-    <div className="p-5 space-y-2">
-      <div className="flex justify-between items-start">
-        <div className="space-y-1">
-          <h4 className="font-bold text-primary">{item.name}</h4>
+  <div className={`rounded-xl border transition-all flex flex-col ${isSelected ? "border-primary ring-1 ring-primary shadow-md" : "border-slate-100 bg-white"}`}>
+    <div className="p-5 space-y-4">
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex items-center gap-4 flex-1">
+          {item.image && (
+            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-slate-50 border border-slate-100">
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            </div>
+          )}
+          <div className="space-y-1">
+            <h4 className="font-bold text-primary leading-tight">{item.name}</h4>
+          </div>
         </div>
         <ToggleSwitch on={isSelected} onClick={onToggle} />
       </div>
@@ -164,8 +171,8 @@ const ItemCard = ({
     
     {isSelected && (
       <div className="mt-auto border-t border-slate-100 p-4 bg-slate-50/50 rounded-b-xl flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-400">
-          Enter sq.ft
+        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+          Enter {item.unit === 'sqft' ? 'sq.ft' : 'units'}
         </span>
         <div className="flex items-center gap-3">
           <div className="relative w-24">
@@ -174,7 +181,7 @@ const ItemCard = ({
               min="1"
               value={qty}
               onChange={(e) => onUpdateQty(e.target.value)}
-              className="w-full h-8 bg-white border border-slate-200 rounded-md px-2 text-sm font-bold focus:outline-none focus:border-primary text-center"
+              className="w-full h-9 bg-white border border-slate-200 rounded-lg px-3 text-sm font-bold focus:outline-none focus:border-primary text-center shadow-sm"
               placeholder="0"
             />
           </div>
@@ -862,7 +869,7 @@ export function CalculatorSection() {
                       >
                         <Download size={20} /> Download PDF
                       </Button>
-                    </div>
+                    </div>  
 
                     {/* Decorative element */}
                     <div className="absolute -bottom-16 -right-16 text-white/5 text-[200px] font-bold italic pointer-events-none select-none">
