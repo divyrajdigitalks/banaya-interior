@@ -20,37 +20,34 @@ export default function WishlistPage() {
       <DoorTransition />
       <Header variant="light" />
       
-      <div className="container mx-auto px-6 pt-48 pb-32">
-        <div className="max-w-6xl mx-auto">
-          <BackButton className="mb-6" />
+      <div className="container mx-auto px-6 pt-52 pb-32">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
             <div className="space-y-4">
               <BackButton className="mb-4" />
               <h1 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight">
                 Your <span className="italic font-light text-gold">Wishlist.</span>
               </h1>
-              <p className="text-primary/50 text-lg font-light max-w-lg leading-relaxed">
+              <p className="text-primary/70 text-lg font-light max-w-lg leading-relaxed">
                 Pieces you've curated for your future home. {wishlist.length} {wishlist.length === 1 ? 'treasure' : 'treasures'} saved.
               </p>
             </div>
           </div>
 
           {wishlist.length === 0 ? (
-            <div className="text-center py-20 space-y-8">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-24 h-24 rounded-full bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
-              >
+            <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10">
+              <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30">
                 <Heart size={40} strokeWidth={1} />
-              </motion.div>
-              <p className="text-primary/40 font-light italic">Your wishlist is currently empty.</p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-primary">Your wishlist is empty</h3>
+                <p className="text-primary/60 text-sm max-w-xs mx-auto">
+                  Pieces you've curated for your future home will appear here.
+                </p>
+              </div>
               <Link href="/shop" className="inline-block">
-                <button className="group relative px-12 py-6 bg-primary text-white text-xs font-bold rounded-full overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700">
-                  <span className="relative z-10 flex items-center gap-4 tracking-widest uppercase">
-                    Discover Collection <ArrowRight size={14} />
-                  </span>
-                  <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
+                <button className="px-10 py-4 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-gold transition-all shadow-xl shadow-primary/10">
+                  Start Exploring
                 </button>
               </Link>
             </div>

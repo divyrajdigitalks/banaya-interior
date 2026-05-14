@@ -126,7 +126,7 @@ export default function InquiriesManagementPage() {
       header: "Service",
       accessorKey: "service",
       cell: (item: Inquiry) => (
-        <span className="text-[10px] font-black uppercase tracking-widest text-charcoal/60 bg-charcoal/5 px-3 py-1.5 rounded-full">
+        <span className="text-[10px] font-semibold text-charcoal/60 bg-charcoal/5 px-3 py-1.5 rounded-full">
           {item.service}
         </span>
       )
@@ -135,7 +135,7 @@ export default function InquiriesManagementPage() {
       header: "Estimate",
       accessorKey: "estimateDetails",
       cell: (item: Inquiry) => (
-        <div className="flex items-center gap-1.5 font-black text-charcoal">
+        <div className="flex items-center gap-1.5 font-semibold text-charcoal">
           <IndianRupee size={12} className="text-gold" />
           {item.estimateDetails?.estimate?.toLocaleString() || "0"}
         </div>
@@ -145,7 +145,7 @@ export default function InquiriesManagementPage() {
       header: "Status",
       accessorKey: "status",
       cell: (item: Inquiry) => (
-        <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+        <span className={`px-3 py-1.5 rounded-full text-[9px] font-semibold border ${
           item.status === 'New' ? 'bg-gold/10 text-gold border-gold/20' : 
           item.status === 'In Progress' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
           'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
@@ -237,145 +237,7 @@ export default function InquiriesManagementPage() {
       </AdminCard>
 
       {/* Details Dialog */}
-      <Dialog open={!!selectedInquiry} onOpenChange={() => setSelectedInquiry(null)}>
-        <DialogContent className="max-w-4xl bg-white border-none rounded-[2.5rem] p-0 overflow-hidden shadow-2xl">
-          <DialogHeader className="p-8 border-b border-charcoal/5 bg-neutral-50/50">
-            <div className="flex justify-between items-start">
-              <div>
-                <DialogTitle className="text-2xl font-bold text-charcoal tracking-tight">Inquiry Details</DialogTitle>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-charcoal/30 mt-1.5">Reference ID: {selectedInquiry?.id}</p>
-              </div>
-            </div>
-          </DialogHeader>
-          
-          <div className="p-8 space-y-8 overflow-y-auto max-h-[75vh] no-scrollbar">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Left Column: Customer & Estimate (5 cols) */}
-              <div className="lg:col-span-5 space-y-6">
-                <div className="rounded-[2rem] border border-charcoal/5 p-8 bg-white shadow-sm space-y-6">
-                  <div className="flex items-center gap-4 pb-6 border-b border-charcoal/5">
-                    <div className="w-16 h-16 rounded-2xl bg-gold/10 flex items-center justify-center text-gold text-2xl font-black border border-gold/20">
-                      {selectedInquiry?.name[0]}
-                    </div>
-                    <div>
-                      <p className="text-xl font-bold text-charcoal">{selectedInquiry?.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Clock size={12} className="text-charcoal/30" />
-                        <p className="text-[10px] font-bold text-charcoal/40 uppercase tracking-widest">{selectedInquiry?.date}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-charcoal/30">Customer Profile</h4>
-                    <div className="grid grid-cols-1 gap-3">
-                      <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-2xl border border-charcoal/5 group hover:border-gold/30 transition-all cursor-pointer">
-                        <Mail size={14} className="text-gold" />
-                        <span className="text-[11px] font-bold text-charcoal/60 truncate">{selectedInquiry?.email}</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-2xl border border-charcoal/5 group hover:border-gold/30 transition-all cursor-pointer">
-                        <Phone size={14} className="text-gold" />
-                        <span className="text-[11px] font-bold text-charcoal/60">{selectedInquiry?.phone}</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-2xl border border-charcoal/5">
-                        <MapPin size={14} className="text-gold" />
-                        <span className="text-[11px] font-bold text-charcoal/60">{selectedInquiry?.city || "Unknown City"}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-[2rem] bg-charcoal p-8 text-white shadow-xl relative overflow-hidden">
-                  <div className="relative z-10 space-y-8">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60 mb-2">Estimated Investment</p>
-                      <h2 className="text-4xl font-black text-gold">₹{selectedInquiry?.estimateDetails?.estimate?.toLocaleString()}</h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-4 pt-6 border-t border-white/10">
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1">Service</p>
-                        <p className="text-[11px] font-black truncate">{selectedInquiry?.service}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1">Quality</p>
-                        <p className="text-[11px] font-black">{selectedInquiry?.estimateDetails?.brand || "Standard"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1">Scope</p>
-                        <p className="text-[11px] font-black uppercase tracking-widest">{selectedInquiry?.estimateDetails?.reqType?.replace('_', ' ') || "Full Home"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1">Config</p>
-                        <p className="text-[11px] font-black uppercase tracking-widest">{selectedInquiry?.estimateDetails?.selBHK || "N/A"}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -mr-16 -mt-16 blur-3xl" />
-                </div>
-              </div>
-
-              {/* Right Column: Items (7 cols) */}
-              <div className="lg:col-span-7">
-                <div className="rounded-[2rem] border border-charcoal/5 p-8 bg-white shadow-sm h-full flex flex-col">
-                  <div className="flex items-center justify-between mb-8">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gold">Selected Items</h4>
-                    <span className="bg-gold/10 text-gold px-3 py-1 rounded-full text-[9px] font-black border border-gold/20 uppercase tracking-widest">
-                      {selectedInquiry?.estimateDetails?.items?.length || 0} TOTAL
-                    </span>
-                  </div>
-
-                  <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-                    {selectedInquiry?.estimateDetails?.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex justify-between items-center p-5 rounded-3xl bg-neutral-50 border border-charcoal/5 hover:border-gold/20 transition-all duration-300">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[13px] font-bold text-charcoal">{item.name || item.id.replace(/-/g, ' ').toUpperCase()}</span>
-                          <span className="text-[9px] font-bold text-charcoal/30 uppercase tracking-[0.2em]">Calculator Requirement</span>
-                        </div>
-                        <div className="px-4 py-2 rounded-xl bg-white border border-charcoal/10 shadow-sm">
-                          <span className="text-[10px] font-black text-charcoal">QTY: {item.qty}</span>
-                        </div>
-                      </div>
-                    ))}
-                    {!selectedInquiry?.estimateDetails?.items?.length && (
-                      <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <Layers size={40} className="text-charcoal/10 mb-4" />
-                        <p className="text-[11px] text-charcoal/30 font-black uppercase tracking-[0.2em]">No specific items selected</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter className="p-6 border-t border-charcoal/10 bg-neutral-50/50 flex flex-col sm:flex-row gap-3">
-            <div className="flex flex-1 gap-2">
-              <Button 
-                onClick={() => updateStatus(selectedInquiry!.id, "In Progress")}
-                className="flex-1 bg-blue-500 text-white hover:bg-blue-600 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20"
-                disabled={selectedInquiry?.status === 'In Progress'}
-              >
-                In Progress
-              </Button>
-              <Button 
-                onClick={() => updateStatus(selectedInquiry!.id, "Completed")}
-                className="flex-1 bg-emerald-500 text-white hover:bg-emerald-600 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
-                disabled={selectedInquiry?.status === 'Completed'}
-              >
-                Complete
-              </Button>
-            </div>
-            <Button 
-              onClick={() => setSelectedInquiry(null)}
-              variant="outline"
-              className="sm:w-32 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest border-charcoal/10"
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+    
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl">

@@ -43,7 +43,7 @@ export default function LoginPage() {
     <main className="min-h-screen bg-background">
       <DoorTransition />
       <Header variant="light" />
-      
+
       <div className="container mx-auto px-6 pt-48 pb-32">
         <div className="max-w-md mx-auto space-y-12">
           <div className="text-center space-y-4">
@@ -55,10 +55,10 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <motion.form 
+          <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            onSubmit={handleSubmit} 
+            onSubmit={handleSubmit}
             className="space-y-6"
           >
             {error && (
@@ -97,15 +97,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between px-2">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 rounded border-primary/10 text-gold focus:ring-gold" />
-                <span className="text-xs text-primary/40 group-hover:text-primary transition-colors">Remember me</span>
-              </label>
-              <Link href="/forgot-password" size={14} className="text-xs font-bold text-gold hover:text-primary transition-colors">
-                Forgot Password?
-              </Link>
-            </div>
+          
 
             <button
               type="submit"
@@ -113,7 +105,8 @@ export default function LoginPage() {
               className="group relative w-full py-6 bg-primary text-white text-xs font-black tracking-[0.2em] uppercase rounded-2xl overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700 disabled:opacity-50"
             >
               <span className="relative z-10 flex items-center justify-center gap-4">
-                {loading ? "Authenticating..." : "Enter Sanctuary"} <ArrowRight size={14} />
+                {loading ? "Authenticating..." : "Login"}{" "}
+                <ArrowRight size={14} />
               </span>
               <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
             </button>
@@ -122,14 +115,17 @@ export default function LoginPage() {
           <div className="text-center">
             <p className="text-xs text-primary/40">
               Don't have an account?{" "}
-              <Link href="/register" className="text-gold font-black uppercase tracking-widest hover:text-primary transition-colors">
+              <Link
+                href="/register"
+                className="text-gold font-black uppercase tracking-widest hover:text-primary transition-colors"
+              >
                 Register Here
               </Link>
             </p>
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </main>
   );

@@ -47,7 +47,6 @@ import { toast } from "sonner";
 
 import { useStore } from "@/context/StoreContext";
 import { useUser } from "@/context/UserContext";
-import { BackButton } from "@/components/common/back-button";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -198,24 +197,23 @@ export default function ProductDetailPage() {
     <div className="min-h-screen bg-[#fdf9f3]">
       <Header />
 
-      <div className="container mx-auto px-4 md:px-8 py-12 pt-40">
-        <BackButton className="mb-6" />
+      <div className="container mx-auto px-4 md:px-8 py-12 pt-52">
         {/* ── Breadcrumbs ── */}
         <nav className="flex items-center gap-2 mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
           <BackButton className="mr-4" />
-          <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Home</Link>
-          <ChevronRight size={12} className="text-primary/20" />
-          <Link href="/shop" className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">Shop</Link>
-          <ChevronRight size={12} className="text-primary/20" />
+          <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-gold transition-colors">Home</Link>
+          <ChevronRight size={12} className="text-primary/40" />
+          <Link href="/shop" className="text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-gold transition-colors">Shop</Link>
+          <ChevronRight size={12} className="text-primary/40" />
           {product.category && (
             <>
               <Link 
                 href={`/shop?category=${typeof product.category === 'object' ? product.category.name : product.category}`} 
-                className="text-[10px] font-bold uppercase tracking-widest text-primary/30 hover:text-gold transition-colors"
+                className="text-[10px] font-bold uppercase tracking-widest text-primary/60 hover:text-gold transition-colors"
               >
                 {typeof product.category === 'object' ? product.category.name : product.category}
               </Link>
-              <ChevronRight size={12} className="text-primary/20" />
+              <ChevronRight size={12} className="text-primary/40" />
             </>
           )}
           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{product.name}</span>
@@ -299,7 +297,7 @@ export default function ProductDetailPage() {
                     key={tab} 
                     onClick={() => setActiveTab(tab)}
                     className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all ${
-                      activeTab === tab ? "border-primary text-primary" : "border-transparent text-primary/40 hover:text-primary"
+                      activeTab === tab ? "border-primary text-primary" : "border-transparent text-primary/60 hover:text-primary"
                     }`}
                   >
                     {tab}
@@ -316,12 +314,12 @@ export default function ProductDetailPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="space-y-6"
                     >
-                      <p className="text-primary/70 text-sm leading-relaxed">
+                      <p className="text-primary/80 text-sm leading-relaxed">
                         {product.description || `Serve in style with our ${product.name}, handcrafted from premium Sheesham wood. Perfect for serving snacks, tea, breakfast in bed or even for organizing your essentials with elegance.`}
                       </p>
-                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 border-b border-primary/5">
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 border-b border-primary/10">
                         {(product.features || ["Elegant natural wood finish", "Sturdy handles for easy grip", "Multipurpose – serve, organize or display", "Food safe & easy to clean"]).map((feat: string) => (
-                          <li key={feat} className="flex items-center gap-3 text-xs text-primary/60">
+                          <li key={feat} className="flex items-center gap-3 text-xs text-primary/70">
                             <div className="w-1.5 h-1.5 rounded-full bg-gold" /> {feat}
                           </li>
                         ))}
@@ -343,8 +341,8 @@ export default function ProductDetailPage() {
                           { label: "Finish", value: "Food Safe Natural Oil" },
                           { label: "Origin", value: "Handcrafted in India" }
                         ]).map((spec: any, idx: number) => (
-                          <div key={idx} className="flex items-center justify-between py-3 border-b border-primary/5">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">{spec.label}</span>
+                          <div key={idx} className="flex items-center justify-between py-3 border-b border-primary/10">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">{spec.label}</span>
                             <span className="text-xs font-bold text-primary">{spec.value}</span>
                           </div>
                         ))}
@@ -360,7 +358,7 @@ export default function ProductDetailPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="space-y-4"
                     >
-                      <p className="text-primary/70 text-sm leading-relaxed">
+                      <p className="text-primary/80 text-sm leading-relaxed">
                         {product.careInstructions || "Wipe with a soft damp cloth. Do not soak in water. Use mild soap if necessary and dry immediately. Apply food-grade oil occasionally to maintain the wood's natural luster."}
                       </p>
                     </motion.div>
@@ -374,7 +372,7 @@ export default function ProductDetailPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="space-y-4"
                     >
-                      <p className="text-primary/70 text-sm leading-relaxed">
+                      <p className="text-primary/80 text-sm leading-relaxed">
                         {product.shippingReturns || "Free shipping on all orders above ₹1499. Orders are usually dispatched within 24-48 hours. We offer a 7-day easy return policy for unused products in their original packaging."}
                       </p>
                     </motion.div>
@@ -382,8 +380,8 @@ export default function ProductDetailPage() {
                 </AnimatePresence>
 
                 {/* Bulk Purchase Link */}
-                <div className="pt-8 border-t border-primary/5 mt-8">
-                  <p className="text-xs font-bold text-primary/60">
+                <div className="pt-8 border-t border-primary/10 mt-8">
+                  <p className="text-xs font-bold text-primary/70">
                     Want to buy this in bulk? <Link href="#" className="text-gold border-b border-gold pb-0.5 hover:text-primary hover:border-primary transition-all">Click here</Link>
                   </p>
                 </div>

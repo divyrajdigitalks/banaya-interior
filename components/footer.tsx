@@ -11,7 +11,7 @@ export function Footer() {
           {/* Logo & Description */}
           <div className="lg:col-span-1">
             <Logo variant="light" className="mb-6" />
-            <p className="text-white/60 text-sm leading-relaxed">
+            <p className="text-white/80 text-sm leading-relaxed">
               Where architecture breathes and every room tells its story. Premium interior design and handcrafted decor.
             </p>
           </div>
@@ -24,7 +24,7 @@ export function Footer() {
                 <li key={link}>
                   <a
                     href="#"
-                    className="text-white/60 text-sm hover:text-[#c9a962] transition-colors"
+                    className="text-white/80 text-sm hover:text-[#c9a962] transition-colors"
                   >
                     {link}
                   </a>
@@ -47,7 +47,7 @@ export function Footer() {
                 <li key={service}>
                   <a
                     href="#"
-                    className="text-white/60 text-sm hover:text-[#c9a962] transition-colors"
+                    className="text-white/80 text-sm hover:text-[#c9a962] transition-colors"
                   >
                     {service}
                   </a>
@@ -62,15 +62,15 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-[#c9a962]" />
-                <span className="text-white/60 text-sm">+91 8855817434</span>
+                <span className="text-white/80 text-sm">+91 8855817434</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-[#c9a962]" />
-                <span className="text-white/60 text-sm">hello@banayaa.com</span>
+                <span className="text-white/80 text-sm">hello@banayaa.com</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#c9a962] mt-0.5" />
-                <span className="text-white/60 text-sm">
+                <span className="text-white/80 text-sm">
                   Studio 12, Design District
                   <br />
                   Mumbai, India
@@ -81,8 +81,8 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/40 text-xs">
+        <div className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-white/60 text-xs">
             © 2024 Banaya. All rights reserved.
           </p>
           <div className="flex gap-4">

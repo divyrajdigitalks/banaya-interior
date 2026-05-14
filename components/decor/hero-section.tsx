@@ -54,7 +54,7 @@ export function DecorHeroSection() {
         {/* Removed HERITAGE background text */}
 
         {/* LEFT TEXT - ROYAL STYLE */}
-        <div className="absolute left-8 md:left-20 top-[20%] md:top-[25%] max-w-[380px] z-30">
+        <div className="absolute left-8 md:left-20 top-[20%] md:top-[25%] max-w-[500px] z-30">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -71,15 +71,15 @@ export function DecorHeroSection() {
               {data?.description || "Masterfully handcrafted wooden serving treasures designed for the most distinguished dining experiences."}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-6">
               <Link href={data?.cta1Link || "/shop"}>
-                <button className="group flex items-center justify-between gap-4 px-8 py-3.5 bg-gold text-primary text-sm font-bold rounded-full hover:bg-white transition-all duration-500 shadow-2xl shadow-gold/20">
+                <button className="group flex items-center justify-center gap-4 px-10 py-3.5 bg-gold text-primary text-sm font-bold rounded-full hover:bg-white transition-all duration-500 shadow-2xl shadow-gold/20 whitespace-nowrap min-w-[200px]">
                   {data?.cta1Text || "Shop Collection"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>
               </Link>
               <Link href={data?.cta2Link || "/decor"}>
-                <button className="group flex items-center justify-between gap-4 px-8 py-3.5 border border-white/30 text-white text-sm font-bold rounded-full hover:bg-white hover:text-primary transition-all duration-500">
+                <button className="group flex items-center justify-center gap-4 px-10 py-3.5 border border-white/30 text-white text-sm font-bold rounded-full hover:bg-white hover:text-primary transition-all duration-500 whitespace-nowrap min-w-[200px]">
                   {data?.cta2Text || "View Lookbook"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </button>

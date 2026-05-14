@@ -15,7 +15,6 @@ import { useUser } from "@/context/UserContext";
 import { couponService } from "@/lib/api";
 import { toast } from "sonner";
 import { type CartItem } from "@/lib/api/services/cart.service";
-import { BackButton } from "@/components/common/back-button";
 
 export default function CartPage() {
   const router = useRouter();
@@ -112,9 +111,8 @@ export default function CartPage() {
     <main className="min-h-screen bg-[#fdf9f3]">
       <Header variant="light" />
       
-      <div className="container mx-auto px-4 sm:px-6 pt-32 pb-32">
+      <div className="container mx-auto px-4 sm:px-6 pt-48 pb-32">
         <div className="max-w-7xl mx-auto">
-          <BackButton className="mb-6" />
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
             
             {/* ── Left: Cart Items ── */}
@@ -124,7 +122,7 @@ export default function CartPage() {
                 <h1 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
                   Your <span className="italic font-light text-gold">Treasures.</span>
                 </h1>
-                <p className="text-primary/40 text-xs font-bold uppercase tracking-widest">
+                <p className="text-primary/60 text-xs font-bold uppercase tracking-widest">
                   {cart.length} item{cart.length !== 1 ? 's' : ''} in your collection
                 </p>
               </div>
@@ -167,7 +165,7 @@ export default function CartPage() {
                           {item.personalization?.name && (
                             <div className="mt-3 p-3 bg-[#fdf9f3] rounded-xl border border-primary/5 inline-block self-start">
                               <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-1">Personalization</p>
-                              <p className="text-xs font-medium text-primary/60">{item.personalization.name}</p>
+                              <p className="text-xs font-medium text-primary/70">{item.personalization.name}</p>
                             </div>
                           )}
 
@@ -175,14 +173,14 @@ export default function CartPage() {
                             <div className="flex items-center gap-4 bg-neutral-50 rounded-xl p-1 border border-primary/5">
                               <button
                                 onClick={() => updateQuantity(item.product?._id, item.quantity - 1)}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/40 hover:text-primary transition-all"
+                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/60 hover:text-primary transition-all"
                               >
                                 <Minus size={12} strokeWidth={3} />
                               </button>
                               <span className="text-xs font-black w-6 text-center text-primary">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item.product?._id, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/40 hover:text-primary transition-all"
+                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/60 hover:text-primary transition-all"
                               >
                                 <Plus size={12} strokeWidth={3} />
                               </button>
@@ -190,7 +188,7 @@ export default function CartPage() {
 
                             <button
                               onClick={() => removeFromCart(item.product?._id)}
-                              className="text-primary/20 hover:text-red-400 transition-colors p-2"
+                              className="text-primary/40 hover:text-red-400 transition-colors p-2"
                             >
                               <Trash2 size={18} />
                             </button>
@@ -200,12 +198,12 @@ export default function CartPage() {
                     ))
                   ) : (
                     <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10">
-                      <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/10">
+                      <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30">
                         <ShoppingBag size={40} strokeWidth={1} />
                       </div>
                       <div className="space-y-2">
                         <h3 className="text-xl font-bold text-primary">Your cart is empty</h3>
-                        <p className="text-primary/40 text-sm max-w-xs mx-auto">
+                        <p className="text-primary/60 text-sm max-w-xs mx-auto">
                           Discover our handcrafted treasures for your sanctuary.
                         </p>
                       </div>
@@ -220,13 +218,13 @@ export default function CartPage() {
               </div>
 
               {cart.length > 0 && (
-                <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary/30 hover:text-gold transition-colors">
+                <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-gold transition-colors">
                   <ArrowLeft size={14} /> Continue Shopping
                 </Link>
               )}
             </div>
 
-            {/* ── Right: Order Summary ── */}
+            {/* ── Order Summary ── */}
             {cart.length > 0 && (
               <div className="lg:w-[400px] shrink-0">
                 <div className="sticky top-32 space-y-6">
@@ -237,11 +235,11 @@ export default function CartPage() {
 
                     <div className="space-y-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-primary/40 font-bold uppercase tracking-widest text-[10px]">Subtotal</span>
+                        <span className="text-primary/60 font-bold uppercase tracking-widest text-[10px]">Subtotal</span>
                         <span className="font-bold text-primary">₹{subtotal.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-primary/40 font-bold uppercase tracking-widest text-[10px]">Shipping</span>
+                        <span className="text-primary/60 font-bold uppercase tracking-widest text-[10px]">Shipping</span>
                         <span className="font-bold text-primary">₹{shipping.toLocaleString()}</span>
                       </div>
                       
@@ -252,10 +250,10 @@ export default function CartPage() {
                         </div>
                       )}
                       
-                      <div className="h-px bg-primary/5 w-full my-2" />
+                      <div className="h-px bg-primary/10 w-full my-2" />
                       
                       <div className="flex justify-between items-end">
-                        <span className="text-primary/40 text-[10px] font-black uppercase tracking-[0.2em]">Total</span>
+                        <span className="text-primary/60 text-[10px] font-black uppercase tracking-[0.2em]">Total</span>
                         <span className="text-3xl font-bold text-primary tracking-tighter">₹{total.toLocaleString()}</span>
                       </div>
                     </div>
@@ -269,7 +267,7 @@ export default function CartPage() {
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                             placeholder="COUPON CODE"
-                            className="w-full h-14 pl-5 pr-24 bg-neutral-50 border border-primary/5 rounded-2xl text-[10px] font-black tracking-widest placeholder:text-primary/20 focus:bg-white focus:border-gold/50 transition-all outline-none uppercase"
+                            className="w-full h-14 pl-5 pr-24 bg-neutral-50 border border-primary/10 rounded-2xl text-[10px] font-black tracking-widest placeholder:text-primary/30 focus:bg-white focus:border-gold/50 transition-all outline-none uppercase"
                           />
                           <button 
                             onClick={handleApplyCoupon}
@@ -285,10 +283,10 @@ export default function CartPage() {
                             <Ticket size={16} className="text-gold" />
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-widest text-gold">{appliedCoupon.code}</p>
-                              <p className="text-[8px] text-primary/40 font-bold uppercase">Applied Successfully</p>
+                              <p className="text-[8px] text-primary/60 font-bold uppercase">Applied Successfully</p>
                             </div>
                           </div>
-                          <button onClick={removeCoupon} className="text-primary/20 hover:text-red-400">
+                          <button onClick={removeCoupon} className="text-primary/40 hover:text-red-400">
                             <X size={16} />
                           </button>
                         </div>

@@ -82,9 +82,9 @@ export function Header({ variant = "dark" }: HeaderProps) {
                 <input 
                   type="text" 
                   placeholder="Search for masterpieces..."
-                  className="w-full bg-white border border-primary/10 rounded-full py-3 px-6 pl-12 text-sm text-primary focus:outline-none focus:border-gold/50 focus:bg-white transition-all placeholder:text-primary/20"
+                  className="w-full bg-white border border-primary/20 rounded-full py-3 px-6 pl-12 text-sm text-primary focus:outline-none focus:border-gold/50 focus:bg-white transition-all placeholder:text-primary/40"
                 />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-gold transition-colors" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 group-focus-within:text-gold transition-colors" size={18} />
               </div>
             </div>
 

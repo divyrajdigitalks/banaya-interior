@@ -27,7 +27,6 @@ import { BackButton } from "@/components/ui/back-button";
 import Image from "next/image";
 import Link from "next/link";
 import { productService, categoryService, filterService, type Product, type Category, type Subcategory, type FilterOptionsByGroup } from "@/lib/api";
-import { BackButton } from "@/components/common/back-button";
 
 function ShopContent() {
   const router = useRouter();
@@ -186,11 +185,10 @@ function ShopContent() {
       <Header variant="light" />
 
       {/* ── Breadcrumbs & Banner ── */}
-      <section className="pt-40">
+      <section className="pt-48">
         {/* Breadcrumbs - Moved inside container for alignment */}
         <div className="container mx-auto px-4 md:px-8">
-          <BackButton className="mb-6" />
-          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/30 mb-8">
+          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/60 mb-8">
             <BackButton className="mr-4" />
             <Link href="/" className="hover:text-gold transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3" />
@@ -208,7 +206,7 @@ function ShopContent() {
             fill
             className="object-cover transition-transform duration-[3s] group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/40 to-transparent flex flex-col justify-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent flex flex-col justify-center">
             <div className="container mx-auto px-4 md:px-16">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -219,7 +217,7 @@ function ShopContent() {
                 <h1 className="text-6xl md:text-8xl font-serif font-black text-white leading-none">
                   {selectedCategory === "All" ? "Decor" : selectedCategory}
                 </h1>
-                <p className="text-white/70 text-lg md:text-xl font-light max-w-xl leading-relaxed">
+                <p className="text-white/80 text-lg md:text-xl font-light max-w-xl leading-relaxed">
                   Handpicked masterpieces designed to bring <br />
                   heritage and warmth into your home.
                 </p>
@@ -240,7 +238,7 @@ function ShopContent() {
         <div className="flex gap-12 items-start">
           {/* Sidebar Filters - Fixed Sticky */}
           <aside className="w-72 hidden lg:block shrink-0 sticky top-[180px] h-[calc(100vh-200px)] overflow-y-auto pr-6 scrollbar-hide">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/5">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/10">
               <h2 className="text-sm font-black ">
                 Refine Sanctuary
               </h2>
@@ -255,7 +253,7 @@ function ShopContent() {
             <div className="space-y-8">
               {/* Type Filter */}
               <div className="space-y-4">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                <button className="flex items-center justify-between w-full text-xs font-bold text-primary tracking-wide">
                   Type <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -268,7 +266,7 @@ function ShopContent() {
                       <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         selectedFilters.Type.includes(opt) 
                           ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                          : "border-primary/10 group-hover:border-gold"
+                          : "border-primary/20 group-hover:border-gold"
                       }`}>
                         <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
                           selectedFilters.Type.includes(opt) 
@@ -279,7 +277,7 @@ function ShopContent() {
                       <span className={`text-xs transition-colors duration-300 ${
                         selectedFilters.Type.includes(opt) 
                           ? "text-primary font-bold" 
-                          : "text-primary/50 group-hover:text-primary"
+                          : "text-primary/60 group-hover:text-primary"
                       }`}>{opt}</span>
                     </label>
                   ))}
@@ -288,7 +286,7 @@ function ShopContent() {
 
               {/* Colour Filter */}
               <div className="space-y-4">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                <button className="flex items-center justify-between w-full text-xs font-bold text-primary tracking-wide">
                   Colour <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -301,7 +299,7 @@ function ShopContent() {
                       <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         selectedFilters.Colour.includes(opt) 
                           ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                          : "border-primary/10 group-hover:border-gold"
+                          : "border-primary/20 group-hover:border-gold"
                       }`}>
                         <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
                           selectedFilters.Colour.includes(opt) 
@@ -312,7 +310,7 @@ function ShopContent() {
                       <span className={`text-xs transition-colors duration-300 ${
                         selectedFilters.Colour.includes(opt) 
                           ? "text-primary font-bold" 
-                          : "text-primary/50 group-hover:text-primary"
+                          : "text-primary/60 group-hover:text-primary"
                       }`}>{opt}</span>
                     </label>
                   ))}
@@ -321,7 +319,7 @@ function ShopContent() {
 
               {/* Discount Filter */}
               <div className="space-y-4">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                <button className="flex items-center justify-between w-full text-xs font-bold text-primary tracking-wide">
                   Discount <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -334,7 +332,7 @@ function ShopContent() {
                       <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         selectedFilters.Discount.includes(opt) 
                           ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                          : "border-primary/10 group-hover:border-gold"
+                          : "border-primary/20 group-hover:border-gold"
                       }`}>
                         <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
                           selectedFilters.Discount.includes(opt) 
@@ -345,7 +343,7 @@ function ShopContent() {
                       <span className={`text-xs transition-colors duration-300 ${
                         selectedFilters.Discount.includes(opt) 
                           ? "text-primary font-bold" 
-                          : "text-primary/50 group-hover:text-primary"
+                          : "text-primary/60 group-hover:text-primary"
                       }`}>{opt}</span>
                     </label>
                   ))}
@@ -354,7 +352,7 @@ function ShopContent() {
 
               {/* Materials Filter */}
               <div className="space-y-4">
-                <button className="flex items-center justify-between w-full text-xs font-black text-primary uppercase tracking-widest">
+                <button className="flex items-center justify-between w-full text-xs font-bold text-primary tracking-wide">
                   Materials <ChevronDown className="h-3 w-3 text-gold" />
                 </button>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -367,7 +365,7 @@ function ShopContent() {
                       <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center transition-all duration-300 ${
                         selectedFilters.Materials.includes(opt) 
                           ? "bg-primary border-primary shadow-lg shadow-primary/10" 
-                          : "border-primary/10 group-hover:border-gold"
+                          : "border-primary/20 group-hover:border-gold"
                       }`}>
                         <Check className={`w-3 h-3 text-white transition-transform duration-300 ${
                           selectedFilters.Materials.includes(opt) 
@@ -378,7 +376,7 @@ function ShopContent() {
                       <span className={`text-xs transition-colors duration-300 ${
                         selectedFilters.Materials.includes(opt) 
                           ? "text-primary font-bold" 
-                          : "text-primary/50 group-hover:text-primary"
+                          : "text-primary/60 group-hover:text-primary"
                       }`}>{opt}</span>
                     </label>
                   ))}
