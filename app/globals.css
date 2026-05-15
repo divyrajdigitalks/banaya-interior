@@ -133,6 +133,9 @@
     @apply border-border outline-ring/50;
     font-variant-numeric: lining-nums;
   }
+  button, a, [role="button"], [onClick], label[for] {
+    cursor: pointer;
+  }
   body {
     @apply bg-background text-foreground;
   }

@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminCard } from "@/components/admin/admin-card";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { inquiryService, type Inquiry } from "@/lib/api";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { 
@@ -202,39 +203,31 @@ export default function InquiriesManagementPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-96 group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20 group-focus-within:text-gold transition-colors" />
-            <input 
-              placeholder="Search by name, email or service..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-11 pr-4 bg-white border border-charcoal/10 rounded-2xl text-sm focus:ring-4 focus:ring-gold/5 focus:border-gold/50 transition-all outline-none placeholder:text-charcoal/20 font-medium"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
-            {["All", "New", "In Progress", "Completed"].map(status => (
-              <button 
-                key={status} 
-                onClick={() => setStatusFilter(status)}
-                className={`px-5 py-2.5 border rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                  statusFilter === status 
-                    ? "bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/10" 
-                    : "bg-white border-charcoal/5 text-charcoal/40 hover:bg-neutral-50 hover:text-charcoal"
-                }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search by name, email or service..."
+      >
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar w-full">
+          {["All", "New", "In Progress", "Completed"].map(status => (
+            <button 
+              key={status} 
+              onClick={() => setStatusFilter(status)}
+              className={`px-5 py-2.5 border rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                statusFilter === status 
+                  ? "bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/10" 
+                  : "bg-white border-charcoal/5 text-charcoal/40 hover:bg-neutral-50 hover:text-charcoal"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
         </div>
-      </AdminCard>
+      </AdminSearchHeader>
 
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredInquiries} />
-      </AdminCard>
+      </div>
 
       {/* Details Dialog */}
     

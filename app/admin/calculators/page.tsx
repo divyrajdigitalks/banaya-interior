@@ -28,6 +28,7 @@ import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { calculatorService, type CalculatorItem, type BrandOption } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
@@ -282,39 +283,31 @@ export default function CalculatorManagementPage() {
         </TabsList>
 
         <TabsContent value="items" className="space-y-6">
-          <AdminCard>
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-                <input
-                  placeholder="Search items..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-                />
-              </div>
-              <Button onClick={() => handleOpenDialog()} className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4">
-                <Plus size={16} className="mr-2" /> Add Item
-              </Button>
-            </div>
-          </AdminCard>
-          <AdminCard>
+          <AdminSearchHeader 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            searchPlaceholder="Search items..."
+            actionLabel="Add Item"
+            onAction={() => handleOpenDialog()}
+            ActionIcon={Plus}
+          />
+          <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
             <AdminTable columns={columns} data={filteredItems} />
-          </AdminCard>
+          </div>
         </TabsContent>
 
         <TabsContent value="brands" className="space-y-6">
-          <AdminCard>
-            <div className="flex justify-between items-center">
-              <h2 className="font-semibold text-charcoal">Brand Multipliers</h2>
-              <Button onClick={() => handleOpenBrandDialog()} className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4">
-                <Plus size={16} className="mr-2" /> Add Brand
-              </Button>
-            </div>
-          </AdminCard>
-          <AdminCard>
+          <AdminSearchHeader 
+            searchQuery={searchQuery} // Actually brand doesn't use search, but we'll use a dummy or just use AdminSearchHeader without search by hiding it or adding a prop. But wait, AdminSearchHeader requires search props.
+            setSearchQuery={() => {}}
+            searchPlaceholder="Search brands..."
+            actionLabel="Add Brand"
+            onAction={() => handleOpenBrandDialog()}
+            ActionIcon={Plus}
+          />
+          <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
             <AdminTable columns={brandColumns} data={brands} />
-          </AdminCard>
+          </div>
         </TabsContent>
       </Tabs>
 

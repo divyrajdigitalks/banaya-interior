@@ -27,7 +27,7 @@ const schema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Invalid phone number"),
-  city: z.string().min(2, "City is required"),
+  address: z.string().min(5, "Address is required"),
 });
 
 type CF = z.infer<typeof schema>;
@@ -111,10 +111,10 @@ const FinalEstimateForm = ({ register, handleSubmit, onSubmit, errors, back, isS
           <Input {...register("phone")} placeholder="+91 00000 00000" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.phone ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
           {errors.phone && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.phone.message}</p>}
         </div>
-        <div className="space-y-3">
-          <label className="text-xs font-semibold text-slate-400">City</label>
-          <Input {...register("city")} placeholder="Your city" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.city ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
-          {errors.city && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.city.message}</p>}
+        <div className="space-y-3 md:col-span-2">
+          <label className="text-xs font-semibold text-slate-400">Complete Address</label>
+          <Input {...register("address")} placeholder="Your complete address" className={`h-14 px-6 rounded-2xl bg-slate-50/50 border-none font-bold ${errors.address ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-slate-900"}`} />
+          {errors.address && <p className="text-[10px] text-red-500 font-bold tracking-widest">{errors.address.message}</p>}
         </div>
       </div>
 

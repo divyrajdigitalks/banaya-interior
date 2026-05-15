@@ -14,6 +14,7 @@ import {
   XCircle
 } from "lucide-react";
 import { AdminTable } from "@/components/admin/admin-table";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -138,28 +139,18 @@ export default function AdminsManagementPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      {/* Toolbar */}
-      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-        <div className="relative w-full lg:w-96 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20 group-focus-within:text-gold transition-colors" />
-          <Input 
-            placeholder="Search admins..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-white border-charcoal/5 rounded-2xl pl-11 py-6 text-[10px] uppercase tracking-widest font-bold focus:ring-2 focus:ring-gold/5 shadow-xl shadow-charcoal/5"
-          />
-        </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search admins..."
+        actionLabel="Add New Admin"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Users}
+      />
 
-        <Button 
-          onClick={() => handleOpenDialog()}
-          className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
-        >
-          <Users className="group-hover:rotate-90 transition-transform duration-500" size={16} />
-          Add New Admin
-        </Button>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
+        <AdminTable columns={columns} data={filteredAdmins} />
       </div>
-
-      <AdminTable columns={columns} data={filteredAdmins} />
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

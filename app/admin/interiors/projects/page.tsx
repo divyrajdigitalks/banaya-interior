@@ -25,6 +25,7 @@ import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { AdminLabel } from "@/components/admin/admin-label";
 import { interiorService, type InteriorProject, type InteriorCategory } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
@@ -235,31 +236,18 @@ export default function InteriorProjectsPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-            <input 
-              placeholder="Search projects..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-            />
-          </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search projects..."
+        actionLabel="Add Project"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Plus}
+      />
 
-          <Button 
-            onClick={() => handleOpenDialog()}
-            className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Project
-          </Button>
-        </div>
-      </AdminCard>
-
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredProjects} />
-      </AdminCard>
+      </div>
 
    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
   <DialogContent className="sm:max-w-[720px] w-[95vw] rounded-3xl border border-charcoal/10 bg-white p-0 overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.08)]">

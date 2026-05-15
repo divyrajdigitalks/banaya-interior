@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Filter, Edit3, Trash2, Plus, ArrowLeft, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -14,17 +14,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { AdminSelectEnhanced } from "@/components/admin/admin-select-enhanced";
+import { AdminSelect } from "@/components/admin/admin-select";
 import { AdminCard } from "@/components/admin/admin-card";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { filterService, type FilterOption } from "@/lib/api";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
@@ -50,7 +52,7 @@ export default function AdminFilterOptionsPage() {
   const [selectedGroup, setSelectedGroup] = useState<string>("All");
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     loadFilterOptions();
@@ -102,13 +104,13 @@ export default function AdminFilterOptionsPage() {
       accessorKey: "id",
       cell: (item: FilterOption) => (
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all"
           >
             <Edit3 size={14} />
           </button>
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all"
           >
@@ -124,7 +126,7 @@ export default function AdminFilterOptionsPage() {
       name: { value: formData.name, rules: ValidationRules.name },
       filterGroup: { value: formData.filterGroup, rules: ValidationRules.required }
     };
-    
+
     const { isValid, errors } = FormValidator.validateForm(formState);
     setFormErrors(errors);
     return isValid;
@@ -133,8 +135,8 @@ export default function AdminFilterOptionsPage() {
   const handleOpenDialog = (filterOption: FilterOption | null = null) => {
     if (filterOption) {
       setEditingFilterOption(filterOption);
-      setFormData({ 
-        name: filterOption.name, 
+      setFormData({
+        name: filterOption.name,
         filterGroup: filterOption.filterGroup,
       });
     } else {
@@ -150,7 +152,7 @@ export default function AdminFilterOptionsPage() {
       showError("Please fix the validation errors");
       return;
     }
-    
+
     setSaving(true);
     try {
       if (editingFilterOption) {
@@ -160,7 +162,7 @@ export default function AdminFilterOptionsPage() {
         await filterService.createFilterOption(formData as FilterOption);
         showSuccess("Filter option created successfully!");
       }
-      
+
       await loadFilterOptions();
       setIsDialogOpen(false);
     } catch (error) {
@@ -200,8 +202,8 @@ export default function AdminFilterOptionsPage() {
     <div className="space-y-6 pb-12">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="h-9 w-9 rounded-xl bg-white border border-charcoal/10"
           >
@@ -214,45 +216,28 @@ export default function AdminFilterOptionsPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-              <input 
-                placeholder="Search options..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-              />
-            </div>
-            <div className="w-full sm:w-48">
-              <select 
-                value={selectedGroup}
-                onChange={(e) => setSelectedGroup(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-              >
-                <option value="All">All Groups</option>
-                {filterGroups.map(group => (
-                  <option key={group.value} value={group.value}>{group.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <Button 
-            onClick={() => handleOpenDialog()}
-            className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Option
-          </Button>
+      <AdminSearchHeader
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search options..."
+        actionLabel="Add Option"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Plus}
+      >
+        <div className="w-full sm:w-48 shrink-0">
+          <AdminSelect
+            label=""
+            value={selectedGroup}
+            onChange={setSelectedGroup}
+            options={[{ value: "All", label: "All Groups" }, ...filterGroups]}
+            // placeholder="All Groups"
+          />
         </div>
-      </AdminCard>
+      </AdminSearchHeader>
 
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredFilterOptions} />
-      </AdminCard>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl">
@@ -262,7 +247,7 @@ export default function AdminFilterOptionsPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminSelectEnhanced 
+            <AdminSelectEnhanced
               label="Filter Group"
               value={formData.filterGroup || ""}
               onChange={(val) => setFormData({ ...formData, filterGroup: val })}
@@ -271,7 +256,7 @@ export default function AdminFilterOptionsPage() {
               required
               error={formErrors.filterGroup}
             />
-            <AdminFormInputEnhanced 
+            <AdminFormInputEnhanced
               label="Option Name"
               value={formData.name || ""}
               onChange={(val) => setFormData({ ...formData, name: val })}
@@ -300,7 +285,7 @@ export default function AdminFilterOptionsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3">
             <AlertDialogCancel className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => deleteId && handleDelete(deleteId)}
               className="flex-1 h-9 bg-red-500 hover:bg-red-600 text-white rounded-xl"
             >

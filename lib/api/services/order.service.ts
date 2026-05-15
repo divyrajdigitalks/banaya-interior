@@ -55,6 +55,22 @@ class OrderService {
     const res = await api.put(`${endPointApi.orders}/${id}/status`, { status });
     return res.data;
   }
+
+  async createRazorpayOrder(amount: number) {
+    const res = await api.post(endPointApi.createRazorpayOrder, { amount });
+    return res.data;
+  }
+
+  async verifyPayment(data: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    totalAmount: number;
+    shippingAddress?: any;
+  }) {
+    const res = await api.post(endPointApi.verifyPayment, data);
+    return res.data;
+  }
 }
 
 export const orderService = new OrderService();

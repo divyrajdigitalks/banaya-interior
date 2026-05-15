@@ -77,7 +77,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
             </div>
 
             {/* Center: Search Bar (Hidden on interiors page) */}
-            <div className={`flex-1 max-w-xl hidden md:block ${isInteriorsPage ? '!hidden' : ''}`}>
+            {/* <div className={`flex-1 max-w-xl hidden md:block ${isInteriorsPage ? '!hidden' : ''}`}>
               <div className="relative group">
                 <input 
                   type="text" 
@@ -86,7 +86,7 @@ export function Header({ variant = "dark" }: HeaderProps) {
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 group-focus-within:text-gold transition-colors" size={18} />
               </div>
-            </div>
+            </div> */}
 
             {/* Right: Icons & Nav Links */}
             <div className="flex items-center justify-end gap-6 md:gap-8 flex-shrink-0">

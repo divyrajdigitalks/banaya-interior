@@ -130,6 +130,8 @@ export interface EndPointApi {
   // Orders
   orders: string;
   myOrders: string;
+  createRazorpayOrder: string;
+  verifyPayment: string;
 
   // Upload
   adminUpload: string;
@@ -267,6 +269,8 @@ const endPointApi: EndPointApi = {
   // Orders
   orders: 'orders',
   myOrders: 'orders/my-orders',
+  createRazorpayOrder: 'orders/create-razorpay-order',
+  verifyPayment: 'orders/verify-payment',
 
   // Upload
   adminUpload: 'upload',

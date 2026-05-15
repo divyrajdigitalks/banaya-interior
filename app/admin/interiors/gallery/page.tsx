@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, GalleryHorizontal, Edit3, Trash2, Plus, ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -14,11 +14,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
 import { AdminTable } from "@/components/admin/admin-table";
@@ -30,6 +30,7 @@ import { galleryService, type GalleryImage } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { FormValidator, ValidationRules } from "@/utils/form-validation";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 
 export default function InteriorGalleryPage() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function InteriorGalleryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     loadGallery();
@@ -91,13 +92,13 @@ export default function InteriorGalleryPage() {
       accessorKey: "id",
       cell: (item: GalleryImage) => (
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); handleOpenDialog(item); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all"
           >
             <Edit3 size={14} />
           </button>
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); setDeleteId(item.id); }}
             className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all"
           >
@@ -111,12 +112,12 @@ export default function InteriorGalleryPage() {
   const validateForm = () => {
     const formState = {
       title: { value: formData.title, rules: ValidationRules.name },
-      src: { 
-        value: formData.src || (selectedFile ? 'file' : ''), 
-        rules: ValidationRules.required 
+      src: {
+        value: formData.src || (selectedFile ? 'file' : ''),
+        rules: ValidationRules.required
       }
     };
-    
+
     const { isValid, errors } = FormValidator.validateForm(formState);
     setFormErrors(errors);
     return isValid;
@@ -145,7 +146,7 @@ export default function InteriorGalleryPage() {
       showError("Please fix the validation errors");
       return;
     }
-    
+
     setSaving(true);
     try {
       if (editingItem) {
@@ -155,7 +156,7 @@ export default function InteriorGalleryPage() {
         await galleryService.createGalleryImage(formData as GalleryImage, selectedFile || undefined);
         showSuccess("Gallery item created successfully!");
       }
-      
+
       await loadGallery();
       setIsDialogOpen(false);
     } catch (error) {
@@ -177,7 +178,7 @@ export default function InteriorGalleryPage() {
     }
   };
 
-  const filteredGallery = gallery.filter(item => 
+  const filteredGallery = gallery.filter(item =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (item.subtitle && item.subtitle.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -194,8 +195,8 @@ export default function InteriorGalleryPage() {
     <div className="space-y-6 pb-12">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="h-9 w-9 rounded-xl bg-white border border-charcoal/10"
           >
@@ -208,31 +209,18 @@ export default function InteriorGalleryPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-            <input 
-              placeholder="Search gallery..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-            />
-          </div>
+      <AdminSearchHeader
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search gallery..."
+        actionLabel="Add Item"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Plus}
+      />
 
-          <Button 
-            onClick={() => handleOpenDialog()}
-            className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Item
-          </Button>
-        </div>
-      </AdminCard>
-
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredGallery} />
-      </AdminCard>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-2xl max-h-[90vh] overflow-y-auto">
@@ -242,7 +230,7 @@ export default function InteriorGalleryPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <AdminFormInputEnhanced 
+            <AdminFormInputEnhanced
               label="Title"
               value={formData.title || ""}
               onChange={(val) => setFormData({ ...formData, title: val })}
@@ -250,14 +238,14 @@ export default function InteriorGalleryPage() {
               required
               error={formErrors.title}
             />
-            <AdminFormInputEnhanced 
+            <AdminFormInputEnhanced
               label="Subtitle"
               value={formData.subtitle || ""}
               onChange={(val) => setFormData({ ...formData, subtitle: val })}
               placeholder="e.g. Modern luxury interior design"
             />
             <div className="min-h-[120px]">
-              <ImageUpload 
+              <ImageUpload
                 label="Gallery Image"
                 value={formData.src}
                 onChange={(val, file) => {
@@ -288,7 +276,7 @@ export default function InteriorGalleryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3">
             <AlertDialogCancel className="flex-1 h-9 rounded-xl border border-charcoal/10">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => deleteId && handleDelete(deleteId)}
               className="flex-1 h-9 bg-red-500 hover:bg-red-600 text-white rounded-xl"
             >

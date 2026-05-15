@@ -17,11 +17,14 @@ import {
   User,
   Phone,
   MapPin,
-  Mail
+  Mail,
+  CreditCard,
+  Banknote
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminTable } from "@/components/admin/admin-table";
 import { AdminCard } from "@/components/admin/admin-card";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { orderService, type Order } from "@/lib/api";
 import { useAdminToast } from "@/hooks/use-admin-toast";
 import { 
@@ -115,7 +118,7 @@ export default function AdminOrdersPage() {
       )
     },
     {
-      header: "Status",
+      header: "Order Status",
       accessorKey: "status",
       cell: (item: Order) => (
         <span className={`px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${
@@ -127,6 +130,33 @@ export default function AdminOrdersPage() {
         }`}>
           {item.status}
         </span>
+      )
+    },
+    {
+      header: "Payment",
+      accessorKey: "paymentStatus",
+      cell: (item: Order) => (
+        <div className="flex flex-col gap-1">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+            (item as any).paymentStatus === 'Paid' 
+              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+              : (item as any).paymentStatus === 'Failed'
+              ? 'bg-red-500/10 text-red-500 border-red-500/20'
+              : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+          }`}>
+            {(item as any).paymentStatus === 'Paid' 
+              ? <CheckCircle2 size={9} /> 
+              : (item as any).paymentStatus === 'Failed'
+              ? <XCircle size={9} />
+              : <Clock size={9} />}
+            {(item as any).paymentStatus || 'Pending'}
+          </span>
+          {(item as any).razorpayPaymentId && (
+            <span className="text-[8px] text-charcoal/30 font-mono truncate max-w-[100px]">
+              {(item as any).razorpayPaymentId}
+            </span>
+          )}
+        </div>
       )
     },
     {
@@ -170,39 +200,31 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-96 group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal/20 group-focus-within:text-gold transition-colors" />
-            <input 
-              placeholder="Search by order ID or name..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-11 pr-4 bg-white border border-charcoal/10 rounded-2xl text-sm focus:ring-4 focus:ring-gold/5 focus:border-gold/50 transition-all outline-none placeholder:text-charcoal/20 font-medium"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
-            {["All", "Pending", "Processing", "Shipped", "Delivered"].map(status => (
-              <button 
-                key={status} 
-                onClick={() => setStatusFilter(status)}
-                className={`px-5 py-2.5 border rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                  statusFilter === status 
-                    ? "bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/10" 
-                    : "bg-white border-charcoal/5 text-charcoal/40 hover:bg-neutral-50 hover:text-charcoal"
-                }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search by order ID or name..."
+      >
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar w-full">
+          {["All", "Pending", "Processing", "Shipped", "Delivered"].map(status => (
+            <button 
+              key={status} 
+              onClick={() => setStatusFilter(status)}
+              className={`px-5 py-2.5 border rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                statusFilter === status 
+                  ? "bg-charcoal text-white border-charcoal shadow-lg shadow-charcoal/10" 
+                  : "bg-white border-charcoal/5 text-charcoal/40 hover:bg-neutral-50 hover:text-charcoal"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
         </div>
-      </AdminCard>
+      </AdminSearchHeader>
 
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredOrders} />
-      </AdminCard>
+      </div>
 
       {/* Details Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
@@ -213,14 +235,30 @@ export default function AdminOrdersPage() {
                 <DialogTitle className="text-xl font-bold text-charcoal tracking-tight">Order Analysis</DialogTitle>
                 <p className="text-[9px] uppercase tracking-widest font-black text-charcoal/30 mt-1">ID: {selectedOrder?._id.toUpperCase()}</p>
               </div>
-              <div className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${
-                selectedOrder?.status === 'Pending' ? 'bg-gold/10 text-gold border-gold/20' : 
-                selectedOrder?.status === 'Processing' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
-                selectedOrder?.status === 'Shipped' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 
-                selectedOrder?.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
-                'bg-red-500/10 text-red-500 border-red-500/20'
-              }`}>
-                {selectedOrder?.status}
+              <div className="flex items-center gap-2">
+                <div className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+                  selectedOrder?.status === 'Pending' ? 'bg-gold/10 text-gold border-gold/20' : 
+                  selectedOrder?.status === 'Processing' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
+                  selectedOrder?.status === 'Shipped' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 
+                  selectedOrder?.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                  'bg-red-500/10 text-red-500 border-red-500/20'
+                }`}>
+                  {selectedOrder?.status}
+                </div>
+                <div className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border flex items-center gap-1.5 ${
+                  (selectedOrder as any)?.paymentStatus === 'Paid' 
+                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                    : (selectedOrder as any)?.paymentStatus === 'Failed'
+                    ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                    : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                }`}>
+                  {(selectedOrder as any)?.paymentStatus === 'Paid' 
+                    ? <CheckCircle2 size={10} /> 
+                    : (selectedOrder as any)?.paymentStatus === 'Failed'
+                    ? <XCircle size={10} />
+                    : <Clock size={10} />}
+                  {(selectedOrder as any)?.paymentStatus || 'Payment Pending'}
+                </div>
               </div>
             </div>
           </DialogHeader>
@@ -258,15 +296,40 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-charcoal text-white flex justify-between items-center">
-                  <div>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-gold/60 mb-0.5">Total Amount</p>
-                    <h2 className="text-2xl font-black text-gold">₹{selectedOrder?.totalAmount.toLocaleString()}</h2>
+                <div className="p-5 rounded-2xl bg-charcoal text-white space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-[8px] font-black uppercase tracking-widest text-gold/60 mb-0.5">Total Amount</p>
+                      <h2 className="text-2xl font-black text-gold">₹{selectedOrder?.totalAmount.toLocaleString()}</h2>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Payment Status</p>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                        (selectedOrder as any)?.paymentStatus === 'Paid'
+                          ? 'bg-emerald-500 text-white'
+                          : (selectedOrder as any)?.paymentStatus === 'Failed'
+                          ? 'bg-red-500 text-white'
+                          : 'bg-amber-500 text-white'
+                      }`}>
+                        {(selectedOrder as any)?.paymentStatus === 'Paid'
+                          ? <CheckCircle2 size={9} />
+                          : <Clock size={9} />}
+                        {(selectedOrder as any)?.paymentStatus || 'Pending'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-0.5">Payment</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{selectedOrder?.paymentStatus}</p>
-                  </div>
+                  {(selectedOrder as any)?.razorpayPaymentId && (
+                    <div className="pt-3 border-t border-white/10 space-y-1">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-white/30">Razorpay Payment ID</p>
+                      <p className="text-[10px] font-mono text-gold/80 break-all">{(selectedOrder as any).razorpayPaymentId}</p>
+                    </div>
+                  )}
+                  {(selectedOrder as any)?.razorpayOrderId && (
+                    <div className="space-y-1">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-white/30">Razorpay Order ID</p>
+                      <p className="text-[10px] font-mono text-white/50 break-all">{(selectedOrder as any).razorpayOrderId}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

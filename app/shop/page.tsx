@@ -188,7 +188,7 @@ function ShopContent() {
       <section className="pt-48">
         {/* Breadcrumbs - Moved inside container for alignment */}
         <div className="container mx-auto px-4 md:px-8">
-          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/60 mb-8">
+          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-primary/60 m-8">
             <BackButton className="mr-4" />
             <Link href="/" className="hover:text-gold transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3" />

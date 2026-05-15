@@ -26,6 +26,7 @@ import { AdminTable } from "@/components/admin/admin-table";
 import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { AdminSelectEnhanced } from "@/components/admin/admin-select-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { categoryService, type Category, type Subcategory } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
@@ -218,25 +219,14 @@ export default function AdminSubcategoriesPage() {
 
   return (
     <div className="space-y-12 pb-12">
-      <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-        <div className="relative w-full lg:w-96 group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-gold transition-colors" size={18} />
-          <Input 
-            placeholder="Search subcategories..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-14 h-14 bg-white border-charcoal/5 rounded-2xl focus:ring-gold/20 focus:border-gold transition-all shadow-xl shadow-charcoal/5"
-          />
-        </div>
-
-        <Button 
-          onClick={() => handleOpenDialog()}
-          className="w-full lg:w-auto bg-gold hover:bg-gold/90 text-charcoal font-black text-[10px] uppercase tracking-widest px-8 py-6 rounded-2xl shadow-xl shadow-gold/10 flex items-center gap-3 group transition-all duration-500"
-        >
-          <Grid className="group-hover:rotate-90 transition-transform duration-500" size={16} />
-          Add Subcategory
-        </Button>
-      </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search subcategories..."
+        actionLabel="Add Subcategory"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Grid}
+      />
 
       <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         {loading ? (

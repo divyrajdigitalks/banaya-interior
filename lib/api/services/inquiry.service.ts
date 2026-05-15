@@ -6,7 +6,7 @@ export interface Inquiry {
   name: string;
   email: string;
   phone: string;
-  city: string;
+  address: string;
   service: string;
   status: 'New' | 'In Progress' | 'Completed';
   message?: string;
@@ -28,7 +28,7 @@ class InquiryService {
         name: item.name,
         email: item.email,
         phone: item.phone,
-        city: item.city,
+        address: item.address,
         service: item.service,
         status: item.status,
         message: item.message,
@@ -58,7 +58,7 @@ class InquiryService {
         name: item.name,
         email: item.email,
         phone: item.phone,
-        city: item.city,
+        address: item.address,
         service: item.service,
         status: item.status,
         message: item.message,

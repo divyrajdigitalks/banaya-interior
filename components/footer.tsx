@@ -71,9 +71,9 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#c9a962] mt-0.5" />
                 <span className="text-white/80 text-sm">
-                  Studio 12, Design District
+                  2066, veneziano mall, udhana magdalla road
                   <br />
-                  Mumbai, India
+                  vesu, surat, gujarat 
                 </span>
               </li>
             </ul>

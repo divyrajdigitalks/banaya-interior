@@ -33,7 +33,7 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const response = await authService.register({ username: name, email, password, confirmPassword });
+      const response = await authService.register({ name, email, mobile, password, confirmPassword });
       if (response.success && response.data) {
         login(response.data);
         router.push("/decor");

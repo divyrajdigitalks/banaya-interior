@@ -80,7 +80,7 @@ export function AdminTable({ columns, data, onRowClick, pageSize: initialPageSiz
               {columns.map((column, idx) => (
                 <TableHead 
                   key={idx}
-                  className={`h-12 px-4 text-[13px] font-semibold text-slate-700 border-r border-slate-200 last:border-r-0`}
+                  className={`h-10 px-3 text-[12px] font-semibold text-slate-700 border-r border-slate-200 last:border-r-0`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export function AdminTable({ columns, data, onRowClick, pageSize: initialPageSiz
                     {columns.map((column, colIdx) => (
                       <TableCell 
                         key={colIdx} 
-                        className={`px-4 py-3 text-[13px] text-slate-600 font-medium border-r border-slate-100 last:border-r-0`}
+                        className={`px-3 py-2 text-[12px] text-slate-600 font-medium border-r border-slate-100 last:border-r-0`}
                       >
                         {column.cell ? column.cell(item) : item[column.accessorKey]}
                       </TableCell>

@@ -26,6 +26,7 @@ import { AdminFormInputEnhanced } from "@/components/admin/form-input-enhanced";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminLabel } from "@/components/admin/admin-label";
+import { AdminSearchHeader } from "@/components/admin/admin-search-header";
 import { categoryService, type Category } from "@/lib/api";
 import { buildImageUrl } from "@/lib/api/axios";
 import { useAdminToast } from "@/hooks/use-admin-toast";
@@ -217,31 +218,18 @@ export default function AdminCategoriesPage() {
         </div>
       </div>
 
-      <AdminCard>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30" size={16} />
-            <input 
-              placeholder="Search categories..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 bg-white border border-charcoal/10 rounded-xl text-sm focus:ring-2 focus:ring-gold/30 focus:border-gold transition-all outline-none"
-            />
-          </div>
+      <AdminSearchHeader 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search categories..."
+        actionLabel="Add Category"
+        onAction={() => handleOpenDialog()}
+        ActionIcon={Plus}
+      />
 
-          <Button 
-            onClick={() => handleOpenDialog()}
-            className="h-10 bg-charcoal hover:bg-charcoal/90 text-white text-sm rounded-xl px-4"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Category
-          </Button>
-        </div>
-      </AdminCard>
-
-      <AdminCard>
+      <div className="bg-white rounded-[2rem] shadow-sm border border-charcoal/5 overflow-hidden">
         <AdminTable columns={columns} data={filteredCategories} />
-      </AdminCard>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl">

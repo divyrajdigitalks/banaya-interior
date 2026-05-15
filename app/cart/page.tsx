@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, ShoppingCart, ArrowLeft, Ticket, Check, X, Loader2, CheckCircle2 } from "lucide-react";
+import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, ShoppingCart, ArrowLeft, Ticket, Check, X, Loader2, CheckCircle2, CreditCard } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -64,48 +64,102 @@ export default function CartPage() {
     setCouponCode("");
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
+    if (!user) {
+      toast.error("Please login to checkout");
+      router.push("/login");
+      return;
+    }
+    setIsCheckingOut(true);
     setCheckoutItems([...cart]);
     setCheckoutTotal(total);
     setCheckoutDiscount(discount);
-    setShowConfirm(true);
-  };
-
-  const handleConfirmCheckout = async () => {
-    if (checkoutItems.length === 0) return;
-    setShowConfirm(false);
-    setIsCheckingOut(true);
 
     try {
-      // 1. Call real order API
-      const orderData = {
-        totalAmount: checkoutTotal
+      // 1. Create Razorpay order
+      const razorpayData = await orderService.createRazorpayOrder(total);
+      if (!razorpayData.success) throw new Error('Failed to create payment order');
+
+      const rzpOrder = razorpayData.data;
+
+      // 2. Load Razorpay script dynamically
+      const loadScript = () =>
+        new Promise<boolean>((resolve) => {
+          if ((window as any).Razorpay) return resolve(true);
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+
+      const loaded = await loadScript();
+      if (!loaded) throw new Error('Razorpay SDK failed to load');
+
+      // 3. Open Razorpay modal
+      const options = {
+        key: rzpOrder.key,  // key sent securely from backend
+        amount: rzpOrder.amount,
+        currency: rzpOrder.currency,
+        name: 'Banaya Interiors',
+        description: `Order for ${cart.length} item(s)`,
+        order_id: rzpOrder.id,
+        prefill: {
+          name: user?.name || '',
+          email: user?.email || '',
+          contact: (user as any)?.mobile || (user as any)?.phone || '',
+        },
+        theme: { color: '#d4af37' },
+        handler: async (response: any) => {
+          // 4. Verify payment
+          try {
+            const verifyRes = await orderService.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              totalAmount: total,
+              shippingAddress: {
+                name: user?.name || '',
+                phone: (user as any)?.mobile || (user as any)?.phone || '',
+                email: user?.email || '',
+              }
+            });
+
+            if (verifyRes.success) {
+              await clearCart();
+              setDiscount(0);
+              setAppliedCoupon(null);
+              setCouponCode('');
+              setShowSuccess(true);
+              toast.success('Payment successful! Order placed.');
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (err: any) {
+            toast.error(err?.response?.data?.error || 'Payment verification failed');
+          } finally {
+            setIsCheckingOut(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsCheckingOut(false);
+            toast.error('Payment cancelled');
+          },
+        },
       };
 
-      const response = await orderService.createOrder(orderData);
-
-      if (response.success) {
-        await clearCart();
-        setDiscount(0);
-        setAppliedCoupon(null);
-        setCouponCode("");
-        setShowSuccess(true);
-        toast.success(`Order #${response.data._id.slice(-6)} placed successfully!`);
-
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 5000);
-      } else {
-        throw new Error(response.error || "Failed to place order");
-      }
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+      // isCheckingOut will be reset inside handler / ondismiss
     } catch (error: any) {
-      console.error("Checkout Error:", error);
-      toast.error(error.message || "Failed to complete purchase");
-    } finally {
+      console.error('Checkout Error:', error);
+      toast.error(error.message || 'Failed to initiate payment');
       setIsCheckingOut(false);
     }
   };
+
 
   return (
     <main className="min-h-screen bg-[#fdf9f3]">
@@ -299,11 +353,14 @@ export default function CartPage() {
                       className="w-full py-5 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-gold transition-all duration-300 shadow-xl shadow-primary/10 disabled:opacity-50 flex items-center justify-center gap-3"
                     >
                       {isCheckingOut ? (
-                        <Loader2 size={14} className="animate-spin" />
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Initiating Payment...</span>
+                        </>
                       ) : (
                         <>
-                          <span>Secure Checkout</span>
-                          <ArrowRight size={14} />
+                          <CreditCard size={14} />
+                          <span>Pay with Razorpay</span>
                         </>
                       )}
                     </button>
@@ -327,49 +384,7 @@ export default function CartPage() {
         </div>
       </div>
       
-      {/* ── Confirm Checkout Modal ── */}
-      <AnimatePresence>
-        {showConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-[3rem] p-10 max-w-lg w-full space-y-6 shadow-2xl"
-            >
-              <div className="text-center space-y-3">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold">
-                  <ShoppingCart size={28} />
-                </div>
-                <h3 className="text-2xl font-black text-primary">Confirm Your Order</h3>
-                <p className="text-sm text-primary/60">
-                  You are about to purchase {checkoutItems.length} item{checkoutItems.length > 1 ? 's' : ''}. Please confirm to complete checkout and clear your cart.
-                </p>
-              </div>
-
-              <div className="grid gap-4">
-                <button
-                  onClick={handleConfirmCheckout}
-                  className="w-full py-4 bg-gold text-primary text-xs font-black tracking-tight rounded-2xl hover:bg-gold/90 transition-all"
-                >
-                  Confirm Purchase
-                </button>
-                <button
-                  onClick={() => setShowConfirm(false)}
-                  className="w-full py-4 bg-white border border-primary/10 text-primary text-xs font-black rounded-2xl hover:bg-primary/5 transition-all"
-                >
-                  Continue Shopping
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Confirm modal removed – Razorpay handles confirmation */}
 
       {/* ── Success Modal ── */}
       <AnimatePresence>

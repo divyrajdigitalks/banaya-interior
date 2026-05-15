@@ -8,10 +8,13 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Try to get token from different possible keys
+    const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+    
     const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
     const userToken = typeof window !== 'undefined' ? localStorage.getItem('banaya-token') : null;
-    const token = adminToken || userToken;
+    
+    // Admin pages use adminToken only, user pages use userToken only
+    const token = isAdminRoute ? adminToken : (userToken || adminToken);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

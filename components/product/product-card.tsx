@@ -117,12 +117,12 @@ export function ProductCard({
               <h3 className="text-sm font-serif font-black text-[#3C2A1E] tracking-tight truncate leading-tight">
                 {name}
               </h3>
-              <div className="flex items-center gap-1 bg-[#F1F9F7] px-1.5 py-0.5 rounded-full border border-[#E0F2F1] shrink-0">
+              {/* <div className="flex items-center gap-1 bg-[#F1F9F7] px-1.5 py-0.5 rounded-full border border-[#E0F2F1] shrink-0">
                 <Star className="h-2.5 w-2.5 fill-[#00897B] text-[#00897B]" />
                 <span className="text-[8px] font-bold text-[#00897B]">{rating}</span>
                 <div className="w-px h-2 bg-[#00897B]/20" />
                 <span className="text-[8px] font-bold text-[#00897B]/60">{reviewsCount}</span>
-              </div>
+              </div> */}
             </div>
             {/* <p className="text-[10px] text-[#C9A962] font-black uppercase tracking-widest line-clamp-1">
               {typeof category === 'object' ? category.name : (category || categoryId || "Bespoke Decor")}
