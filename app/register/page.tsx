@@ -153,7 +153,7 @@ export default function RegisterPage() {
               className="group relative w-full py-6 bg-primary text-white text-xs font-black tracking-[0.2em] uppercase rounded-2xl overflow-hidden shadow-2xl hover:shadow-gold/20 transition-all duration-700 disabled:opacity-50"
             >
               <span className="relative z-10 flex items-center justify-center gap-4">
-                {loading ? "Creating Account..." : "Join the Legacy"} <ArrowRight size={14} />
+                {loading ? "Creating Account..." : "Register Now"} <ArrowRight size={14} />
               </span>
               <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
             </button>
