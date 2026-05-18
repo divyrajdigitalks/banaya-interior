@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Mail, Lock, User, ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -16,8 +16,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useUser();
+  const { login, user, loading: userLoading } = useUser();
   const router = useRouter();
+
+  // Already logged in → redirect to decor
+  useEffect(() => {
+    if (!userLoading && user) {
+      router.replace("/decor");
+    }
+  }, [user, userLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

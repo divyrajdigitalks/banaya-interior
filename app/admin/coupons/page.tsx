@@ -108,6 +108,10 @@ export default function CouponsManagementPage() {
             <Calendar size={12} className="text-gold" />
             Ends: {new Date(item.endDate).toLocaleDateString()}
           </div>
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">
+            <Ticket size={12} className="text-gold" />
+            Used: {item.usedCount ?? 0} / {item.usageLimit ?? 0}
+          </div>
         </div>
       )
     },

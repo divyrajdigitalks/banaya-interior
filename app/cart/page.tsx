@@ -119,6 +119,8 @@ export default function CartPage() {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               totalAmount: total,
+              couponCode: appliedCoupon?.code || undefined,
+              discountAmount: discount || 0,
               shippingAddress: {
                 name: user?.name || '',
                 phone: (user as any)?.mobile || (user as any)?.phone || '',

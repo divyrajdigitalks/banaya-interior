@@ -14,4 +14,5 @@ export { legacyProjectService, type LegacyProject, type LegacySettings } from '.
 export { interiorServicesService, type InteriorService } from './services.service';
 export { inquiryService, type Inquiry } from './inquiry.service';
 export { orderService, type Order, type OrderItem } from './order.service';
+export { reviewService, type Review } from './review.service';
 export { calculatorService, type CalculatorItem, type BrandOption, type CalculatorData } from './calculator.service';
