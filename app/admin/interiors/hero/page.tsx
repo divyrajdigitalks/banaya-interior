@@ -23,7 +23,8 @@ export default function InteriorHeroAdmin() {
     headingLine2: "",
     description: "",
     cta1Text: "",
-    cta2Text: ""
+    cta2Text: "",
+    cta2Link: ""
   });
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
@@ -113,16 +114,34 @@ export default function InteriorHeroAdmin() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AdminFormInput
-                  label="Primary CTA Button"
-                  value={formData.cta1Text || ""}
-                  onChange={(val) => setFormData({ ...formData, cta1Text: val })}
-                />
-                <AdminFormInput
-                  label="Secondary CTA Button"
-                  value={formData.cta2Text || ""}
-                  onChange={(val) => setFormData({ ...formData, cta2Text: val })}
-                />
+                <div>
+                  <AdminFormInput
+                    label="Primary CTA Button Text"
+                    value={formData.cta1Text || ""}
+                    onChange={(val) => setFormData({ ...formData, cta1Text: val })}
+                  />
+                </div>
+                <div>
+                  <AdminFormInput
+                    label="Primary CTA Button Link"
+                    value={formData.cta1Link || ""}
+                    onChange={(val) => setFormData({ ...formData, cta1Link: val })}
+                  />
+                </div>
+                <div>
+                  <AdminFormInput
+                    label="Secondary CTA Button Text"
+                    value={formData.cta2Text || ""}
+                    onChange={(val) => setFormData({ ...formData, cta2Text: val })}
+                  />
+                </div>
+                <div>
+                  <AdminFormInput
+                    label="Secondary CTA Button Link"
+                    value={formData.cta2Link || ""}
+                    onChange={(val) => setFormData({ ...formData, cta2Link: val })}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
