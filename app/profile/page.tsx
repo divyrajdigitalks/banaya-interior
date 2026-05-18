@@ -67,49 +67,55 @@ export default function UserProfilePage() {
   return (
     <div>
       <Header variant="light" />
-      <div className="min-h-screen pt-40 pb-20 bg-[#fdf9f3]">
+      <div className="min-h-screen pt-38 pb-20 bg-[#fdf9f3]">
         <div className="container mx-auto px-6 md:px-12">
-          <div className="max-w-4xl mx-auto space-y-12">
-            <div className="space-y-4">
-              <BackButton />
-              <h1 className="text-4xl md:text-5xl font-sans font-black text-charcoal tracking-tight uppercase">
-                Profile <span className="text-gold">Details</span>
-              </h1>
+          <div className="mx-auto space-y-12">
+            <div className="rounded-[3rem] border border-charcoal/10 bg-linear-to-br from-white via-[#fff9f2] to-[#fff4e7] p-8 shadow-2xl shadow-charcoal/10">
+              <div className="space-y-4 max-w-3xl">
+                <BackButton />
+                <h1 className="font-serif text-4xl md:text-5xl text-primary font-black leading-tight">
+                  Profile <span className="font-light text-gold">Details</span>
+                </h1>
+                <p className="text-sm text-primary/70 max-w-2xl">
+                  Keep your profile in perfect form and manage account security with ease.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Avatar Card */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/5 shadow-xl shadow-charcoal/5 text-center space-y-6">
-                  <div className="w-32 h-32 rounded-[2rem] bg-gold/10 flex items-center justify-center text-gold text-4xl font-black border-2 border-gold/20 shadow-inner mx-auto">
+                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/10 shadow-xl shadow-charcoal/5 text-center space-y-6">
+                  <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-4xl bg-gold/10 text-4xl font-black text-gold border-2 border-gold/20 shadow-inner">
                     {user.name?.[0] || "U"}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-charcoal">{user.name}</h3>
                     <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mt-1">Valued Collector</p>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-emerald-500 bg-emerald-50 py-2 rounded-xl border border-emerald-100">
-                    <ShieldCheck size={14} />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Verified Account</span>
+                  <div className="rounded-3xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-600 shadow-sm">
+                    <div className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-widest">
+                      <ShieldCheck size={14} /> Verified Account
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Info + Edit Card */}
               <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/5 shadow-xl shadow-charcoal/5 space-y-8">
-                  <div className="flex items-center justify-between">
+                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/10 shadow-xl shadow-charcoal/5 space-y-8">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <p className="text-xs font-black uppercase tracking-widest text-charcoal/40">Personal Info</p>
                     {!isEditing ? (
-                      <button onClick={startEdit} className="flex items-center gap-2 px-4 py-2 bg-charcoal text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gold transition-all">
+                      <button onClick={startEdit} className="inline-flex items-center gap-2 rounded-xl bg-charcoal px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-gold">
                         <Edit3 size={12} /> Edit
                       </button>
                     ) : (
-                      <div className="flex gap-2">
-                        <button onClick={() => setIsEditing(false)} className="flex items-center gap-1 px-3 py-2 border border-charcoal/10 text-charcoal/50 text-[10px] font-black uppercase rounded-xl hover:bg-charcoal/5 transition-all">
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => setIsEditing(false)} className="inline-flex items-center gap-1 rounded-xl border border-charcoal/10 px-3 py-2 text-[10px] font-black uppercase text-charcoal/60 transition-all hover:bg-charcoal/5">
                           <X size={12} /> Cancel
                         </button>
-                        <button onClick={handleSaveProfile} disabled={isSaving} className="flex items-center gap-1 px-4 py-2 bg-charcoal text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gold transition-all disabled:opacity-50">
+                        <button onClick={handleSaveProfile} disabled={isSaving} className="inline-flex items-center gap-1 rounded-xl bg-charcoal px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-gold disabled:opacity-50">
                           <Save size={12} /> {isSaving ? "Saving..." : "Save"}
                         </button>
                       </div>
@@ -119,56 +125,56 @@ export default function UserProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Name */}
                     <div className="space-y-2">
-                      <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <p className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/20">
                         <User size={12} className="text-gold" /> Full Name
                       </p>
                       {isEditing ? (
                         <input
                           value={editForm.name}
                           onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                          className="w-full h-11 px-4 bg-[#f8f5f0] rounded-xl text-sm font-bold outline-none border border-transparent focus:border-gold transition-all"
+                          className="w-full h-11 rounded-xl border border-transparent bg-[#f8f5f0] px-4 text-sm font-bold outline-none transition-all focus:border-gold"
                         />
                       ) : (
-                        <p className="text-sm font-bold text-charcoal border-b border-charcoal/5 pb-3">{user.name || "Not provided"}</p>
+                        <p className="border-b border-charcoal/5 pb-3 text-sm font-bold text-charcoal">{user.name || "Not provided"}</p>
                       )}
                     </div>
 
                     {/* Email (read-only) */}
                     <div className="space-y-2">
-                      <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <p className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/20">
                         <Mail size={12} className="text-gold" /> Email Address
                       </p>
-                      <p className="text-sm font-bold text-charcoal border-b border-charcoal/5 pb-3">{user.email}</p>
+                      <p className="border-b border-charcoal/5 pb-3 text-sm font-bold text-charcoal">{user.email}</p>
                     </div>
 
                     {/* Mobile */}
                     <div className="space-y-2">
-                      <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <p className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/20">
                         <Phone size={12} className="text-gold" /> Phone Number
                       </p>
                       {isEditing ? (
                         <input
                           value={editForm.mobile}
                           onChange={e => setEditForm(f => ({ ...f, mobile: e.target.value }))}
-                          className="w-full h-11 px-4 bg-[#f8f5f0] rounded-xl text-sm font-bold outline-none border border-transparent focus:border-gold transition-all"
                           placeholder="10-digit mobile"
+                          className="w-full h-11 rounded-xl border border-transparent bg-[#f8f5f0] px-4 text-sm font-bold outline-none transition-all focus:border-gold"
                         />
                       ) : (
-                        <p className="text-sm font-bold text-charcoal border-b border-charcoal/5 pb-3">{(user as any).mobile || "Not provided"}</p>
+                        <p className="border-b border-charcoal/5 pb-3 text-sm font-bold text-charcoal">{(user as any).mobile || "Not provided"}</p>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Change Password */}
-                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/5 shadow-xl shadow-charcoal/5 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-black uppercase tracking-widest text-charcoal/40 flex items-center gap-2">
+                <div className="bg-white rounded-[2.5rem] p-10 border border-charcoal/10 shadow-xl shadow-charcoal/5 space-y-6">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <p className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-charcoal/40">
                       <Lock size={14} className="text-gold" /> Password
                     </p>
                     <button
                       onClick={() => setShowPwForm(v => !v)}
-                      className="flex items-center gap-2 px-4 py-2 bg-charcoal text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gold transition-all"
+                      className="inline-flex items-center gap-2 rounded-xl bg-charcoal px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-gold"
                     >
                       <Settings size={12} /> {showPwForm ? "Cancel" : "Change Password"}
                     </button>
@@ -183,12 +189,12 @@ export default function UserProfilePage() {
                             placeholder={["Current Password", "New Password", "Confirm New Password"][i]}
                             value={pwForm[field]}
                             onChange={e => setPwForm(f => ({ ...f, [field]: e.target.value }))}
-                            className="w-full h-12 px-4 pr-12 bg-[#f8f5f0] rounded-xl text-sm font-bold outline-none border border-transparent focus:border-gold transition-all"
+                            className="w-full h-12 rounded-xl border border-transparent bg-[#f8f5f0] px-4 pr-12 text-sm font-bold outline-none transition-all focus:border-gold"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPw(s => ({ ...s, [field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm"]: !s[field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm"] }))}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-charcoal/30 hover:text-charcoal transition-colors"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-charcoal/30 transition-colors hover:text-charcoal"
                           >
                             {showPw[field === "currentPassword" ? "current" : field === "newPassword" ? "new" : "confirm"] ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
@@ -197,7 +203,7 @@ export default function UserProfilePage() {
                       <button
                         onClick={handleChangePassword}
                         disabled={isSavingPw}
-                        className="w-full py-4 bg-charcoal text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gold transition-all disabled:opacity-50"
+                        className="w-full rounded-xl bg-charcoal py-4 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-gold disabled:opacity-50"
                       >
                         {isSavingPw ? "Updating..." : "Update Password"}
                       </button>

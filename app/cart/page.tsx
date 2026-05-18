@@ -78,7 +78,7 @@ export default function CartPage() {
 
     try {
       // 1. Create Razorpay order
-      const razorpayData = await orderService.createRazorpayOrder(total);
+      const razorpayData = await (orderService as any).createRazorpayOrder(total);
       if (!razorpayData.success) throw new Error('Failed to create payment order');
 
       const rzpOrder = razorpayData.data;
@@ -114,7 +114,7 @@ export default function CartPage() {
         handler: async (response: any) => {
           // 4. Verify payment
           try {
-            const verifyRes = await orderService.verifyPayment({
+            const verifyRes = await (orderService as any).verifyPayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -167,16 +167,16 @@ export default function CartPage() {
     <main className="min-h-screen bg-[#fdf9f3]">
       <Header variant="light" />
       
-      <div className="container mx-auto px-4 sm:px-6 pt-48 pb-32">
-        <div className="max-w-7xl mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 pt-40 pb-32">
+        <div className="mx-auto">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
             
             {/* ── Left: Cart Items ── */}
             <div className="flex-1 space-y-10">
               <div className="space-y-4">
                 <BackButton className="mb-4" />
-                <h1 className="font-serif text-5xl md:text-6xl text-primary font-black leading-tight">
-                  Your <span className="italic font-light text-gold">Treasures.</span>
+                <h1 className="font-serif text-4xl md:text-5xl text-primary font-black leading-tight">
+                  Your <span className="font-light text-gold">Treasures.</span>
                 </h1>
                 <p className="text-primary/60 text-xs font-bold uppercase tracking-widest">
                   {cart.length} item{cart.length !== 1 ? 's' : ''} in your collection
@@ -187,16 +187,16 @@ export default function CartPage() {
                 <AnimatePresence mode="popLayout">
                   {cart.length > 0 ? (
                     cart.map((item) => (
-                        <motion.div
+                      <motion.div
                         key={item._id}
                         layout
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98 }}
-                        className="group relative flex flex-col sm:flex-row items-center gap-6 bg-white p-6 rounded-3xl border border-primary/5 hover:border-gold/20 transition-all duration-300"
+                        className="group relative flex flex-col sm:flex-row items-center gap-6 rounded-[2.5rem] border border-primary/10 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                       >
                         {/* Image */}
-                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-[#fdf9f3] shrink-0 border border-primary/5">
+                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 overflow-hidden rounded-3xl border border-primary/10 bg-[#fdf9f3] shadow-inner">
                           <Image
                             src={item.product?.image ? (item.product.image.startsWith('http') ? item.product.image : buildImageUrl(item.product.image)) : ""}
                             alt={item.product?.name || "Product"}
@@ -208,32 +208,33 @@ export default function CartPage() {
                         {/* Details */}
                         <div className="flex-1 w-full flex flex-col justify-between py-1">
                           <div className="flex justify-between items-start gap-4">
-                            <div className="space-y-1">
-                              <span className="text-[10px] font-bold text-gold tracking-widest uppercase">
-                                {typeof item.product?.category === 'object' ? (item.product.category as any).name : (item.product?.category || "Decor")}
+                            <div className="space-y-2">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-gold">
+                                {typeof item.product?.category === 'object' && item.product.category?.name
+                                  ? `${item.product.category.name}${typeof item.product.subcategory === 'object' && item.product.subcategory?.name ? ` / ${item.product.subcategory.name}` : ''}`
+                                  : (item.product?.category || "Decor")}
                               </span>
                               <h3 className="text-xl font-bold text-primary tracking-tight">{item.product?.name}</h3>
                             </div>
-                            <p className="text-lg font-bold text-primary">₹{(item.product?.price || 0).toLocaleString()}</p>
+                            <p className="text-lg font-black text-primary">₹{(item.product?.price || 0).toLocaleString()}</p>
                           </div>
 
-                          {/* Personalization Preview */}
-                          {item.personalization?.name && (
-                            <div className="mt-3 p-3 bg-[#fdf9f3] rounded-xl border border-primary/5 inline-block self-start">
-                              <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-1">Personalization</p>
-                              <p className="text-xs font-medium text-primary/70">{item.personalization.name}</p>
+                          {((item as any).personalization?.name) && (
+                            <div className="mt-4 rounded-3xl border border-primary/10 bg-[#f8f3ea] p-4 text-sm font-bold text-primary">
+                              <p className="text-[9px] font-black uppercase tracking-widest text-gold">Personalization</p>
+                              <p className="mt-2 text-[10px] font-medium text-primary/80">{(item as any).personalization.name}</p>
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between mt-6">
-                            <div className="flex items-center gap-4 bg-neutral-50 rounded-xl p-1 border border-primary/5">
+                          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-3 rounded-3xl border border-primary/10 bg-neutral-50 p-2 shadow-sm">
                               <button
                                 onClick={() => updateQuantity(item.product?._id, item.quantity - 1)}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/60 hover:text-primary transition-all"
+                                className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-primary/70 transition-all hover:bg-white hover:text-primary"
                               >
                                 <Minus size={12} strokeWidth={3} />
                               </button>
-                              <span className="text-xs font-black w-6 text-center text-primary">{item.quantity}</span>
+                              <span className="text-xs font-black text-primary w-6 text-center">{item.quantity}</span>
                               <button
                                 onClick={() => {
                                   const stock = (item.product as any)?.stock;
@@ -243,7 +244,7 @@ export default function CartPage() {
                                   }
                                   updateQuantity(item.product?._id, item.quantity + 1);
                                 }}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/60 hover:text-primary transition-all"
+                                className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-primary/70 transition-all hover:bg-white hover:text-primary"
                               >
                                 <Plus size={12} strokeWidth={3} />
                               </button>
@@ -251,7 +252,7 @@ export default function CartPage() {
 
                             <button
                               onClick={() => removeFromCart(item.product?._id)}
-                              className="text-primary/40 hover:text-red-400 transition-colors p-2"
+                              className="rounded-2xl border border-primary/10 bg-white p-2 text-primary/60 transition-colors hover:border-red-200 hover:text-red-400"
                             >
                               <Trash2 size={18} />
                             </button>
@@ -260,8 +261,8 @@ export default function CartPage() {
                       </motion.div>
                     ))
                   ) : (
-                    <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10">
-                      <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30">
+                    <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10 shadow-xl shadow-charcoal/10">
+                      <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30 shadow-inner">
                         <ShoppingBag size={40} strokeWidth={1} />
                       </div>
                       <div className="space-y-2">
@@ -289,9 +290,9 @@ export default function CartPage() {
 
             {/* ── Order Summary ── */}
             {cart.length > 0 && (
-              <div className="lg:w-[400px] shrink-0">
+              <div className="lg:w-100 shrink-0">
                 <div className="sticky top-32 space-y-6">
-                  <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] border border-primary/5 shadow-2xl shadow-primary/5 space-y-8">
+                  <div className="rounded-[2.5rem] border border-primary/10 bg-linear-to-br from-white via-[#fff9f1] to-[#fef3d6] p-8 sm:p-10 shadow-2xl shadow-primary/10 space-y-8">
                     <h2 className="text-2xl font-serif font-medium text-primary tracking-tight">
                       Order <span className="italic font-light text-gold">Summary</span>
                     </h2>
@@ -377,11 +378,11 @@ export default function CartPage() {
 
                   {/* Trust Badges */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-5 bg-white rounded-3xl border border-primary/5 text-center space-y-1">
+                    <div className="p-5 bg-white rounded-3xl border border-primary/5 text-center space-y-1 shadow-sm">
                       <p className="text-[9px] font-black text-primary uppercase tracking-widest">Safe Delivery</p>
                       <p className="text-[8px] text-primary/40 font-medium">Insured shipping India-wide</p>
                     </div>
-                    <div className="p-5 bg-white rounded-3xl border border-primary/5 text-center space-y-1">
+                    <div className="p-5 bg-white rounded-3xl border border-primary/5 text-center space-y-1 shadow-sm">
                       <p className="text-[9px] font-black text-primary uppercase tracking-widest">Authentic</p>
                       <p className="text-[8px] text-primary/40 font-medium">Handcrafted Artisan Pieces</p>
                     </div>

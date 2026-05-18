@@ -20,23 +20,27 @@ export default function WishlistPage() {
       <DoorTransition />
       <Header variant="light" />
       
-      <div className="container mx-auto px-6 pt-52 pb-32">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
-            <div className="space-y-4">
-              <BackButton className="mb-4" />
-              <h1 className="font-serif text-5xl md:text-7xl text-primary font-black leading-tight">
-                Your <span className="italic font-light text-gold">Wishlist.</span>
+      <div className="container mx-auto px-6 pt-38 pb-32">
+        <div className="mx-auto space-y-10">
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-8 rounded-[3rem] border border-charcoal/10 bg-white/90 p-8 shadow-2xl shadow-charcoal/5">
+            <div className="space-y-4 max-w-2xl">
+              <BackButton className="mb-2" />
+              <h1 className="font-serif text-4xl md:text-5xl text-primary font-black leading-tight">
+                Your <span className="font-light text-gold">Wishlist.</span>
               </h1>
-              <p className="text-primary/70 text-lg font-light max-w-lg leading-relaxed">
-                Pieces you've curated for your future home. {wishlist.length} {wishlist.length === 1 ? 'treasure' : 'treasures'} saved.
+              <p className="text-sm text-primary/70">
+                Curate the pieces you love and keep them ready for your next design chapter.
               </p>
+            </div>
+            <div className="rounded-3xl border border-charcoal/10 bg-[#fff8e5] px-6 py-5 text-center shadow-sm">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-charcoal/40">Saved Items</p>
+              <p className="mt-3 text-3xl font-black text-primary">{wishlist.length}</p>
             </div>
           </div>
 
           {wishlist.length === 0 ? (
-            <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10">
-              <div className="w-20 h-20 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30">
+            <div className="text-center py-24 space-y-8 bg-white rounded-[3rem] border border-dashed border-primary/10 shadow-xl shadow-charcoal/10">
+              <div className="w-24 h-24 bg-[#fdf9f3] rounded-full flex items-center justify-center mx-auto text-primary/30 shadow-inner">
                 <Heart size={40} strokeWidth={1} />
               </div>
               <div className="space-y-2">
@@ -52,7 +56,7 @@ export default function WishlistPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               <AnimatePresence mode="popLayout">
                 {wishlist.map((item, index) => (
                   <motion.div
@@ -60,8 +64,9 @@ export default function WishlistPage() {
                     layout
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ delay: index * 0.1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: index * 0.08 }}
+                    className="rounded-[2.5rem] border border-charcoal/10 bg-white shadow-sm"
                   >
                     <ProductCard 
                       id={item.product._id}
@@ -69,7 +74,7 @@ export default function WishlistPage() {
                       price={item.product.price}
                       image={item.product.image}
                       category={item.product.category?.name || "Decor"}
-                      rating={item.product.rating || 4.5}
+                      rating={((item.product as any).rating as number) || 4.5}
                     />
                   </motion.div>
                 ))}
