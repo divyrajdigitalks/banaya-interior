@@ -32,6 +32,7 @@ export interface Order {
   };
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   paymentStatus: 'Pending' | 'Paid' | 'Failed';
+  paymentMethod?: 'COD' | 'Razorpay';
   createdAt: string;
 }
 
@@ -67,6 +68,8 @@ class OrderService {
     razorpay_signature: string;
     totalAmount: number;
     shippingAddress?: any;
+    couponCode?: string;
+    discountAmount?: number;
   }) {
     const res = await api.post(endPointApi.verifyPayment, data);
     return res.data;

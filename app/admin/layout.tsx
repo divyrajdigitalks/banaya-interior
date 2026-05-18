@@ -65,8 +65,8 @@ const sidebarLinks = [
   { name: "Coupons", icon: ShoppingBag, href: "/admin/coupons" },
   { type: "label", name: "System" },
   { name: "Inquiries", icon: Users, href: "/admin/inquiries" },
-  { name: "Admins", icon: Users, href: "/admin/admins" },
-  { name: "Settings", icon: Settings, href: "/admin/settings" },
+  // { name: "Admins", icon: Users, href: "/admin/admins" },
+  // { name: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
@@ -182,8 +182,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     key={navLink.href}
                     href={navLink.href}
                     className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 group relative ${isActive
-                        ? "bg-gold text-charcoal shadow-lg shadow-gold/20 font-medium"
-                        : "text-white/50 hover:text-white hover:bg-white/5 font-normal"
+                      ? "bg-gold text-charcoal shadow-lg shadow-gold/20 font-medium"
+                      : "text-white/50 hover:text-white hover:bg-white/5 font-normal"
                       }`}
                   >
                     <navLink.icon size={18} className={isActive ? "text-charcoal" : "text-white/30 group-hover:text-gold transition-colors"} />

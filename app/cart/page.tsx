@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, ShoppingCart, ArrowLeft, Ticket, Check, X, Loader2, CheckCircle2, CreditCard } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +31,28 @@ export default function CartPage() {
   const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
   const [checkoutTotal, setCheckoutTotal] = useState(0);
   const [checkoutDiscount, setCheckoutDiscount] = useState(0);
+
+  // Address and COD State
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'Razorpay' | 'COD'>('Razorpay');
+  const [shippingAddress, setShippingAddress] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: ""
+  });
+
+  useEffect(() => {
+    if (user) {
+      setShippingAddress(prev => ({
+        ...prev,
+        name: user.name || "",
+        phone: (user as any).mobile || (user as any).phone || ""
+      }));
+    }
+  }, [user]);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.product?.price || 0) * item.quantity, 0);
   const shipping = subtotal > 0 ? 500 : 0;
@@ -64,100 +86,122 @@ export default function CartPage() {
     setCouponCode("");
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cart.length === 0) return;
     if (!user) {
       toast.error("Please login to checkout");
       router.push("/login");
       return;
     }
-    setIsCheckingOut(true);
     setCheckoutItems([...cart]);
     setCheckoutTotal(total);
     setCheckoutDiscount(discount);
+    setShowCheckoutModal(true);
+  };
+
+  const executeCheckout = async () => {
+    if (!shippingAddress.name || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city || !shippingAddress.pincode) {
+      toast.error("Please fill all shipping details");
+      return;
+    }
+
+    setIsCheckingOut(true);
 
     try {
-      // 1. Create Razorpay order
-      const razorpayData = await (orderService as any).createRazorpayOrder(total);
-      if (!razorpayData.success) throw new Error('Failed to create payment order');
-
-      const rzpOrder = razorpayData.data;
-
-      // 2. Load Razorpay script dynamically
-      const loadScript = () =>
-        new Promise<boolean>((resolve) => {
-          if ((window as any).Razorpay) return resolve(true);
-          const script = document.createElement('script');
-          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-          script.onload = () => resolve(true);
-          script.onerror = () => resolve(false);
-          document.body.appendChild(script);
+      if (paymentMethod === 'COD') {
+        const response = await orderService.createOrder({
+          shippingAddress,
+          totalAmount: total,
+          // Add other necessary fields if required by your backend
         });
 
-      const loaded = await loadScript();
-      if (!loaded) throw new Error('Razorpay SDK failed to load');
+        if (response.success) {
+          await clearCart();
+          setDiscount(0);
+          setAppliedCoupon(null);
+          setCouponCode('');
+          setShowCheckoutModal(false);
+          setShowSuccess(true);
+          toast.success('Order placed successfully (COD)!');
+        } else {
+          throw new Error(response.error || 'Failed to place order');
+        }
+      } else {
+        // Razorpay Payment Flow
+        const razorpayData = await orderService.createRazorpayOrder(total);
+        if (!razorpayData.success) throw new Error('Failed to create payment order');
 
-      // 3. Open Razorpay modal
-      const options = {
-        key: rzpOrder.key,  // key sent securely from backend
-        amount: rzpOrder.amount,
-        currency: rzpOrder.currency,
-        name: 'Banaya Interiors',
-        description: `Order for ${cart.length} item(s)`,
-        order_id: rzpOrder.id,
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || '',
-          contact: (user as any)?.mobile || (user as any)?.phone || '',
-        },
-        theme: { color: '#d4af37' },
-        handler: async (response: any) => {
-          // 4. Verify payment
-          try {
-            const verifyRes = await (orderService as any).verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              totalAmount: total,
-              couponCode: appliedCoupon?.code || undefined,
-              discountAmount: discount || 0,
-              shippingAddress: {
-                name: user?.name || '',
-                phone: (user as any)?.mobile || (user as any)?.phone || '',
-                email: user?.email || '',
-              }
-            });
+        const rzpOrder = razorpayData.data;
 
-            if (verifyRes.success) {
-              await clearCart();
-              setDiscount(0);
-              setAppliedCoupon(null);
-              setCouponCode('');
-              setShowSuccess(true);
-              toast.success('Payment successful! Order placed.');
-            } else {
-              throw new Error('Payment verification failed');
-            }
-          } catch (err: any) {
-            toast.error(err?.response?.data?.error || 'Payment verification failed');
-          } finally {
-            setIsCheckingOut(false);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setIsCheckingOut(false);
-            toast.error('Payment cancelled');
+        const loadScript = () =>
+          new Promise<boolean>((resolve) => {
+            if ((window as any).Razorpay) return resolve(true);
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+
+        const loaded = await loadScript();
+        if (!loaded) throw new Error('Razorpay SDK failed to load');
+
+        const options = {
+          key: rzpOrder.key,
+          amount: rzpOrder.amount,
+          currency: rzpOrder.currency,
+          name: 'Banaya Interiors',
+          description: `Order for ${cart.length} item(s)`,
+          order_id: rzpOrder.id,
+          prefill: {
+            name: shippingAddress.name,
+            email: user?.email || '',
+            contact: shippingAddress.phone,
           },
-        },
-      };
+          theme: { color: '#d4af37' },
+          handler: async (response: any) => {
+            try {
+              const verifyRes = await orderService.verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                totalAmount: total,
+                couponCode: appliedCoupon?.code || undefined,
+                discountAmount: discount || 0,
+                shippingAddress: shippingAddress
+              });
 
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-      // isCheckingOut will be reset inside handler / ondismiss
+              if (verifyRes.success) {
+                await clearCart();
+                setDiscount(0);
+                setAppliedCoupon(null);
+                setCouponCode('');
+                setShowCheckoutModal(false);
+                setShowSuccess(true);
+                toast.success('Payment successful! Order placed.');
+              } else {
+                throw new Error('Payment verification failed');
+              }
+            } catch (err: any) {
+              toast.error(err?.response?.data?.error || 'Payment verification failed');
+            } finally {
+              setIsCheckingOut(false);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setIsCheckingOut(false);
+              toast.error('Payment cancelled');
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      }
     } catch (error: any) {
       console.error('Checkout Error:', error);
-      toast.error(error.message || 'Failed to initiate payment');
+      toast.error(error.message || 'Failed to process checkout');
       setIsCheckingOut(false);
     }
   };
@@ -219,10 +263,11 @@ export default function CartPage() {
                             <p className="text-lg font-black text-primary">₹{(item.product?.price || 0).toLocaleString()}</p>
                           </div>
 
-                          {((item as any).personalization?.name) && (
-                            <div className="mt-4 rounded-3xl border border-primary/10 bg-[#f8f3ea] p-4 text-sm font-bold text-primary">
-                              <p className="text-[9px] font-black uppercase tracking-widest text-gold">Personalization</p>
-                              <p className="mt-2 text-[10px] font-medium text-primary/80">{(item as any).personalization.name}</p>
+                          {/* Personalization Preview */}
+                          {item.personalization?.name && (
+                            <div className="mt-3 p-3 bg-[#fdf9f3] rounded-xl border border-primary/5 inline-block self-start">
+                              <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-1">Personalization</p>
+                              <p className="text-xs font-medium text-primary/70">{item.personalization.name}</p>
                             </div>
                           )}
 
@@ -359,20 +404,11 @@ export default function CartPage() {
 
                     <button 
                       onClick={handleCheckout}
-                      disabled={isCheckingOut || cart.length === 0}
+                      disabled={cart.length === 0}
                       className="w-full py-5 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-gold transition-all duration-300 shadow-xl shadow-primary/10 disabled:opacity-50 flex items-center justify-center gap-3"
                     >
-                      {isCheckingOut ? (
-                        <>
-                          <Loader2 size={14} className="animate-spin" />
-                          <span>Initiating Payment...</span>
-                        </>
-                      ) : (
-                        <>
-                          <CreditCard size={14} />
-                          <span>Pay with Razorpay</span>
-                        </>
-                      )}
+                      <span>Proceed to Checkout</span>
+                      <ArrowRight size={14} />
                     </button>
                   </div>
 
@@ -395,6 +431,176 @@ export default function CartPage() {
       </div>
       
       {/* Confirm modal removed – Razorpay handles confirmation */}
+
+      {/* ── Checkout & Address Dialog Box ── */}
+      <AnimatePresence>
+        {showCheckoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-[3rem] p-8 md:p-10 max-w-2xl w-full space-y-6 shadow-2xl border border-primary/5 max-h-[90vh] overflow-y-auto custom-scrollbar"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start border-b border-primary/10 pb-4">
+                <div>
+                  <h3 className="text-2xl font-serif font-black text-primary">Checkout Details</h3>
+                  <p className="text-[9px] uppercase tracking-widest font-black text-gold mt-1">Specify Delivery & Payment</p>
+                </div>
+                <button 
+                  onClick={() => setShowCheckoutModal(false)}
+                  className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-primary/40 hover:text-primary transition-all"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Shipping Address Fields */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-primary/40 uppercase tracking-widest">1. Shipping Address</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">Full Name</label>
+                    <input 
+                      type="text" 
+                      value={shippingAddress.name}
+                      onChange={(e) => setShippingAddress({...shippingAddress, name: e.target.value})}
+                      placeholder="Receiver's Name"
+                      className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">Phone Number</label>
+                    <input 
+                      type="text" 
+                      value={shippingAddress.phone}
+                      onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
+                      placeholder="10-digit Phone"
+                      className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">Street Address</label>
+                    <input 
+                      type="text" 
+                      value={shippingAddress.address}
+                      onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
+                      placeholder="Flat, House no., Building, Apartment, Street name"
+                      className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">City</label>
+                    <input 
+                      type="text" 
+                      value={shippingAddress.city}
+                      onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                      placeholder="City"
+                      className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">State</label>
+                        <input 
+                          type="text" 
+                          value={shippingAddress.state}
+                          onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
+                          placeholder="State"
+                          className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-primary/60 uppercase tracking-wider">Pincode</label>
+                        <input 
+                          type="text" 
+                          value={shippingAddress.pincode}
+                          onChange={(e) => setShippingAddress({...shippingAddress, pincode: e.target.value})}
+                          placeholder="6-digits"
+                          className="w-full h-12 px-4 bg-neutral-50 border border-primary/10 rounded-xl text-xs font-bold text-primary focus:bg-white focus:border-gold outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Method Selector */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-primary/40 uppercase tracking-widest">2. Payment Method</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setPaymentMethod('Razorpay')}
+                    className={`flex flex-col items-center gap-3 p-5 rounded-2xl border text-center transition-all ${
+                      paymentMethod === 'Razorpay' 
+                        ? 'border-gold bg-gold/5 text-primary shadow-lg shadow-gold/5' 
+                        : 'border-primary/10 hover:border-gold/40 text-primary/60 bg-white'
+                    }`}
+                  >
+                    <CreditCard size={20} className={paymentMethod === 'Razorpay' ? 'text-gold' : 'text-primary/40'} />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider">Pay Online</p>
+                      <p className="text-[8px] font-bold text-primary/40 mt-0.5">UPI, Cards, NetBanking</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => setPaymentMethod('COD')}
+                    className={`flex flex-col items-center gap-3 p-5 rounded-2xl border text-center transition-all ${
+                      paymentMethod === 'COD' 
+                        ? 'border-gold bg-gold/5 text-primary shadow-lg shadow-gold/5' 
+                        : 'border-primary/10 hover:border-gold/40 text-primary/60 bg-white'
+                    }`}
+                  >
+                    <ShoppingBag size={20} className={paymentMethod === 'COD' ? 'text-gold' : 'text-primary/40'} />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider">Cash On Delivery</p>
+                      <p className="text-[8px] font-bold text-primary/40 mt-0.5">Pay cash on delivery</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Order Total Review */}
+              <div className="p-4 bg-[#fdf9f3] rounded-2xl border border-primary/5 flex justify-between items-center text-sm font-bold text-primary">
+                <span className="uppercase text-[9px] tracking-widest text-primary/60">Final Investment</span>
+                <span className="text-xl text-gold">₹{total.toLocaleString()}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => setShowCheckoutModal(false)}
+                  className="flex-1 py-4 border border-primary/10 text-primary/60 hover:text-primary text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-neutral-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={executeCheckout}
+                  disabled={isCheckingOut}
+                  className="flex-1 py-4 bg-primary hover:bg-gold text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isCheckingOut ? (
+                    <>
+                      <Loader2 size={12} className="animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <span>{paymentMethod === 'COD' ? 'Place COD Order' : 'Pay via Razorpay'}</span>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Success Modal ── */}
       <AnimatePresence>

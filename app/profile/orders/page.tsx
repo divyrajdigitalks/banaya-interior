@@ -10,7 +10,10 @@ import {
   CheckCircle2, 
   Truck, 
   ShoppingBag,
-  ArrowLeft
+  ArrowLeft,
+  CreditCard,
+  Banknote,
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { orderService, type Order } from "@/lib/api";
@@ -145,6 +148,48 @@ export default function UserOrdersPage() {
                               {order.totalAmount.toLocaleString()}
                             </p>
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Delivery Address & Payment Method */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-dashed border-charcoal/10">
+                        <div className="flex items-start gap-3">
+                          <MapPin size={14} className="text-gold shrink-0 mt-0.5" />
+                          <div className="space-y-0.5">
+                            <p className="text-[8px] font-black text-charcoal/30 uppercase tracking-[0.2em]">Shipping Destination</p>
+                            <p className="text-xs font-bold text-charcoal">{order.shippingAddress?.name || user?.name} ({order.shippingAddress?.phone || (user as any)?.mobile})</p>
+                            <p className="text-[11px] text-charcoal/60 leading-relaxed">
+                              {order.shippingAddress?.address ? (
+                                `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`
+                              ) : (
+                                "No Shipping Address Stored"
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 md:justify-end md:text-right">
+                          {order.paymentMethod === 'COD' ? (
+                            <>
+                              <div className="space-y-0.5 md:order-1">
+                                <p className="text-[8px] font-black text-charcoal/30 uppercase tracking-[0.2em]">Payment Mode</p>
+                                <p className="text-xs font-black text-gold uppercase tracking-wider">Cash on Delivery</p>
+                                <p className="text-[10px] text-charcoal/40 font-bold uppercase">
+                                  {order.paymentStatus === 'Paid' ? 'Paid ✓' : 'Pay on Delivery'}
+                                </p>
+                              </div>
+                              <Banknote size={14} className="text-gold shrink-0 mt-0.5 md:order-2" />
+                            </>
+                          ) : (
+                            <>
+                              <div className="space-y-0.5 md:order-1">
+                                <p className="text-[8px] font-black text-charcoal/30 uppercase tracking-[0.2em]">Payment Mode</p>
+                                <p className="text-xs font-black text-emerald-600 uppercase tracking-wider">Paid Online</p>
+                                <p className="text-[10px] text-charcoal/40 font-bold uppercase">Verified via Razorpay</p>
+                              </div>
+                              <CreditCard size={14} className="text-emerald-600 shrink-0 mt-0.5 md:order-2" />
+                            </>
+                          )}
                         </div>
                       </div>
 
