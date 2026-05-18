@@ -239,34 +239,53 @@ export default function ProductDetailPage() {
                 <Heart size={20} className={isWishlisted ? "fill-white" : ""} />
               </button>
 
-              <div className="relative aspect-[4/3] w-full">
-                {isVideo(images[selectedImage]) ? (
-                  <video 
-                    src={images[selectedImage]} 
-                    className="w-full h-full object-cover" 
-                    autoPlay 
-                    muted 
-                    loop 
-                    controls
-                  />
-                ) : (
-                  <Image
-                    src={images[selectedImage]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    priority
-                    loading="eager"
-                  />
-                )}
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/50 hover:bg-white text-primary transition-all">
-                  <ChevronLeft size={24} />
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedImage}
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    className="w-full h-full relative"
+                  >
+                    {isVideo(images[selectedImage]) ? (
+                      <video 
+                        src={images[selectedImage]} 
+                        className="w-full h-full object-cover" 
+                        autoPlay 
+                        muted 
+                        loop 
+                        controls
+                      />
+                    ) : (
+                      <Image
+                        src={images[selectedImage]}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        priority
+                        loading="eager"
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+                
+                <button 
+                  onClick={() => setSelectedImage((selectedImage - 1 + images.length) % images.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white text-primary transition-all duration-300 shadow-md active:scale-90 hover:scale-105 z-10 border border-primary/5"
+                >
+                  <ChevronLeft size={20} />
                 </button>
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/50 hover:bg-white text-primary transition-all">
-                  <ChevronRight size={24} />
+                <button 
+                  onClick={() => setSelectedImage((selectedImage + 1) % images.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 hover:bg-white text-primary transition-all duration-300 shadow-md active:scale-90 hover:scale-105 z-10 border border-primary/5"
+                >
+                  <ChevronRight size={20} />
                 </button>
-                <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1.5 rounded-lg flex items-center gap-2 text-[10px] font-bold text-primary shadow-sm cursor-pointer hover:bg-white transition-all">
-                  <Search size={14} /> Click to zoom
+                
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur border border-primary/5 px-4 py-2 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-primary shadow-sm cursor-pointer hover:bg-white transition-all">
+                  <Search size={12} className="text-gold" /> Click to zoom
                 </div>
               </div>
             </div>
@@ -277,7 +296,7 @@ export default function ProductDetailPage() {
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
                   className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
-                    selectedImage === idx ? "border-primary shadow-md scale-105" : "border-transparent opacity-70 hover:opacity-100"
+                    selectedImage === idx ? "border-gold shadow-md scale-105 z-10" : "border-gold/10 opacity-70 hover:opacity-100"
                   }`}
                 >
                   {isVideo(img) ? (
@@ -504,22 +523,7 @@ export default function ProductDetailPage() {
               <p className="text-[10px] text-primary/40 font-bold uppercase tracking-widest italic">Inclusive of all taxes</p>
             </div>
 
-            {/* Feature Highlights */}
-            <div className="grid grid-cols-4 gap-4 py-6 border-y border-primary/5">
-              {[
-                { icon: Sparkles, text: "Premium Sheesham Wood" },
-                { icon: User, text: "Handcrafted with Care" },
-                { icon: ShieldCheck, text: "Food Safe Finish" },
-                { icon: Truck, text: "Long Lasting Durability" }
-              ].map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-[#f8f5f0] flex items-center justify-center text-primary/60">
-                    <item.icon size={18} />
-                  </div>
-                  <p className="text-[8px] font-bold text-primary/40 leading-tight uppercase tracking-wider">{item.text}</p>
-                </div>
-              ))}
-            </div>
+        
 
             {/* Selection Options */}
             <div className="space-y-6">
@@ -692,24 +696,40 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Trust Info */}
-            <div className="bg-white rounded-2xl p-8 space-y-6 shadow-sm border border-primary/5">
+            <div className="grid grid-cols-3 gap-4 py-6 border-y border-primary/5 bg-[#fdf9f3]/40 rounded-3xl p-5">
               {[
                 { icon: Truck, title: "Estimated Delivery", desc: "3-5 business days" },
-                { icon: Sparkles, title: "Free Shipping", desc: "On orders above ₹1499" },
-                { icon: RotateCcw, title: "7 Days Return", desc: "Easy returns & exchanges" }
+                { icon: Sparkles, title: "Free Shipping", desc: "Above ₹1499" },
+                { icon: RotateCcw, title: "7 Days Return", desc: "Easy exchanges" }
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-6 group">
-                  <div className="w-12 h-12 rounded-xl bg-[#f8f5f0] flex items-center justify-center text-primary/60 group-hover:bg-primary group-hover:text-white transition-all">
-                    <item.icon size={22} />
+                <div key={idx} className="flex flex-col items-center text-center gap-1.5 group cursor-default">
+                  <div className="w-10 h-10 rounded-2xl bg-white border border-gold/15 flex items-center justify-center text-gold group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300 shadow-sm">
+                    <item.icon size={18} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-primary uppercase tracking-widest">{item.title}</h4>
-                    <p className="text-[10px] text-primary/40 font-bold">{item.desc}</p>
+                    <h4 className="text-[9px] font-black text-primary uppercase tracking-[0.1em]">{item.title}</h4>
+                    <p className="text-[8px] text-primary/50 font-medium mt-0.5">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
+            {/* Feature Highlights */}
+            <div className="grid grid-cols-4 gap-4 py-6 border-b border-primary/5">
+              {[
+                { icon: Sparkles, text: "Premium Sheesham Wood" },
+                { icon: User, text: "Handcrafted with Care" },
+                { icon: ShieldCheck, text: "Food Safe Finish" },
+                { icon: Truck, text: "Long Lasting Durability" }
+              ].map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-[#f8f5f0] flex items-center justify-center text-primary/60">
+                    <item.icon size={18} />
+                  </div>
+                  <p className="text-[8px] font-bold text-primary/40 leading-tight uppercase tracking-wider">{item.text}</p>
+                </div>
+              ))}
+            </div>
             {/* Why Choose Us */}
             <div className="space-y-6">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Why Choose Banaya Decor?</p>

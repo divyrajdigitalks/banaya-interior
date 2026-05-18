@@ -73,18 +73,37 @@ export default function UserOrdersPage() {
       <Header variant="light" />
       <div className="min-h-screen pt-40 pb-20 bg-[#fdf9f3]">
         <div className="container mx-auto px-6 md:px-12">
-          <div className="max-w-4xl mx-auto space-y-12">
+          <div className="mx-auto space-y-12">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div className="space-y-4">
-                <BackButton />
-                <h1 className="text-4xl md:text-5xl font-sans font-black text-charcoal tracking-tight uppercase">
-                  My <span className="text-gold">Orders</span>
-                </h1>
-              </div>
-              <div className="flex items-center gap-3 px-6 py-4 bg-white border border-charcoal/5 rounded-2xl shadow-xl shadow-charcoal/5">
-                <Package size={20} className="text-gold" />
-                <span className="text-sm font-bold text-charcoal">{orders.length} Orders Total</span>
+            <div className="relative overflow-hidden rounded-[3rem] border border-charcoal/10 bg-linear-to-br from-[#fffdf8] via-white to-[#fff7e7] p-8 md:p-10 shadow-2xl shadow-charcoal/10">
+              <div className="pointer-events-none absolute -right-24 top-16 h-56 w-56 rounded-full bg-gold/10 blur-3xl" />
+              <div className="pointer-events-none absolute left-1/2 top-10 h-44 w-44 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div className="space-y-4">
+                  <BackButton />
+                  <h1 className="font-serif text-4xl md:text-5xl text-primary font-black leading-tight">
+                    My <span className="font-light text-gold">Order</span>
+                  </h1>
+                  <p className="max-w-2xl text-sm text-primary/70">
+                    A curated overview of every purchase, status, and detail in one elegant place.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 w-full lg:w-auto">
+                  <div className="rounded-3xl border border-charcoal/10 bg-white/90 p-5 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-charcoal/40">Orders</p>
+                    <p className="mt-3 text-3xl font-black text-primary">{orders.length}</p>
+                  </div>
+                  <div className="rounded-3xl border border-charcoal/10 bg-white/90 p-5 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-charcoal/40">Total Spent</p>
+                    <p className="mt-3 text-3xl font-black text-gold">₹{orders.reduce((sum, order) => sum + order.totalAmount, 0).toLocaleString()}</p>
+                  </div>
+                  <div className="rounded-3xl border border-charcoal/10 bg-white/90 p-5 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-charcoal/40">Latest Status</p>
+                    <p className="mt-3 text-sm font-black text-primary">
+                      {orders[0]?.status || "No orders yet"}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -96,51 +115,55 @@ export default function UserOrdersPage() {
                     key={order._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-[2.5rem] border border-charcoal/5 overflow-hidden shadow-xl shadow-charcoal/5 hover:shadow-2xl transition-all duration-500 group"
+                    transition={{ delay: idx * 0.08 }}
+                    className="overflow-hidden rounded-[2.5rem] border border-charcoal/10 bg-white shadow-xl shadow-charcoal/5 transition-all duration-500 hover:-translate-y-1"
                   >
                     <div className="p-8 md:p-10 space-y-8">
                       {/* Order Meta */}
-                      <div className="flex flex-wrap items-center justify-between gap-6">
-                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em]">Order Reference</p>
-                          <p className="text-sm font-bold text-charcoal">#{order._id.slice(-8).toUpperCase()}</p>
+                      <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] lg:grid-cols-[1.5fr_1fr]">
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div className="rounded-3xl bg-[#fff8e8] border border-gold/10 p-5">
+                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/40">Order Reference</p>
+                            <p className="mt-3 text-sm font-black text-charcoal">#{order._id.slice(-8).toUpperCase()}</p>
+                          </div>
+                          <div className="rounded-3xl bg-[#eef6ff] border border-blue-100 p-5">
+                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/40">Ordered On</p>
+                            <p className="mt-3 text-sm font-black text-charcoal">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em]">Ordered On</p>
-                          <p className="text-sm font-bold text-charcoal">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em]">Status</p>
-                          <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </div>
-                        <div className="space-y-1 text-right">
-                          <p className="text-[9px] font-black text-charcoal/20 uppercase tracking-[0.2em]">Investment</p>
-                          <p className="text-xl font-black text-charcoal flex items-center justify-end gap-1">
-                            <IndianRupee size={16} className="text-gold" />
-                            {order.totalAmount.toLocaleString()}
-                          </p>
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
+                          <div className="rounded-3xl border border-charcoal/10 p-5 flex flex-col justify-between">
+                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/40">Status</p>
+                            <span className={`mt-3 inline-flex items-center justify-center rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border ${getStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </div>
+                          <div className="rounded-3xl bg-[#f9fafb] border border-charcoal/10 p-5 text-right">
+                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-charcoal/40">Investment</p>
+                            <p className="mt-3 text-xl font-black text-charcoal flex items-center justify-end gap-1">
+                              <IndianRupee size={16} className="text-gold" />
+                              {order.totalAmount.toLocaleString()}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
                       <div className="h-px bg-charcoal/5" />
 
                       {/* Items */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {order.items.map((item, i) => (
-                          <div key={i} className="flex gap-6 p-4 rounded-3xl bg-neutral-50 border border-charcoal/5 group/item hover:border-gold/20 transition-all">
-                            <div className="w-20 h-20 rounded-2xl bg-white border border-charcoal/5 overflow-hidden flex-shrink-0 shadow-sm">
-                              <img src={item.product?.image} alt={item.product?.name} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
+                          <div key={i} className="group flex gap-4 rounded-3xl border border-charcoal/10 bg-neutral-50 p-4 transition-all duration-300 hover:border-gold/20">
+                            <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-charcoal/10 bg-white shadow-sm">
+                              <img src={item.product?.image} alt={item.product?.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                             </div>
-                            <div className="flex-1 py-1">
-                              <p className="text-xs font-bold text-charcoal leading-tight line-clamp-2">{item.product?.name}</p>
-                              <p className="text-[10px] font-bold text-charcoal/40 mt-1 uppercase tracking-widest">Qty: {item.quantity}</p>
+                            <div className="flex-1">
+                              <p className="text-xs font-black text-charcoal leading-tight line-clamp-2">{item.product?.name}</p>
+                              <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-charcoal/40">Qty: {item.quantity}</p>
                               {item.personalization?.name && (
-                                <div className="mt-3 flex items-center gap-2">
-                                  <div className="w-1 h-4 bg-gold rounded-full" />
-                                  <span className="text-[9px] font-black text-gold uppercase tracking-widest">Personalized</span>
+                                <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-gold/10 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-gold">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+                                  Personalized
                                 </div>
                               )}
                             </div>
@@ -159,7 +182,7 @@ export default function UserOrdersPage() {
                   <p className="text-[10px] uppercase tracking-[0.2em] font-black text-charcoal/30 mt-3 max-w-xs mx-auto leading-relaxed">
                     Your collection is waiting to be started. Explore our shop for masterpieces.
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => router.push("/shop")}
                     className="mt-10 bg-charcoal text-white hover:bg-gold px-12 py-8 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all"
                   >
