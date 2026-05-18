@@ -94,9 +94,15 @@ export default function AdminProductsPage() {
       accessorKey: "stock",
       cell: (item: Product) => (
         <div className="flex items-center gap-1.5">
-          <div className={`w-1.5 h-1.5 rounded-full ${item.stock && item.stock > 0 ? 'bg-emerald-500' : 'bg-red-400'}`} />
-          <span className={`text-[11px] font-bold ${item.stock && item.stock > 0 ? 'text-emerald-500' : 'text-red-400'}`}>
-            {item.stock && item.stock > 0 ? item.stock : 'Out'}
+          <div className={`w-1.5 h-1.5 rounded-full ${
+            !item.stock || item.stock <= 0 ? 'bg-red-400' :
+            item.stock <= 5 ? 'bg-amber-400' : 'bg-emerald-500'
+          }`} />
+          <span className={`text-[11px] font-bold ${
+            !item.stock || item.stock <= 0 ? 'text-red-400' :
+            item.stock <= 5 ? 'text-amber-500' : 'text-emerald-500'
+          }`}>
+            {!item.stock || item.stock <= 0 ? 'Out of Stock' : item.stock <= 5 ? `Low (${item.stock})` : item.stock}
           </span>
         </div>
       )

@@ -806,15 +806,22 @@ export default function ProductDetailPage() {
                 <div className="flex items-center bg-[#f8f5f0] rounded-xl px-2">
                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 text-primary/40 hover:text-primary transition-colors"><Minus size={16} /></button>
                   <span className="w-10 text-center font-black text-primary">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="p-3 text-primary/40 hover:text-primary transition-colors"><Plus size={16} /></button>
+                  <button
+                    onClick={() => {
+                      const maxQty = product.stock ?? Infinity;
+                      if (quantity >= maxQty) { toast.error(`Only ${maxQty} item(s) available in stock`); return; }
+                      setQuantity(quantity + 1);
+                    }}
+                    className="p-3 text-primary/40 hover:text-primary transition-colors"
+                  ><Plus size={16} /></button>
                 </div>
                 <Button 
                   onClick={handleAddToCart}
-                  disabled={isAdding}
+                  disabled={isAdding || (product.stock !== undefined && product.stock <= 0)}
                   className="flex-1 bg-primary hover:bg-gold text-white font-black uppercase tracking-[0.2em] text-[10px] py-7 rounded-xl transition-all shadow-xl shadow-primary/10 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
                   {isAdding ? <Check size={18} /> : <ShoppingBag size={18} />}
-                  {isAdding ? "Added to Cart" : "Add to Cart"}
+                  {product.stock !== undefined && product.stock <= 0 ? "Out of Stock" : isAdding ? "Added to Cart" : "Add to Cart"}
                 </Button>
               </div>
 

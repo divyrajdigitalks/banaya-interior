@@ -102,13 +102,7 @@ export function ImageUpload({ value, onChange, onFileSelect, onRemove, label, cl
                 <Upload className="text-charcoal h-5 w-5" />
               </div>
             </div>
-            <Button
-              size="icon"
-              onClick={handleRemove}
-              className="absolute top-3 right-3 h-7 w-7 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg z-10 border-2 border-white"
-            >
-              <X size={14} />
-            </Button>
+
           </>
         ) : (
           <div className="flex flex-col items-center gap-2 text-charcoal/30 group-hover:text-gold transition-colors">

@@ -117,6 +117,12 @@ export default function LoginPage() {
               </span>
               <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
             </button>
+
+            <div className="text-center">
+              <Link href="/forgot-password" className="text-xs text-primary/40 hover:text-gold transition-colors font-bold">
+                Forgot your password?
+              </Link>
+            </div>
           </motion.form>
 
           <div className="text-center">
