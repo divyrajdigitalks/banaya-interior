@@ -179,7 +179,14 @@ export default function CartPage() {
                               </button>
                               <span className="text-xs font-black w-6 text-center text-primary">{item.quantity}</span>
                               <button
-                                onClick={() => updateQuantity(item.product?._id, item.quantity + 1)}
+                                onClick={() => {
+                                  const stock = (item.product as any)?.stock;
+                                  if (stock !== undefined && item.quantity >= stock) {
+                                    toast.error(`Only ${stock} item(s) available in stock`);
+                                    return;
+                                  }
+                                  updateQuantity(item.product?._id, item.quantity + 1);
+                                }}
                                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-primary/60 hover:text-primary transition-all"
                               >
                                 <Plus size={12} strokeWidth={3} />

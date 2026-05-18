@@ -11,6 +11,7 @@ export interface CartItem {
     category: string;
     description?: string;
     subcategoryId?: any;
+    stock?: number;
   };
   quantity: number;
 }

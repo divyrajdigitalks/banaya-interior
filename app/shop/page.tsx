@@ -527,7 +527,22 @@ function ShopContent() {
                 </div>
                 <p className="text-xs font-bold text-primary/60">Showing {filteredProducts.length} masterpieces</p>
               </div>
-              
+              {/* Search */}
+              <div className="relative w-full md:w-72">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30" size={16} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full h-11 pl-11 pr-10 bg-white border border-primary/10 rounded-xl text-sm font-medium outline-none focus:border-gold transition-all"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary/30 hover:text-primary transition-colors">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Grid */}
@@ -537,6 +552,7 @@ function ShopContent() {
                   <ProductCard 
                     key={product.id} 
                     {...product} 
+                    stock={product.stock}
                     originalPrice={product.price * 1.2}
                   />
                 ))}

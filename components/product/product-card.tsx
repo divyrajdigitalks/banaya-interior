@@ -20,6 +20,7 @@ interface ProductCardProps {
   tag?: string;
   rating?: number;
   reviewsCount?: string | number;
+  stock?: number;
 }
 
 export function ProductCard({ 
@@ -33,13 +34,18 @@ export function ProductCard({
   categoryId,
   tag,
   rating = 4.8,
-  reviewsCount = "4.2k"
+  reviewsCount = "4.2k",
+  stock
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore();
 
+  const isOutOfStock = stock !== undefined && stock <= 0;
+  const isLowStock = stock !== undefined && stock > 0 && stock <= 5;
+
   const handleQuickAdd = (e: React.MouseEvent) => {
+    if (isOutOfStock) return;
     e.preventDefault();
     e.stopPropagation();
     setIsAdding(true);
@@ -102,7 +108,17 @@ export function ProductCard({
             onMouseLeave={() => setIsHovered(false)}
           />
 
-          {/* Pagination Dots */}
+          {/* Out of Stock / Low Stock Badge */}
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] rounded-[1.5rem] flex items-center justify-center z-20">
+              <span className="bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg">Out of Stock</span>
+            </div>
+          )}
+          {isLowStock && (
+            <div className="absolute bottom-10 left-3 z-20">
+              <span className="bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow">Only {stock} left</span>
+            </div>
+          )}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1 z-20">
             {[...Array(3)].map((_, i) => (
               <div key={i} className={`w-1 h-1 rounded-full transition-all duration-500 ${i === 0 ? "bg-white w-3" : "bg-white/40"}`} />
@@ -144,16 +160,17 @@ export function ProductCard({
           <div className="mt-auto pt-1">
             <button
               onClick={handleQuickAdd}
-              disabled={isAdding}
+              disabled={isAdding || isOutOfStock}
               className={`w-full py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all duration-700 relative overflow-hidden shadow-lg shadow-[#3C2A1E]/5 group/btn ${
+                isOutOfStock ? "bg-primary/20 text-primary/40 cursor-not-allowed" :
                 isAdding ? "bg-emerald-500 text-white" : "bg-[#3C2A1E] text-white hover:bg-[#C9A962] hover:text-[#3C2A1E]"
               }`}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                {isAdding ? "Added" : "Add to Cart"}
-                {!isAdding && <ShoppingBag size={12} className="group-hover/btn:translate-x-1 transition-transform" />}
+                {isOutOfStock ? "Out of Stock" : isAdding ? "Added" : "Add to Cart"}
+                {!isAdding && !isOutOfStock && <ShoppingBag size={12} className="group-hover/btn:translate-x-1 transition-transform" />}
               </span>
-              <div className="absolute inset-0 bg-[#C9A962] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />
+              {!isOutOfStock && <div className="absolute inset-0 bg-[#C9A962] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-700" />}
             </button>
           </div>
         </div>

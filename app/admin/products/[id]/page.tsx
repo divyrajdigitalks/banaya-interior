@@ -249,6 +249,8 @@ export default function ProductFormPage() {
         subcategoryId: formData.subcategoryId,
         sku: formData.sku,
         stock: formData.stock ? Number(formData.stock) : undefined,
+        image: formData.image,
+        subImages: formData.subImages,
         sizes: formData.sizes,
         tags: formData.tags,
         isPersonalisable: formData.isPersonalisable,
